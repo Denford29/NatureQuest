@@ -8,8 +8,8 @@ using  Umbraco.Web;
 using  Umbraco.ModelsBuilder;
 using  Umbraco.ModelsBuilder.Umbraco;
 [assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "62af7f657426dc73")]
-[assembly:System.Reflection.AssemblyVersion("0.0.0.1")]
+[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "4946eb2c39373851")]
+[assembly:System.Reflection.AssemblyVersion("0.0.0.44")]
 
 
 // FILE: models.generated.cs
@@ -40,6 +40,731 @@ using  Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.Web.PublishedModels
 {
+	// Mixin Content Type with alias "generalContent"
+	/// <summary>General Content</summary>
+	public partial interface IGeneralContent : IPublishedContent
+	{
+		/// <summary>Banner Image</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		Image BannerImage { get; }
+
+		/// <summary>Page Heading</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string PageHeading { get; }
+
+		/// <summary>Page Text</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		IHtmlString PageText { get; }
+
+		/// <summary>Page Title</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string PageTitle { get; }
+	}
+
+	/// <summary>General Content</summary>
+	[PublishedModel("generalContent")]
+	public partial class GeneralContent : PublishedContentModel, IGeneralContent
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "generalContent";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<GeneralContent, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public GeneralContent(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+
+		///<summary>
+		/// Banner Image: The main heading image for the page
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("bannerImage")]
+		public Image BannerImage => GetBannerImage(this);
+
+		/// <summary>Static getter for Banner Image</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static Image GetBannerImage(IGeneralContent that) => that.Value<Image>("bannerImage");
+
+		///<summary>
+		/// Page Heading: The page's main heading, will default to the page name if not set
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("pageHeading")]
+		public string PageHeading => GetPageHeading(this);
+
+		/// <summary>Static getter for Page Heading</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetPageHeading(IGeneralContent that) => that.Value<string>("pageHeading");
+
+		///<summary>
+		/// Page Text: The general introduction text for the page
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("pageText")]
+		public IHtmlString PageText => GetPageText(this);
+
+		/// <summary>Static getter for Page Text</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static IHtmlString GetPageText(IGeneralContent that) => that.Value<IHtmlString>("pageText");
+
+		///<summary>
+		/// Page Title: This will be used for the display text for links to this page, if not set will default to the page name.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("pageTitle")]
+		public string PageTitle => GetPageTitle(this);
+
+		/// <summary>Static getter for Page Title</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetPageTitle(IGeneralContent that) => that.Value<string>("pageTitle");
+	}
+
+	// Mixin Content Type with alias "sEOSetting"
+	/// <summary>SEO Setting</summary>
+	public partial interface ISEosetting : IPublishedContent
+	{
+		/// <summary>Browser Title</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string BrowserTitle { get; }
+
+		/// <summary>Hide From Sitemap</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		bool HideFromSitemap { get; }
+
+		/// <summary>Meta Description</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string MetaDescription { get; }
+
+		/// <summary>Meta Keyword</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string MetaKeyword { get; }
+
+		/// <summary>Sitemap Frequency</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string SitemapFrequency { get; }
+
+		/// <summary>Sitemap Priority</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string SitemapPriority { get; }
+	}
+
+	/// <summary>SEO Setting</summary>
+	[PublishedModel("sEOSetting")]
+	public partial class SEosetting : PublishedContentModel, ISEosetting
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "sEOSetting";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<SEosetting, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public SEosetting(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+
+		///<summary>
+		/// Browser Title: Display in the browser's title, will default to page name and site name if not set
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("browserTitle")]
+		public string BrowserTitle => GetBrowserTitle(this);
+
+		/// <summary>Static getter for Browser Title</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetBrowserTitle(ISEosetting that) => that.Value<string>("browserTitle");
+
+		///<summary>
+		/// Hide From Sitemap: set this to hide this page from the sitemap xml
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("hideFromSitemap")]
+		public bool HideFromSitemap => GetHideFromSitemap(this);
+
+		/// <summary>Static getter for Hide From Sitemap</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static bool GetHideFromSitemap(ISEosetting that) => that.Value<bool>("hideFromSitemap");
+
+		///<summary>
+		/// Meta Description: Small description used by SEO bots to list and index the page e.g. google bots
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("metaDescription")]
+		public string MetaDescription => GetMetaDescription(this);
+
+		/// <summary>Static getter for Meta Description</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetMetaDescription(ISEosetting that) => that.Value<string>("metaDescription");
+
+		///<summary>
+		/// Meta Keyword: Page specific keywords for SEO listing and indexing
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("metaKeyword")]
+		public string MetaKeyword => GetMetaKeyword(this);
+
+		/// <summary>Static getter for Meta Keyword</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetMetaKeyword(ISEosetting that) => that.Value<string>("metaKeyword");
+
+		///<summary>
+		/// Sitemap Frequency: Enter how often the SEO bots should index this page
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("sitemapFrequency")]
+		public string SitemapFrequency => GetSitemapFrequency(this);
+
+		/// <summary>Static getter for Sitemap Frequency</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetSitemapFrequency(ISEosetting that) => that.Value<string>("sitemapFrequency");
+
+		///<summary>
+		/// Sitemap Priority: Enter the page priority for SEO indexing
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("sitemapPriority")]
+		public string SitemapPriority => GetSitemapPriority(this);
+
+		/// <summary>Static getter for Sitemap Priority</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetSitemapPriority(ISEosetting that) => that.Value<string>("sitemapPriority");
+	}
+
+	// Mixin Content Type with alias "openGraphSettings"
+	/// <summary>Open Graph Settings</summary>
+	public partial interface IOpenGraphSettings : IPublishedContent
+	{
+		/// <summary>Open Graph Description</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string OpenGraphDescription { get; }
+
+		/// <summary>Open Graph Image</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		Image OpenGraphImage { get; }
+
+		/// <summary>Open Graph Title</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string OpenGraphTitle { get; }
+	}
+
+	/// <summary>Open Graph Settings</summary>
+	[PublishedModel("openGraphSettings")]
+	public partial class OpenGraphSettings : PublishedContentModel, IOpenGraphSettings
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "openGraphSettings";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<OpenGraphSettings, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public OpenGraphSettings(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+
+		///<summary>
+		/// Open Graph Description: Enter the description used by social media apps
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("openGraphDescription")]
+		public string OpenGraphDescription => GetOpenGraphDescription(this);
+
+		/// <summary>Static getter for Open Graph Description</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetOpenGraphDescription(IOpenGraphSettings that) => that.Value<string>("openGraphDescription");
+
+		///<summary>
+		/// Open Graph Image: Set the image used by social media apps, standard size is 1200px X 630px
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("openGraphImage")]
+		public Image OpenGraphImage => GetOpenGraphImage(this);
+
+		/// <summary>Static getter for Open Graph Image</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static Image GetOpenGraphImage(IOpenGraphSettings that) => that.Value<Image>("openGraphImage");
+
+		///<summary>
+		/// Open Graph Title: Enter the title used by social media apps, will default to page name if not set
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("openGraphTitle")]
+		public string OpenGraphTitle => GetOpenGraphTitle(this);
+
+		/// <summary>Static getter for Open Graph Title</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetOpenGraphTitle(IOpenGraphSettings that) => that.Value<string>("openGraphTitle");
+	}
+
+	// Mixin Content Type with alias "pageSetting"
+	/// <summary>Page Setting</summary>
+	public partial interface IPageSetting : IPublishedContent
+	{
+		/// <summary>Hide from Menu</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		bool HideFromMenu { get; }
+
+		/// <summary>Hide From Side Menu</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		bool HideFromSideMenu { get; }
+	}
+
+	/// <summary>Page Setting</summary>
+	[PublishedModel("pageSetting")]
+	public partial class PageSetting : PublishedContentModel, IPageSetting
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "pageSetting";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<PageSetting, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public PageSetting(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+
+		///<summary>
+		/// Hide from Menu: Set this option to hide this page from the main menu
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("hideFromMenu")]
+		public bool HideFromMenu => GetHideFromMenu(this);
+
+		/// <summary>Static getter for Hide from Menu</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static bool GetHideFromMenu(IPageSetting that) => that.Value<bool>("hideFromMenu");
+
+		///<summary>
+		/// Hide From Side Menu: Set this option to hide this page from the side menu and any other extra menus e.g. footer
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("hideFromSideMenu")]
+		public bool HideFromSideMenu => GetHideFromSideMenu(this);
+
+		/// <summary>Static getter for Hide From Side Menu</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static bool GetHideFromSideMenu(IPageSetting that) => that.Value<bool>("hideFromSideMenu");
+	}
+
+	/// <summary>Home Page</summary>
+	[PublishedModel("homePage")]
+	public partial class HomePage : PublishedContentModel, IOpenGraphSettings, ISEosetting
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "homePage";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<HomePage, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public HomePage(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+
+		///<summary>
+		/// Open Graph Description: Enter the description used by social media apps
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("openGraphDescription")]
+		public string OpenGraphDescription => OpenGraphSettings.GetOpenGraphDescription(this);
+
+		///<summary>
+		/// Open Graph Image: Set the image used by social media apps, standard size is 1200px X 630px
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("openGraphImage")]
+		public Image OpenGraphImage => OpenGraphSettings.GetOpenGraphImage(this);
+
+		///<summary>
+		/// Open Graph Title: Enter the title used by social media apps, will default to page name if not set
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("openGraphTitle")]
+		public string OpenGraphTitle => OpenGraphSettings.GetOpenGraphTitle(this);
+
+		///<summary>
+		/// Browser Title: Display in the browser's title, will default to page name and site name if not set
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("browserTitle")]
+		public string BrowserTitle => SEosetting.GetBrowserTitle(this);
+
+		///<summary>
+		/// Hide From Sitemap: set this to hide this page from the sitemap xml
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("hideFromSitemap")]
+		public bool HideFromSitemap => SEosetting.GetHideFromSitemap(this);
+
+		///<summary>
+		/// Meta Description: Small description used by SEO bots to list and index the page e.g. google bots
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("metaDescription")]
+		public string MetaDescription => SEosetting.GetMetaDescription(this);
+
+		///<summary>
+		/// Meta Keyword: Page specific keywords for SEO listing and indexing
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("metaKeyword")]
+		public string MetaKeyword => SEosetting.GetMetaKeyword(this);
+
+		///<summary>
+		/// Sitemap Frequency: Enter how often the SEO bots should index this page
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("sitemapFrequency")]
+		public string SitemapFrequency => SEosetting.GetSitemapFrequency(this);
+
+		///<summary>
+		/// Sitemap Priority: Enter the page priority for SEO indexing
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("sitemapPriority")]
+		public string SitemapPriority => SEosetting.GetSitemapPriority(this);
+	}
+
+	/// <summary>Site Default Page</summary>
+	[PublishedModel("siteDefaultPage")]
+	public partial class SiteDefaultPage : PublishedContentModel, IGeneralContent, IOpenGraphSettings, IPageSetting, ISEosetting
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "siteDefaultPage";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<SiteDefaultPage, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public SiteDefaultPage(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+
+		///<summary>
+		/// Banner Image: The main heading image for the page
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("bannerImage")]
+		public Image BannerImage => GeneralContent.GetBannerImage(this);
+
+		///<summary>
+		/// Page Heading: The page's main heading, will default to the page name if not set
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("pageHeading")]
+		public string PageHeading => GeneralContent.GetPageHeading(this);
+
+		///<summary>
+		/// Page Text: The general introduction text for the page
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("pageText")]
+		public IHtmlString PageText => GeneralContent.GetPageText(this);
+
+		///<summary>
+		/// Page Title: This will be used for the display text for links to this page, if not set will default to the page name.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("pageTitle")]
+		public string PageTitle => GeneralContent.GetPageTitle(this);
+
+		///<summary>
+		/// Open Graph Description: Enter the description used by social media apps
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("openGraphDescription")]
+		public string OpenGraphDescription => OpenGraphSettings.GetOpenGraphDescription(this);
+
+		///<summary>
+		/// Open Graph Image: Set the image used by social media apps, standard size is 1200px X 630px
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("openGraphImage")]
+		public Image OpenGraphImage => OpenGraphSettings.GetOpenGraphImage(this);
+
+		///<summary>
+		/// Open Graph Title: Enter the title used by social media apps, will default to page name if not set
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("openGraphTitle")]
+		public string OpenGraphTitle => OpenGraphSettings.GetOpenGraphTitle(this);
+
+		///<summary>
+		/// Hide from Menu: Set this option to hide this page from the main menu
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("hideFromMenu")]
+		public bool HideFromMenu => PageSetting.GetHideFromMenu(this);
+
+		///<summary>
+		/// Hide From Side Menu: Set this option to hide this page from the side menu and any other extra menus e.g. footer
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("hideFromSideMenu")]
+		public bool HideFromSideMenu => PageSetting.GetHideFromSideMenu(this);
+
+		///<summary>
+		/// Browser Title: Display in the browser's title, will default to page name and site name if not set
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("browserTitle")]
+		public string BrowserTitle => SEosetting.GetBrowserTitle(this);
+
+		///<summary>
+		/// Hide From Sitemap: set this to hide this page from the sitemap xml
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("hideFromSitemap")]
+		public bool HideFromSitemap => SEosetting.GetHideFromSitemap(this);
+
+		///<summary>
+		/// Meta Description: Small description used by SEO bots to list and index the page e.g. google bots
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("metaDescription")]
+		public string MetaDescription => SEosetting.GetMetaDescription(this);
+
+		///<summary>
+		/// Meta Keyword: Page specific keywords for SEO listing and indexing
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("metaKeyword")]
+		public string MetaKeyword => SEosetting.GetMetaKeyword(this);
+
+		///<summary>
+		/// Sitemap Frequency: Enter how often the SEO bots should index this page
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("sitemapFrequency")]
+		public string SitemapFrequency => SEosetting.GetSitemapFrequency(this);
+
+		///<summary>
+		/// Sitemap Priority: Enter the page priority for SEO indexing
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("sitemapPriority")]
+		public string SitemapPriority => SEosetting.GetSitemapPriority(this);
+	}
+
+	/// <summary>Standard Page</summary>
+	[PublishedModel("standardPage")]
+	public partial class StandardPage : SiteDefaultPage
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "standardPage";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<StandardPage, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public StandardPage(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+	}
+
+	/// <summary>Product Landing Page</summary>
+	[PublishedModel("productLandingPage")]
+	public partial class ProductLandingPage : SiteDefaultPage
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "productLandingPage";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<ProductLandingPage, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public ProductLandingPage(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+	}
+
+	/// <summary>Product Category Page</summary>
+	[PublishedModel("productCategoryPage")]
+	public partial class ProductCategoryPage : SiteDefaultPage
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "productCategoryPage";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<ProductCategoryPage, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public ProductCategoryPage(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+	}
+
+	/// <summary>Product Page</summary>
+	[PublishedModel("productPage")]
+	public partial class ProductPage : SiteDefaultPage
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "productPage";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<ProductPage, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public ProductPage(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+	}
+
+	/// <summary>Stockist Landing Page</summary>
+	[PublishedModel("stockistLandingPage")]
+	public partial class StockistLandingPage : SiteDefaultPage
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "stockistLandingPage";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<StockistLandingPage, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public StockistLandingPage(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+	}
+
+	/// <summary>Stockist Page</summary>
+	[PublishedModel("stockistPage")]
+	public partial class StockistPage : SiteDefaultPage
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "stockistPage";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<StockistPage, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public StockistPage(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+	}
+
 	/// <summary>Folder</summary>
 	[PublishedModel("Folder")]
 	public partial class Folder : PublishedContentModel
