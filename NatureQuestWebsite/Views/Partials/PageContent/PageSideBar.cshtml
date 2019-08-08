@@ -1,0 +1,123 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<StandardPageViewModel>
+@{
+
+    var siteMenuModel = Model.SiteMenu;
+
+    <div class="col-xl-3 col-lg-4">
+        <button class="sidebar-toggle position-left" data-toggle="modal" data-target="#modalBlogSidebar">
+            <i class="icon-layout"></i>
+        </button>
+        <aside class="sidebar sidebar-offcanvas">
+            <!-- Widget Search-->
+            <section class="widget">
+                <form class="input-group form-group" method="get">
+                    <span class="input-group-btn">
+                        <button type="submit"><i class="icon-search"></i></button>
+                    </span>
+                    <input class="form-control" type="search" placeholder="Search blog">
+                </form>
+            </section>
+
+            @if (siteMenuModel.CategoryProductsLinks.Any())
+            {
+                <section class="widget widget-categories">
+                    <h3 class="widget-title">
+                        @siteMenuModel.CategoriesMenuTitle
+                    </h3>
+                    <ul>
+                        @foreach (var category in siteMenuModel.CategoryProductsLinks)
+                        {
+                            <li>
+                                <a href="@category.LinkUrl" title="@category.LinkTitle">
+                                    @category.LinkTitle
+                                </a>
+                                @if (category.ChildLinkItems.Any())
+                                {
+                                    <span>(@category.ChildLinkItems.Count)</span>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+
+            @if (siteMenuModel.FeaturedProductsLinks.Any())
+            {
+                var featureProducts = siteMenuModel.FeaturedProductsLinks.Take(3).ToList();
+                var promoItem = featureProducts.FirstOrDefault();
+                var allFeatureProducts = featureProducts.Skip(1).ToList();
+                <section class="widget widget-featured-posts">
+                    <h3 class="widget-title">
+                        Featured Products
+                    </h3>
+                    @foreach (var featuredLink in allFeatureProducts)
+                    {
+                        <div class="entry">
+                            <div class="entry-thumb">
+                                <a href="@featuredLink.LinkUrl" title="@featuredLink.LinkTitle">
+                                    <img alt="@featuredLink.LinkTitle" src="@featuredLink.ThumbLinkImage">
+                                </a>
+                            </div>
+                            <div class="entry-content">
+                                <h4 class="entry-title">
+                                    <a href="@featuredLink.LinkUrl" title="@featuredLink.LinkTitle">
+                                        @featuredLink.LinkTitle
+                                    </a>
+                                </h4>
+                                @if (featuredLink.ProductPrice != null)
+                                {
+                                    if (featuredLink.ProductPrice.SalePrice > 0)
+                                    {
+                                        <span class="entry-meta">
+                                            <del>$@featuredLink.ProductPrice.ProductPrice</del>
+                                            $@featuredLink.ProductPrice.SalePrice
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="entry-meta">
+                                            $@featuredLink.ProductPrice.ProductPrice
+                                        </span>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </section>
+
+                if (promoItem != null)
+                {
+                    <section class="promo-box" style="background-image: url(@promoItem.LinkImage);">
+                        <span class="overlay-dark" style="opacity: .40;"></span>
+                        <div class="promo-box-content text-center padding-top-2x padding-bottom-2x">
+                            <h3 class="text-bold text-light text-shadow">
+                                @promoItem.LinkTitle
+                            </h3>
+                            @if (promoItem.ProductPrice != null)
+                            {
+                                if (promoItem.ProductPrice.SalePrice > 0)
+                                {
+                                    <h4 class="text-light text-thin text-shadow">
+                                        <del>$@promoItem.ProductPrice.ProductPrice</del>
+                                        $@promoItem.ProductPrice.SalePrice
+                                    </h4>
+                                }
+                                else
+                                {
+                                    <h4 class="text-light text-thin text-shadow">
+                                        $@promoItem.ProductPrice.ProductPrice
+                                    </h4>
+                                }
+                            }
+                            <a class="btn btn-sm btn-primary" href="@promoItem.LinkUrl" title="@promoItem.LinkTitle">
+                                Shop Now
+                            </a>
+                        </div>
+                    </section>
+                }
+            }
+        </aside>
+    </div>
+
+}

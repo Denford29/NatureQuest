@@ -1,0 +1,78 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<List<ProductModel>>
+@{
+    //check if we have any feature products
+    if (Model.Any())
+    {
+        <section class="container padding-top-3x padding-bottom-3x">
+            <h3 class="text-center mb-30">
+                Featured Products
+            </h3>
+            <div class="owl-carousel" data-owl-carousel="{ &quot;nav&quot;: true, &quot;dots&quot;: true, &quot;loop&quot;: true, &quot;autoplay&quot;: true, &quot;autoplayTimeout&quot;: 5000, &quot;margin&quot;: 30, &quot;responsive&quot;: {&quot;0&quot;:{&quot;items&quot;:1},&quot;576&quot;:{&quot;items&quot;:2},&quot;768&quot;:{&quot;items&quot;:3},&quot;991&quot;:{&quot;items&quot;:4},&quot;1200&quot;:{&quot;items&quot;:4}} }">
+
+                @foreach (var productModel in Model)
+                {
+                    var productPage = productModel.ProductPage;
+                    var productFirstImage = productModel.ProductImages.FirstOrDefault();
+                    //if we haven't got a featured price, then just get the 1st normal price
+                    var productFeaturedPrice = productModel.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice) ??
+                                                                   productModel.ProductPrices.FirstOrDefault();
+
+                    //check if we have the image, product page and price
+                    if (productPage?.Id > 0 &&
+                        !string.IsNullOrWhiteSpace(productFirstImage?.ImageUrl) &&
+                        productFeaturedPrice != null) 
+                    {
+                        <!-- Product-->
+                        <div class="grid-item">
+                            <div class="product-card">
+                                @if (productFeaturedPrice.SalePercentage > 0)
+                                {
+                                    <div class="product-badge text-danger">
+                                        @productFeaturedPrice.SalePercentage% Off
+                                    </div>
+                                }
+
+                                <a class="product-thumb" href="@productPage.Url">
+                                    <img src="@productFirstImage.ImageUrl" alt="@productFirstImage.ImageAltText">
+                                </a>
+                                <h3 class="product-title">
+                                    <a href="@productPage.Url">
+                                        @productModel.ProductTitle
+                                    </a>
+                                </h3>
+                                @if (productFeaturedPrice.SalePrice > 0)
+                                {
+                                    <h4 class="product-price">
+                                        <del>$@productFeaturedPrice.ProductPrice</del>
+                                        $@productFeaturedPrice.SalePrice (@productFeaturedPrice.ProductVariant)
+                                    </h4>
+                                }
+                                else
+                                {
+                                    <h4 class="product-price">
+                                        $@productFeaturedPrice.ProductPrice (@productFeaturedPrice.ProductVariant)
+                                    </h4>
+                                }
+
+                                <div class="product-buttons">
+                                    @*<button class="btn btn-outline-secondary btn-sm btn-wishlist" data-toggle="tooltip" title="Wish-list">
+                                        <i class="icon-heart"></i>
+                                    </button>*@
+                                    <button class="btn btn-outline-primary btn-sm"
+                                            data-toast data-toast-type="success"
+                                            data-toast-position="topRight"
+                                            data-toast-icon="icon-circle-check"
+                                            data-toast-title="Product"
+                                            data-toast-message="successfully added to cart!">
+                                        Add to Cart
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </section>
+    }
+}

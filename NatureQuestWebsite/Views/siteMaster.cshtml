@@ -1,0 +1,47 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<StandardPageViewModel>
+@{
+    var currentModel = Model;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    @Html.Partial("/Views/Partials/Global/MetaContent.cshtml", currentModel)
+
+    <link rel="stylesheet" media="screen" href="/Css/vendor.min.css">
+    <link id="mainStyles" rel="stylesheet" media="screen" href="/Css/styles.css">
+    <script src="/Scripts/modernizr.min.js"></script>
+</head>
+
+<body>
+
+    @Html.Partial("/Views/Partials/PageContent/MobileSideBar.cshtml", Model)
+
+    @Html.Partial("/Views/Partials/Global/SiteMenu.cshtml", currentModel)
+
+    <div class="offcanvas-wrapper">
+
+        @RenderBody()
+
+        <!-- Popular Brands-->
+        @Html.Action("GetStockistSliders", "PageContent")
+
+        <!-- Site Footer-->
+        @Html.Partial("/Views/Partials/Global/SiteFooter.cshtml", currentModel)
+
+    </div>
+
+    <!-- Back To Top Button-->
+    <a class="scroll-to-top-btn" href="#">
+        <i class="icon-arrow-up"></i>
+    </a>
+    <!-- Backdrop-->
+    <div class="site-backdrop"></div>
+    <!-- JavaScript (jQuery) libraries, plugins and custom scripts-->
+    <script src="/Scripts/vendor.min.js"></script>
+    <script src="/Scripts/scripts.min.js"></script>
+</body>
+</html>

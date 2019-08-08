@@ -1,0 +1,19 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<StandardPageViewModel>
+@{
+    Layout = "siteMaster.cshtml";
+    var currentModel = Model;
+
+    @Html.Partial("/Views/Partials/PageContent/PageHeader.cshtml", Model)
+
+    <div class="container padding-bottom-3x mb-2">
+        <div class="row">
+
+            @Html.Partial("/Views/Partials/PageContent/PageText.cshtml", Model)
+
+            @Html.Partial("/Views/Partials/PageContent/PageSideBar.cshtml", Model)
+
+        </div>
+    </div>
+}
+
