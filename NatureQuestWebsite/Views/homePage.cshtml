@@ -1,7 +1,15 @@
-﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<StandardPageViewModel>
 @{
-	Layout = "siteMaster.cshtml";
+    Layout = "siteMaster.cshtml";
+    var currentModel = Model;
+
+    @Html.Action("GetHomeSlider", "PageContent")
+
+    @Html.Action("GetFeatureProductsSlider", "PageContent")
+
+    @Html.Action("GetPageServices", "PageContent")
+
+    @Html.Action("GetProductCategories", "PageContent")
+
 }
-
-@* the fun starts here *@
-

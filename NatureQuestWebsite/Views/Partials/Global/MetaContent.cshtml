@@ -1,0 +1,25 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<StandardPageViewModel>
+@{
+    <!--Browser title-->
+    <title>
+        @Model.BrowserTitle
+    </title>
+
+    <!-- SEO Meta Tags-->
+    <meta name="description" content="@Model.MetaDescription">
+    <meta name="keywords" content="@Model.MetaKeywords">
+    <meta name="author" content="RDM Online - https://rdmonline.com.au">
+
+    <!--OG Tags-->
+    <meta property="og:url" content="@Model.OgPageUrl" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="@Model.OgPageTitle" />
+    <meta property="og:description" content="@Model.OgPageDescription" />
+    <meta property="og:image" content="@Model.OgPageImage" />
+
+    <!-- Favicon and Apple Icons-->
+    <link rel="icon" type="image/x-icon" href="/Images/favicon.ico">
+    <link rel="icon" type="image/png" href="/Images/favicon.png">
+    <link rel="apple-touch-icon" href="/Images/apple-icon.png">
+}

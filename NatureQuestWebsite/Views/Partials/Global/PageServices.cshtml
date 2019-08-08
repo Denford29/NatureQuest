@@ -1,0 +1,87 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<IPublishedContent>
+@{
+    var globalDetailsPage = Model;
+    <section class="bg-faded container padding-top-3x padding-bottom-2x d-none d-md-block">
+        <div class="row">
+            @if (globalDetailsPage.HasProperty("shippingHeading") && globalDetailsPage.HasValue("shippingHeading"))
+            {
+                // get the shipping heading
+                var shippingHeading = globalDetailsPage.GetProperty("shippingHeading").Value().ToString();
+                <div class="col-md-3 col-sm-6 text-center mb-30">
+                    <img class="d-block w-90 img-thumbnail rounded-circle mx-auto mb-3" src="/Images/services/01.png" alt="Natures Quest - Shipping">
+                    <h6>
+                        @shippingHeading
+                    </h6>
+                    @*get the shipping text*@
+                    @if (globalDetailsPage.HasProperty("shippingText") && globalDetailsPage.HasValue("shippingText"))
+                    {
+                        var shippingText = globalDetailsPage.GetProperty("shippingText").Value().ToString();
+                        <p class="text-muted margin-bottom-none">
+                            @shippingText
+                        </p>
+                    }
+                </div>
+            }
+
+            @if (globalDetailsPage.HasProperty("guaranteeHeading") && globalDetailsPage.HasValue("guaranteeHeading"))
+            {
+                // get the guarantee heading
+                var guaranteeHeading = globalDetailsPage.GetProperty("guaranteeHeading").Value().ToString();
+                <div class="col-md-3 col-sm-6 text-center mb-30">
+                    <img class="d-block w-90 img-thumbnail rounded-circle mx-auto mb-3" src="/Images/services/02.png" alt="Natures Quest - Guarantee">
+                    <h6>
+                        @guaranteeHeading
+                    </h6>
+                    @*get the guarantee text*@
+                    @if (globalDetailsPage.HasProperty("guaranteeText") && globalDetailsPage.HasValue("guaranteeText"))
+                    {
+                        var guaranteeText = globalDetailsPage.GetProperty("guaranteeText").Value().ToString();
+                        <p class="text-muted margin-bottom-none">
+                            @guaranteeText
+                        </p>
+                    }
+                </div>
+            }
+
+            @if (globalDetailsPage.HasProperty("supportHeading") && globalDetailsPage.HasValue("supportHeading"))
+            {
+                // get the support heading
+                var supportHeading = globalDetailsPage.GetProperty("supportHeading").Value().ToString();
+                <div class="col-md-3 col-sm-6 text-center mb-30">
+                    <img class="d-block w-90 img-thumbnail rounded-circle mx-auto mb-3" src="/Images/services/03.png" alt="Natures Quest - Support">
+                    <h6>
+                        @supportHeading
+                    </h6>
+                    @*get the support text*@
+                    @if (globalDetailsPage.HasProperty("supportText") && globalDetailsPage.HasValue("supportText"))
+                    {
+                        var supportText = globalDetailsPage.GetProperty("supportText").Value().ToString();
+                        <p class="text-muted margin-bottom-none">
+                            @supportText
+                        </p>
+                    }
+                </div>
+            }
+
+            @if (globalDetailsPage.HasProperty("paymentHeading") && globalDetailsPage.HasValue("paymentHeading"))
+            {
+                // get the payment heading
+                var paymentHeading = globalDetailsPage.GetProperty("paymentHeading").Value().ToString();
+                <div class="col-md-3 col-sm-6 text-center mb-30">
+                    <img class="d-block w-90 img-thumbnail rounded-circle mx-auto mb-3" src="/Images/services/04.png" alt="Natures Quest - Payment">
+                    <h6>
+                        @paymentHeading
+                    </h6>
+                    @*get the payment text*@
+                    @if (globalDetailsPage.HasProperty("paymentText") && globalDetailsPage.HasValue("paymentText"))
+                    {
+                        var paymentText = globalDetailsPage.GetProperty("paymentText").Value().ToString();
+                        <p class="text-muted margin-bottom-none">
+                            @paymentText
+                        </p>
+                    }
+                </div>
+            }
+        </div>
+    </section>
+}

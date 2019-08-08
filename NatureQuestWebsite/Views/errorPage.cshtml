@@ -1,0 +1,28 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<StandardPageViewModel>
+@{
+    Layout = "siteMaster.cshtml";
+    var currentModel = Model;
+
+    @Html.Partial("/Views/Partials/PageContent/PageHeader.cshtml", Model)
+
+    <div class="container padding-bottom-3x mb-2">
+        <div class="row">
+
+            @*@Html.Partial("/Views/Partials/PageContent/PageText.cshtml", Model)*@
+            <div class="col-xl-9 col-lg-8">
+                <img class="d-block m-auto" src="/Images/404_art.jpg" style="width: 100%;" alt="Nature Quest - Error">
+                <div class="padding-top-1x mt-2 text-center">
+                    <h3>Page Not Found</h3>
+                    @if (!string.IsNullOrWhiteSpace(currentModel.PageContentText.ToString()))
+                    {
+                        @Html.Raw(currentModel.PageContentText)
+                    }
+                </div>
+            </div>
+
+            @Html.Partial("/Views/Partials/PageContent/PageSideBar.cshtml", Model)
+
+        </div>
+    </div>
+}

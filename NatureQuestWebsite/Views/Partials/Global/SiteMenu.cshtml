@@ -1,0 +1,377 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<StandardPageViewModel>
+@{
+    var siteMenuModel = Model.SiteMenu;
+    <!--get the current page id-->
+    var currentPageId = Model.Content.Level <= 2 ? Model.Content.Id : Model.Content.Ancestor(2).Id;
+
+    <div class="offcanvas-container" id="shop-categories">
+        <div class="offcanvas-header">
+            <h3 class="offcanvas-title">
+                @siteMenuModel.CategoriesMenuTitle
+            </h3>
+        </div>
+
+        @if (siteMenuModel.CategoryProductsLinks.Any())
+        {
+            <nav class="offcanvas-menu">
+                <ul class="menu">
+                    @foreach (var category in siteMenuModel.CategoryProductsLinks)
+                    {
+                        //set the class for the category items
+                        var childrenClass = category.ChildLinkItems.Any() ? "has-children" : "";
+                        <li class="@childrenClass">
+                            <span>
+                                <a href="@category.LinkUrl" title="@category.LinkTitle">
+                                    @category.LinkTitle
+                                </a>
+                                @*add the toggle link if we have child items*@
+                                @if (category.ChildLinkItems.Any())
+                                {
+                                    <span class="sub-menu-toggle"></span>
+                                }
+                            </span>
+                            @if (category.ChildLinkItems.Any())
+                            {
+                                <ul class="offcanvas-submenu">
+                                    @foreach (var childLink in category.ChildLinkItems)
+                                    {
+                                        <li>
+                                            <a href="@childLink.LinkUrl" title="@childLink.LinkTitle">
+                                                @childLink.LinkTitle
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    </div>
+
+    <div class="offcanvas-container" id="mobile-menu">
+        <a class="account-link" href="account-orders.html">
+            <div class="user-ava">
+                <img src="/Images/account/user-ava-md.jpg" alt="Daniel Adams">
+            </div>
+            <div class="user-info">
+                <h6 class="user-name">Daniel Adams</h6><span class="text-sm text-white opacity-60">290 Reward points</span>
+            </div>
+        </a>
+        <nav class="offcanvas-menu">
+            <ul class="menu">
+                <!--Add the home link-->
+                @if (siteMenuModel.HomeLinkItem?.LinkPage?.Id > 0)
+                {
+                    var homeLink = siteMenuModel.HomeLinkItem;
+                    //set the active class if the current page id is the same as the home page
+                    var activeClass = currentPageId == homeLink.LinkPage.Id ? "active" : "";
+
+                    <li class="@activeClass">
+                        <span>
+                            <a href="@homeLink.LinkUrl" title="@homeLink.LinkTitle">
+                                <span>Home</span>
+                            </a>
+                        </span>
+                    </li>
+                }
+
+                <!--add the rest of the links to the menu-->
+                @if (siteMenuModel.MenuLinks.Any())
+                {
+                    foreach (var menuLink in siteMenuModel.MenuLinks)
+                    {
+                        //set the active class if the current page id is the same as the menu link page
+                        var activeClass = currentPageId == menuLink.LinkPage.Id ? "active" : "";
+                        var childrenClass = menuLink.HasChildLinks ? "has-children" : "";
+                        <li class="@activeClass @childrenClass">
+                            <span>
+                                <a href="@menuLink.LinkUrl" title="@menuLink.LinkTitle">
+                                    <span>@menuLink.LinkTitle</span>
+                                </a>
+                                <!-- add the mobile toggle for sub menu-->
+                                @if (menuLink.HasChildLinks)
+                                {
+                                    <span class="sub-menu-toggle"></span>
+                                }
+                            </span>
+
+                            <!-- check if the menu link has got child item-->
+                            @if (menuLink.HasChildLinks)
+                            {
+                                <ul class="offcanvas-submenu">
+                                    @foreach (var childLinkItem in menuLink.ChildLinkItems)
+                                    {
+                                        <li>
+                                            <a href="@childLinkItem.LinkUrl" title="@childLinkItem.LinkTitle">
+                                                @childLinkItem.LinkTitle
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </li>
+                    }
+                }
+            </ul>
+        </nav>
+    </div>
+
+    <div class="topbar topbar-dark bg-dark">
+        <div class="topbar-column">
+            <!--Add the email address-->
+            @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteEmailAddress))
+            {
+                <a class="hidden-md-down" href="mailto:@siteMenuModel.SiteEmailAddress">
+                    <i class="icon-mail"></i>&nbsp; @siteMenuModel.SiteEmailAddress
+                </a>
+            }
+
+            <!--Add the phone number-->
+            @if (!string.IsNullOrWhiteSpace(siteMenuModel.SitePhoneNumber))
+            {
+                <a class="hidden-md-down" href="tel:@siteMenuModel.SitePhoneNumber">
+                    <i class="icon-bell"></i>&nbsp; @siteMenuModel.SitePhoneNumber
+                </a>
+            }
+        </div>
+        <div class="topbar-column">
+            @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteFacebook))
+            {
+                <a class="social-button sb-facebook shape-none sb-dark" href="@siteMenuModel.SiteFacebook" target="_blank" tittle="Facebook">
+                    <i class="socicon-facebook"></i>
+                </a>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteTwitter))
+            {
+                <a class="social-button sb-twitter shape-none sb-dark" href="@siteMenuModel.SiteTwitter" target="_blank" title="Twitter">
+                    <i class="socicon-twitter"></i>
+                </a>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteInstagram))
+            {
+                <a class="social-button sb-instagram shape-none sb-dark" href="@siteMenuModel.SiteInstagram" target="_blank" title="Instagram">
+                    <i class="socicon-instagram"></i>
+                </a>
+            }
+
+        </div>
+    </div>
+    <!-- Navbar-->
+
+    <!-- Remove "navbar-sticky" class to make navigation bar scrollable with the page.-->
+    <header class="navbar navbar-sticky">
+
+        <!-- Search form-->
+        <form class="site-search" method="get">
+            <input type="text" name="site_search" placeholder="Type to search...">
+            <div class="search-tools">
+                <span class="clear-search">Clear</span>
+                <span class="close-search"><i class="icon-cross"></i></span>
+            </div>
+        </form>
+
+        <div class="site-branding">
+            <div class="inner">
+                <!-- Off-Canvas Toggle (#shop-categories)-->
+                <a class="offcanvas-toggle cats-toggle" href="#shop-categories" data-toggle="offcanvas"></a>
+                <!-- Off-Canvas Toggle (#mobile-menu)-->
+                <a class="offcanvas-toggle menu-toggle" href="#mobile-menu" data-toggle="offcanvas"></a>
+                <!-- Site Logo-->
+                <a class="site-logo" href="/" title="Nature Quest">
+                    <img src="/Images/NatureQuest-Site-Logo.png" alt="Nature Quest">
+                </a>
+            </div>
+        </div>
+        <!-- Main Navigation-->
+        <nav class="site-menu">
+            <ul>
+                <!--Add the home link-->
+                @if (siteMenuModel.HomeLinkItem?.LinkPage?.Id > 0)
+                {
+                    var homeLink = siteMenuModel.HomeLinkItem;
+                    //set the active class if the current page id is the same as the home page
+                    var activeClass = currentPageId == homeLink.LinkPage.Id ? "active" : "";
+                    <li class="@activeClass">
+                        <a href="@homeLink.LinkUrl" title="@homeLink.LinkTitle">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                }
+
+                <!--add the rest of the links to the menu-->
+                @if (siteMenuModel.MenuLinks.Any())
+                {
+                    //add the products mega menu
+                    var productsMenuLink = siteMenuModel.MenuLinks.FirstOrDefault(link => link.IsProductLinks);
+                    if (productsMenuLink?.LinkPage?.Id > 0)
+                    {
+                        //set the active class if the current page id is the same as the menu link page
+                        var activeClass = currentPageId == productsMenuLink.LinkPage.Id ? "active" : "";
+                        <li class="has-megamenu @activeClass">
+                            <a href="@productsMenuLink.LinkUrl" title="@productsMenuLink.LinkTitle">
+                                <span>@productsMenuLink.LinkTitle</span>
+                            </a>
+                            @*check if the product has got visible product categories*@
+                            @if (productsMenuLink.HasChildLinks)
+                            {
+                                <ul class="mega-menu">
+                                    @foreach (var productCategory in productsMenuLink.ChildLinkItems)
+                                    {
+                                        <li>
+                                            <a href="@productCategory.LinkUrl" title="@productCategory.LinkTitle">
+                                                <span class="mega-menu-title">
+                                                    @productCategory.LinkTitle
+                                                </span>
+                                            </a>
+                                            @if (productCategory.HasChildLinks)
+                                            {
+                                                <ul class="sub-menu">
+                                                    @foreach (var product in productCategory.ChildLinkItems)
+                                                    {
+                                                        <li>
+                                                            <a href="@product.LinkUrl" title="@product.LinkTitle">
+                                                                @product.LinkTitle
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </li>
+                    }
+
+                    //add the rest of the menu items that are not products
+                    foreach (var menuLink in siteMenuModel.MenuLinks.Where(link => !link.IsProductLinks))
+                    {
+                        //set the active class if the current page id is the same as the menu link page
+                        var activeClass = currentPageId == menuLink.LinkPage.Id ? "active" : "";
+                        <li class="@activeClass">
+                            <a href="@menuLink.LinkUrl" title="@menuLink.LinkTitle">
+                                <span>@menuLink.LinkTitle</span>
+                            </a>
+                            <!-- check if the menu link has got child item-->
+                            @if (menuLink.HasChildLinks)
+                            {
+                                <ul class="sub-menu">
+                                    @foreach (var childLinkItem in menuLink.ChildLinkItems)
+                                    {
+                                        //check if the child link has got children
+                                        var hasChildrenClass = "";
+                                        if (childLinkItem.HasChildLinks)
+                                        {
+                                            hasChildrenClass = "has-children";
+                                        }
+                                        <li class="@hasChildrenClass">
+                                            <a href="@childLinkItem.LinkUrl" title="@childLinkItem.LinkTitle">
+                                                <span>@childLinkItem.LinkTitle</span>
+                                            </a>
+                                            @*add the extra child menu*@
+                                            @if (childLinkItem.HasChildLinks)
+                                            {
+                                                <ul class="sub-menu">
+                                                    @foreach (var linkItem in childLinkItem.ChildLinkItems)
+                                                    {
+                                                        <li>
+                                                            <a href="@linkItem.LinkUrl" title="@linkItem.LinkTitle">
+                                                                <span>@linkItem.LinkTitle</span>
+                                                            </a>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </li>
+                    }
+                }
+
+                @*add the featured products*@
+                @if (siteMenuModel.FeaturedProductsLinks.Any())
+                {
+                    <li class="has-megamenu">
+                        <a title="specials">
+                            <span>
+                                Specials
+                            </span>
+                        </a>
+                        <ul class="mega-menu">
+                            @foreach (var featuredLink in siteMenuModel.FeaturedProductsLinks.Take(4).ToList())
+                            {
+                                <li>
+                                    <a class="d-block img-thumbnail text-center navi-link" href="@featuredLink.LinkUrl" title="@featuredLink.LinkTitle">
+                                        <img alt="@featuredLink.LinkTitle" src="@featuredLink.LinkImage">
+                                        <h6 class="mt-3">
+                                            @featuredLink.LinkTitle
+                                        </h6>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                }
+            </ul>
+        </nav>
+        <!--Toolbar-->
+        <div class="toolbar">
+            <div class="inner">
+                <div class="tools">
+                    <div class="search"><i class="icon-search"></i></div>
+                    @*<div class="account">
+                        <a href="account-orders.html"></a><i class="icon-head"></i>
+                        <ul class="toolbar-dropdown">
+                            <li class="sub-menu-user">
+                                <div class="user-ava">
+                                    <img src="/Images/account/user-ava-sm.jpg" alt="Daniel Adams">
+                                </div>
+                                <div class="user-info">
+                                    <h6 class="user-name">Daniel Adams</h6><span class="text-xs text-muted">290 Reward points</span>
+                                </div>
+                            </li>
+                            <li><a href="account-profile.html">My Profile</a></li>
+                            <li><a href="account-orders.html">Orders List</a></li>
+                            <li><a href="account-wishlist.html">Wishlist</a></li>
+                            <li class="sub-menu-separator"></li>
+                            <li><a href="#"> <i class="icon-unlock"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                    <div class="cart">
+                        <a href="cart.html"></a><i class="icon-bag"></i><span class="count">3</span><span class="subtotal">$289.68</span>
+                        <div class="toolbar-dropdown">
+                            <div class="dropdown-product-item">
+                                <span class="dropdown-product-remove"><i class="icon-cross"></i></span><a class="dropdown-product-thumb" href="shop-single.html"><img src="/Images/cart-dropdown/01.jpg" alt="Product"></a>
+                                <div class="dropdown-product-info"><a class="dropdown-product-title" href="shop-single.html">Unionbay Park</a><span class="dropdown-product-details">1 x $43.90</span></div>
+                            </div>
+                            <div class="dropdown-product-item">
+                                <span class="dropdown-product-remove"><i class="icon-cross"></i></span><a class="dropdown-product-thumb" href="shop-single.html"><img src="/Images/cart-dropdown/02.jpg" alt="Product"></a>
+                                <div class="dropdown-product-info"><a class="dropdown-product-title" href="shop-single.html">Daily Fabric Cap</a><span class="dropdown-product-details">2 x $24.89</span></div>
+                            </div>
+                            <div class="dropdown-product-item">
+                                <span class="dropdown-product-remove"><i class="icon-cross"></i></span><a class="dropdown-product-thumb" href="shop-single.html"><img src="/Images/cart-dropdown/03.jpg" alt="Product"></a>
+                                <div class="dropdown-product-info"><a class="dropdown-product-title" href="shop-single.html">Haan Crossbody</a><span class="dropdown-product-details">1 x $200.00</span></div>
+                            </div>
+                            <div class="toolbar-dropdown-group">
+                                <div class="column"><span class="text-lg">Total:</span></div>
+                                <div class="column text-right"><span class="text-lg text-medium">$289.68&nbsp;</span></div>
+                            </div>
+                            <div class="toolbar-dropdown-group">
+                                <div class="column"><a class="btn btn-sm btn-block btn-secondary" href="cart.html">View Cart</a></div>
+                                <div class="column"><a class="btn btn-sm btn-block btn-success" href="checkout-address.html">Checkout</a></div>
+                            </div>
+                        </div>
+                    </div>*@
+                </div>
+            </div>
+        </div>
+    </header>
+
+}

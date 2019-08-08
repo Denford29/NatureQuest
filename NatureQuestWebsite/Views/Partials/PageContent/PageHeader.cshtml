@@ -1,0 +1,37 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<StandardPageViewModel>
+@{
+    var currentModel = Model;
+
+    <div class="page-title">
+        <div class="container">
+            <div class="column">
+                <h1>
+                    @currentModel.PageHeading
+                </h1>
+            </div>
+
+            @if (currentModel.BreadCrumbLinks.Any())
+            {
+                <div class="column">
+                    <ul class="breadcrumbs">
+                        @foreach (var link in currentModel.BreadCrumbLinks)
+                        {
+                            <li>
+                                <a href="@link.LinkUrl" title="@link.LinkTitle">
+                                    @link.LinkTitle
+                                </a>
+                            </li>
+                            <li class="separator">&nbsp;</li>
+                        }
+                        
+                        @*add the current page*@
+                        <li>
+                            @currentModel.PageTitle
+                        </li>
+                    </ul>
+                </div>
+            }
+        </div>
+    </div>
+}

@@ -28,7 +28,8 @@ namespace NatureQuestWebsite.Testing
         {
             Current.Factory = Mock.Of<IFactory>();
             _content = new Mock<IPublishedContent>();
-            _controller = new StandardPageController(new UmbracoMapper(), new ContentModel(_content.Object));
+            //_controller = new StandardPageController(new UmbracoMapper(), new ContentModel(_content.Object));
+            _controller = new StandardPageController();
         }
 
         /// <summary>

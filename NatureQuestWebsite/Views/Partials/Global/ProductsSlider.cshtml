@@ -1,0 +1,40 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<SliderItemModel>
+@{
+    //check if we have the slider item
+    if (Model.SliderItems.Any())
+    {
+
+        <section class="hero-slider" style="background-image: url(/images/Nature-Quest-Lavenders.png);">
+            @*<section class="hero-slider">*@
+            <div class="owl-carousel large-controls dots-inside"
+                 data-owl-carousel="{ &quot;nav&quot;: true, &quot;dots&quot;: true, &quot;loop&quot;: true, &quot;autoplay&quot;: true, &quot;autoplayTimeout&quot;: 7000 }">
+                @foreach (var slider in Model.SliderItems)
+                {
+                    <div class="item">
+                        <div class="container padding-top-3x">
+                            <div class="row justify-content-center align-items-center">
+                                <div class="col-lg-5 col-md-6 padding-bottom-2x text-md-left text-center">
+                                    <div class="from-bottom">
+                                        <div class="h2 text-body text-normal mb-2 pt-1">
+                                            @slider.SliderHeading
+                                        </div>
+                                        <div class="h2 text-body text-normal mb-4 pb-1">
+                                            <span class="text-bold">@slider.SliderText</span>
+                                        </div>
+                                    </div>
+                                    <a class="btn btn-primary btn-outline-primary scale-up delay-1" href="@slider.SliderUrl" title="@slider.SliderLinkPage.Name">
+                                        View @slider.SliderLinkPage.Name
+                                    </a>
+                                </div>
+                                <div class="col-md-6 padding-bottom-2x mb-3">
+                                    <img class="d-block mx-auto" src="@slider.SliderImage" alt="@slider.SliderLinkPage.Name">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+}

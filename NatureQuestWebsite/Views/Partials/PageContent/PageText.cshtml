@@ -1,0 +1,25 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<StandardPageViewModel>
+@{
+    var currentModel = Model;
+
+    <div class="col-xl-9 col-lg-8">
+        @if (!string.IsNullOrWhiteSpace(currentModel.PageHeaderImage))
+        {
+            <div class="owl-carousel padding-bottom-1x" data-owl-carousel="{ &quot;nav&quot;: false, &quot;dots&quot;: false, &quot;loop&quot;: false }">
+                <figure>
+                    <img src="@currentModel.PageHeaderImage" alt="@currentModel.PageTitle">
+                    <figcaption class="text-white">
+                        @currentModel.PageTitle
+                    </figcaption>
+                </figure>
+            </div>
+        }
+        
+        @if (!string.IsNullOrWhiteSpace(currentModel.PageContentText))
+        {
+            @Html.Raw(currentModel.PageContentText)
+        }
+    </div>
+
+}
