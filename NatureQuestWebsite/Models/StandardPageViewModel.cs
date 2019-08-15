@@ -78,6 +78,11 @@ namespace NatureQuestWebsite.Models
         public string OgPageImage { get; set; }
 
         /// <summary>
+        /// get or set the google maps api key
+        /// </summary>
+        public string GoogleMapsApiKey { get; set; }
+
+        /// <summary>
         /// get or set the site menu on the standard model
         /// </summary>
         public MainMenuModel SiteMenu { get; set; } = new MainMenuModel();

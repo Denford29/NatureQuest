@@ -8,7 +8,7 @@ using  Umbraco.Web;
 using  Umbraco.ModelsBuilder;
 using  Umbraco.ModelsBuilder.Umbraco;
 [assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "a234c425f9349a01")]
+[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "7b3485ec2a14e818")]
 [assembly:System.Reflection.AssemblyVersion("0.0.0.1")]
 
 
@@ -889,7 +889,7 @@ namespace Umbraco.Web.PublishedModels
 
 	/// <summary>Contact Page</summary>
 	[PublishedModel("contactPage")]
-	public partial class ContactPage : SiteDefaultPage
+	public partial class ContactPage : SiteDefaultPage, ILocationAddress
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -911,6 +911,62 @@ namespace Umbraco.Web.PublishedModels
 		{ }
 
 		// properties
+
+		///<summary>
+		/// Address City: Enter the city for the address
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("addressCity")]
+		public string AddressCity => LocationAddress.GetAddressCity(this);
+
+		///<summary>
+		/// Address Post Code: Enter the postcode for the address e.g. 5000
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("addressPostCode")]
+		public string AddressPostCode => LocationAddress.GetAddressPostCode(this);
+
+		///<summary>
+		/// Address Suburb: Enter the suburb of the address
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("addressSuburb")]
+		public string AddressSuburb => LocationAddress.GetAddressSuburb(this);
+
+		///<summary>
+		/// Full Address: This will be he full address generated from the above and used to find the lat and long values.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("fullAddress")]
+		public string FullAddress => LocationAddress.GetFullAddress(this);
+
+		///<summary>
+		/// Lat: This it the latitude of the location, this will be set automatically.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("lat")]
+		public decimal Lat => LocationAddress.GetLat(this);
+
+		///<summary>
+		/// Address Lat Long: This will be the latitude and longitude of a valid address
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("LatLong")]
+		public string LatLong => LocationAddress.GetLatLong(this);
+
+		///<summary>
+		/// Long: This is the longitude of the location, this will be set automatically
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("long")]
+		public decimal Long => LocationAddress.GetLong(this);
+
+		///<summary>
+		/// Street Address: Enter the street address, e.g. 100 new street
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("streetAddress")]
+		public string StreetAddress => LocationAddress.GetStreetAddress(this);
 	}
 
 	/// <summary>Shopping Cart Page</summary>
@@ -1128,6 +1184,13 @@ namespace Umbraco.Web.PublishedModels
 		public string CategoriesHeadline => this.Value<string>("categoriesHeadline");
 
 		///<summary>
+		/// Company ABN: Enter the company ABN Number for listing on the website
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("companyABN")]
+		public string CompanyAbn => this.Value<string>("companyABN");
+
+		///<summary>
 		/// Default Description: Default page description for pages with no meta description set.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
@@ -1147,6 +1210,13 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("footerLinks")]
 		public IEnumerable<IPublishedContent> FooterLinks => this.Value<IEnumerable<IPublishedContent>>("footerLinks");
+
+		///<summary>
+		/// Google Maps API Key: Save the google maps API key, used to display and plot maps on the website.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("googleMapsAPIKey")]
+		public string GoogleMapsApikey => this.Value<string>("googleMapsAPIKey");
 
 		///<summary>
 		/// Guarantee Heading: Enter the heading for the guarantee page
@@ -1442,9 +1512,46 @@ namespace Umbraco.Web.PublishedModels
 		// properties
 	}
 
+	// Mixin Content Type with alias "locationAddress"
+	/// <summary>Location Address</summary>
+	public partial interface ILocationAddress : IPublishedContent
+	{
+		/// <summary>Address City</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string AddressCity { get; }
+
+		/// <summary>Address Post Code</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string AddressPostCode { get; }
+
+		/// <summary>Address Suburb</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string AddressSuburb { get; }
+
+		/// <summary>Full Address</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string FullAddress { get; }
+
+		/// <summary>Lat</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		decimal Lat { get; }
+
+		/// <summary>Address Lat Long</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string LatLong { get; }
+
+		/// <summary>Long</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		decimal Long { get; }
+
+		/// <summary>Street Address</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		string StreetAddress { get; }
+	}
+
 	/// <summary>Location Address</summary>
 	[PublishedModel("locationAddress")]
-	public partial class LocationAddress : PublishedContentModel
+	public partial class LocationAddress : PublishedContentModel, ILocationAddress
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
@@ -1472,28 +1579,88 @@ namespace Umbraco.Web.PublishedModels
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("addressCity")]
-		public string AddressCity => this.Value<string>("addressCity");
+		public string AddressCity => GetAddressCity(this);
+
+		/// <summary>Static getter for Address City</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetAddressCity(ILocationAddress that) => that.Value<string>("addressCity");
 
 		///<summary>
 		/// Address Post Code: Enter the postcode for the address e.g. 5000
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("addressPostCode")]
-		public string AddressPostCode => this.Value<string>("addressPostCode");
+		public string AddressPostCode => GetAddressPostCode(this);
+
+		/// <summary>Static getter for Address Post Code</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetAddressPostCode(ILocationAddress that) => that.Value<string>("addressPostCode");
 
 		///<summary>
 		/// Address Suburb: Enter the suburb of the address
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("addressSuburb")]
-		public string AddressSuburb => this.Value<string>("addressSuburb");
+		public string AddressSuburb => GetAddressSuburb(this);
+
+		/// <summary>Static getter for Address Suburb</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetAddressSuburb(ILocationAddress that) => that.Value<string>("addressSuburb");
+
+		///<summary>
+		/// Full Address: This will be he full address generated from the above and used to find the lat and long values.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("fullAddress")]
+		public string FullAddress => GetFullAddress(this);
+
+		/// <summary>Static getter for Full Address</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetFullAddress(ILocationAddress that) => that.Value<string>("fullAddress");
+
+		///<summary>
+		/// Lat: This it the latitude of the location, this will be set automatically.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("lat")]
+		public decimal Lat => GetLat(this);
+
+		/// <summary>Static getter for Lat</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static decimal GetLat(ILocationAddress that) => that.Value<decimal>("lat");
+
+		///<summary>
+		/// Address Lat Long: This will be the latitude and longitude of a valid address
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("LatLong")]
+		public string LatLong => GetLatLong(this);
+
+		/// <summary>Static getter for Address Lat Long</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetLatLong(ILocationAddress that) => that.Value<string>("LatLong");
+
+		///<summary>
+		/// Long: This is the longitude of the location, this will be set automatically
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("long")]
+		public decimal Long => GetLong(this);
+
+		/// <summary>Static getter for Long</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static decimal GetLong(ILocationAddress that) => that.Value<decimal>("long");
 
 		///<summary>
 		/// Street Address: Enter the street address, e.g. 100 new street
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("streetAddress")]
-		public string StreetAddress => this.Value<string>("streetAddress");
+		public string StreetAddress => GetStreetAddress(this);
+
+		/// <summary>Static getter for Street Address</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static string GetStreetAddress(ILocationAddress that) => that.Value<string>("streetAddress");
 	}
 
 	/// <summary>Folder</summary>

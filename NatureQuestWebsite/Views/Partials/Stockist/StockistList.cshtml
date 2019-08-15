@@ -1,0 +1,85 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<StockistListModel>
+@{
+    var currentModel = Model;
+<div class="col-xl-9 col-lg-8">
+
+    @if (!string.IsNullOrWhiteSpace(currentModel.PageContentText))
+    {
+        @Html.Raw(currentModel.PageContentText)
+        <hr class="margin-bottom-1x">
+    }
+
+    @*check if this is the landing page*@
+    @if (currentModel.IsStockistLanding)
+    {
+        if (currentModel.StockistLinks.Any())
+        {
+            <div class="card text-center">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist" id="stockistTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="stockistList-tab" data-toggle="tab" href="#stockistList" role="tab" aria-controls="stockistList" aria-selected="true">
+                                Stockist List
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="stockistMap-tab" data-toggle="tab" href="#stockistMap" role="tab" aria-controls="stockistMap" aria-selected="false">
+                                Stockist Map
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body tab-content">
+                    <div class="tab-pane fade show active" id="stockistList" role="tabpanel" aria-labelledby="stockistList-tab">
+                        @foreach (var link in currentModel.StockistLinks)
+                        {
+                            <div class="row">
+                                <div class="col-lg-7 text-left">
+                                    <h4 class="text-muted text-primary text-uppercase">
+                                        @link.LinkTitle
+                                    </h4>
+                                </div>
+                                <div class="col-lg-5 text-right">
+                                    <a class="btn btn-primary btn-sm btn-outline-primary" href="@link.LinkUrl" title="@link.LinkTitle">
+                                        All @link.LinkTitle Stockists
+                                    </a>
+                                </div>
+                            </div>
+                            <hr class="margin-bottom-1x">
+                            if (link.ChildLinkItems.Any())
+                            {
+                                var r = new Random();
+                                var displayedStockist = link.ChildLinkItems.OrderBy(x => r.Next()).Take(3).ToList();
+                                <div class="row">
+                                    @foreach (var stockist in displayedStockist)
+                                    {
+                                        <div class="col-lg-4 margin-bottom-1x">
+                                            <div class="card border-success">
+                                                <img class="card-img-top" src="@stockist.ThumbLinkImage" alt="@stockist.LinkTitle">
+                                                <div class="card-body">
+                                                    <h4 class="card-title">
+                                                        @stockist.LinkTitle
+                                                    </h4>
+                                                    <a class="btn btn-primary btn-sm" href="@stockist.LinkUrl" title="@stockist.LinkTitle">
+                                                        View @stockist.LinkTitle 
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        }
+
+                    </div>
+                    <div class="tab-pane fade show" id="stockistMap" role="tabpanel" aria-labelledby="stockistMap-tab">
+                    </div>
+                </div>
+            </div>
+        }
+
+    }
+
+</div>
+}

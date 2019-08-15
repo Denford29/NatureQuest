@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
@@ -62,6 +61,11 @@ namespace NatureQuestWebsite.Controllers
         /// create the default site twitter
         /// </summary>
         private readonly string _siteTwitter;
+
+        /// <summary>
+        /// create the default site phone number
+        /// </summary>
+        private readonly string _siteGoogleMapsApiKey = "AIzaSyC-vhODoo9YtzzoEyUlf4XwFBs3ZmQ7X9I";
 
         /// <summary>
         /// initialise the controller
@@ -135,6 +139,13 @@ namespace NatureQuestWebsite.Controllers
                         //set the global site twitter
                         _siteTwitter = siteDetailsPage.GetProperty("siteTwitter").Value().ToString();
                     }
+
+                    //get the google api key
+                    if (siteDetailsPage.HasProperty("googleMapsAPIKey") && siteDetailsPage.HasValue("googleMapsAPIKey"))
+                    {
+                        //set the global site name
+                        _siteGoogleMapsApiKey = siteDetailsPage.GetProperty("googleMapsAPIKey").Value().ToString();
+                    }
                 }
             }
         }
@@ -197,6 +208,8 @@ namespace NatureQuestWebsite.Controllers
         /// <returns></returns>
         public StandardPageViewModel PrepareMetaDetails(StandardPageViewModel model)
         {
+            // save the google api key
+            model.GoogleMapsApiKey = _siteGoogleMapsApiKey;
             //check if we have a global details page to use
             if (_globalDetailsPage?.Id > 0)
             {
@@ -369,7 +382,10 @@ namespace NatureQuestWebsite.Controllers
                 };
 
                 //get the 1st level child pages from the home page
-                var landingPages = _homePage.Children.Where(page => !page.Value<bool>("hideFromMenu")).ToList();
+                var landingPages = _homePage.Children.Where(page => 
+                                                    !page.Value<bool>("hideFromMenu")
+                                                    && page.IsPublished()).
+                                                    ToList();
                 //add these to the model
                 if (landingPages.Any())
                 {
@@ -393,8 +409,6 @@ namespace NatureQuestWebsite.Controllers
                             LinkPage = landingPage,
                             IsProductLinks = landingPage.ContentType.Alias == "productLandingPage"
                         };
-
-                        //check if this is a product link
 
                         //check if this landing page has got child pages which can be displayed in the menu
                         var landingPageChildren = landingPage.Children.Where(page => !page.Value<bool>("hideFromMenu")).ToList();

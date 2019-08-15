@@ -43,8 +43,7 @@ namespace NatureQuestWebsite.Controllers
         /// <summary>
         /// initialise the controller
         /// </summary>
-        public PageContentController(
-                IProductsService productsService)
+        public PageContentController(IProductsService productsService)
         {
             //get the global site settings page to use
             var homePage = Umbraco.ContentAtRoot().FirstOrDefault(x => x.ContentType.Alias == "home");
@@ -336,6 +335,116 @@ namespace NatureQuestWebsite.Controllers
             }
 
             return View("/Views/Partials/Global/StockistSlider.cshtml", displayModel);
+        }
+
+        /// <summary>
+        /// get the stockist list to display
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetStockistListView()
+        {
+            //create the new model to use
+            var model = new StockistListModel();
+
+            //get the page html text
+            if (CurrentPage.HasProperty("pageText") && CurrentPage.HasValue("pageText"))
+            {
+                model.PageContentText = CurrentPage.GetProperty("pageText").Value().ToString();
+            }
+
+            //check if the current page is the stockist landing page
+            if (CurrentPage.ContentType.Alias == "stockistLandingPage")
+            {
+                //set the landing flag
+                model.IsStockistLanding = true;
+
+                //get the state page
+                var statePages = CurrentPage.Children.Where(page => 
+                    !page.Value<bool>("hideFromMenu")
+                    && page.ContentType.Alias == "stockistRegionPage"
+                    && page.IsPublished()).
+                    ToList();
+
+                //create the link models for the state pages
+                if (statePages.Any())
+                {
+                    foreach (var statePage in statePages)
+                    {
+                        //set the default page title
+                        var pageTitle = statePage.Name;
+                        //check if we have the page title set on the current page
+                        if (statePage.HasProperty("pageTitle") && statePage.HasValue("pageTitle"))
+                        {
+                            // set the page title to override the default
+                            pageTitle = statePage.GetProperty("pageTitle").Value().ToString();
+                        }
+
+                        //create the landing page item
+                        var stateLinkItem = new LinkItemModel
+                        {
+                            LinkTitle = pageTitle,
+                            LinkUrl = statePage.Url,
+                            LinkPage = statePage
+                        };
+
+                        //check if this state page has got stockist pages 
+                        var stockistPages = statePage.Children.Where(page =>
+                                !page.Value<bool>("hideFromMenu")
+                                && page.ContentType.Alias == "stockistPage"
+                                && page.HasProperty("stockistLogo")
+                                && page.HasValue("stockistLogo")
+                                && page.IsPublished())
+                            .ToList();
+
+                        //get the stockist links
+                        if (stockistPages.Any())
+                        {
+                            foreach (var stockistPage in stockistPages)
+                            {
+                                stateLinkItem.HasChildLinks = true;
+                                //set the default page title
+                                var stockistPageTitle = stockistPage.Name;
+                                //check if we have the page title set on the current page
+                                if (stockistPage.HasProperty("pageTitle") && stockistPage.HasValue("pageTitle"))
+                                {
+                                    // set the page title to override the default
+                                    stockistPageTitle = stockistPage.GetProperty("pageTitle").Value().ToString();
+                                }
+
+                                //create the landing page item
+                                var stockistLinkItem = new LinkItemModel
+                                {
+                                    LinkTitle = stockistPageTitle,
+                                    LinkUrl = stockistPage.Url,
+                                    LinkPage = stockistPage
+                                };
+
+                                //set feature product image
+                                var stockistLogo = stockistPage.Value<IPublishedContent>("stockistLogo");
+                                if (stockistLogo != null && stockistLogo.Id > 0)
+                                {
+                                    var defaultCropSize = stockistLogo.GetCropUrl("thumbNail");
+                                    var logoImage = !string.IsNullOrEmpty(defaultCropSize) ?
+                                        defaultCropSize :
+                                        stockistLogo.GetCropUrl(250, 250);
+                                    if (!string.IsNullOrWhiteSpace(logoImage))
+                                    {
+                                        stockistLinkItem.ThumbLinkImage = logoImage;
+                                    }
+                                }
+                                //add the stockist page to the state link
+                                stateLinkItem.ChildLinkItems.Add(stockistLinkItem);
+                            }
+                        }
+
+                        //add the stockist link item to the model
+                        model.StockistLinks.Add(stateLinkItem);
+
+                    }
+                }
+            }
+
+            return View("/Views/Partials/Stockist/StockistList.cshtml", model);
         }
 
     }

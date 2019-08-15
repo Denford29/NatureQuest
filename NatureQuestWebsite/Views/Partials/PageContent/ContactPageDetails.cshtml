@@ -1,0 +1,204 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<StandardPageViewModel>
+@{
+    var currentModel = Model;
+    var siteMenuModel = Model.SiteMenu;
+    var currentPage = Model.CurrentPage;
+
+    <div class="col-xl-12">
+
+        @if (!string.IsNullOrWhiteSpace(currentModel.PageContentText))
+        {
+            @Html.Raw(currentModel.PageContentText)
+            <hr class="margin-top-2x">
+        }
+
+        <div class="row">
+            <div class="col-md-8">
+                <h3 class="margin-top-1x text-center mb-10 text-primary">
+                    Contact Us
+                </h3>
+                <hr class="margin-bottom-1x">
+                <form class="needs-validation" novalidate>
+                    <div class="row">
+                        <div class="col-sm-6 form-group">
+                            <label for="validationCustom01">Full Name</label>
+                            <input class="form-control" type="text" id="validationCustom01" placeholder="Full Name" value="" required>
+                            <div class="invalid-feedback">Please choose a username.</div>
+                            <div class="valid-feedback">Looks good!</div>
+                        </div>
+
+                        <div class="col-sm-6 form-group">
+                            <label for="validationCustom02">Email Address</label>
+                            <input class="form-control" type="text" id="validationCustom02" placeholder="Email Address" value="" required>
+                            <div class="invalid-feedback">Please choose a username.</div>
+                            <div class="valid-feedback">Looks good!</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 form-group">
+                            <label for="validationCustomUsername">
+                                Inquiry Details
+                            </label>
+                            <textarea class="form-control" id="textarea-input" rows="4">Hello World!</textarea>
+                            <div class="invalid-feedback">Please choose a username.</div>
+                            <div class="valid-feedback">Looks good!</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input" type="checkbox" id="invalidCheck" required>
+                            <label class="custom-control-label" for="invalidCheck">Agree to terms and conditions</label>
+                            <div class="invalid-feedback">You must agree before submitting.</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Submit Form</button>
+                </form>
+
+                @if (currentPage.HasProperty("fullAddress") && currentPage.HasValue("fullAddress"))
+                {
+                    var fullAddress = currentPage.Value<string>("fullAddress");
+                    <hr class="margin-bottom-1x">
+                    <h3 class="margin-top-1x text-center mb-10 text-primary">
+                        Head Office location...
+                    </h3>
+                    <hr class="margin-bottom-1x">
+                    <div class="google-map"
+                         data-height="400"
+                         data-address="@fullAddress"
+                         data-zoom="13"
+                         data-disable-controls="false"
+                         data-scrollwheel="false"
+                         data-marker="/Images/map-marker.png"
+                         data-marker-title="@siteMenuModel.SiteName">
+                    </div>
+                }
+
+            </div>
+
+            <div class="col-md-4">
+                <button class="sidebar-toggle position-left" data-toggle="modal" data-target="#modalMobileSidebar">
+                    <i class="icon-layout"></i>
+                </button>
+                <aside class="sidebar sidebar-offcanvas">
+                    <h3 class="margin-top-1x text-center mb-10 text-primary">
+                        Contact Details
+                    </h3>
+                    <hr class="margin-bottom-1x">
+                    <ul class="list-icon">
+                        @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteEmailAddress))
+                        {
+                            <li>
+                                <i class="icon-mail"></i>
+                                <a class="navi-link" href="mailto:@siteMenuModel.SiteEmailAddress">
+                                    Email:&nbsp;@siteMenuModel.SiteEmailAddress
+                                </a>
+                            </li>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(siteMenuModel.SitePhoneNumber))
+                        {
+                            <li>
+                                <i class="icon-bell"></i>
+                                <a class="navi-link" href="tel:@siteMenuModel.SitePhoneNumber">
+                                    Phone:&nbsp;@siteMenuModel.SitePhoneNumber
+                                </a>
+                            </li>
+                        }
+
+                        @if (siteMenuModel.OpeningHours.Length > 0)
+                        {
+                            foreach (var detail in siteMenuModel.OpeningHours)
+                            {
+                                <li>
+                                    <i class="icon-clock"></i>
+                                    @detail
+                                </li>
+                            }
+                        }
+                    </ul>
+
+                    <section class="widget">
+                        <hr class="margin-bottom-1x">
+                        <form class="input-group form-group" method="get">
+                            <span class="input-group-btn">
+                                <button type="submit"><i class="icon-search"></i></button>
+                            </span>
+                            <input class="form-control" type="search" placeholder="Search the site...">
+                        </form>
+                        <hr class="margin-bottom-1x">
+                    </section>
+
+                    @if (siteMenuModel.CategoryProductsLinks.Any())
+                    {
+                        <section class="widget widget-categories">
+                            <h3 class="margin-top-1x text-center mb-10 text-primary">
+                                @siteMenuModel.CategoriesMenuTitle
+                            </h3>
+                            <hr class="margin-bottom-1x">
+                            <ul>
+                                @foreach (var category in siteMenuModel.CategoryProductsLinks)
+                                {
+                                    <li>
+                                        <a href="@category.LinkUrl" title="@category.LinkTitle">
+                                            @category.LinkTitle
+                                        </a>
+                                        @if (category.ChildLinkItems.Any())
+                                        {
+                                            <span>(@category.ChildLinkItems.Count)</span>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        </section>
+                    }
+
+                    @if (siteMenuModel.FeaturedProductsLinks.Any())
+                    {
+                        var featureProducts = siteMenuModel.FeaturedProductsLinks.Take(3).ToList();
+                        <section class="widget widget-featured-posts">
+                            <h3 class="margin-top-1x text-center mb-10 text-primary">
+                                Featured Products
+                            </h3>
+                            <hr class="margin-bottom-1x">
+                            @foreach (var featuredLink in featureProducts)
+                            {
+                                <div class="entry">
+                                    <div class="entry-thumb">
+                                        <a href="@featuredLink.LinkUrl" title="@featuredLink.LinkTitle">
+                                            <img alt="@featuredLink.LinkTitle" src="@featuredLink.ThumbLinkImage">
+                                        </a>
+                                    </div>
+                                    <div class="entry-content">
+                                        <h4 class="entry-title">
+                                            <a href="@featuredLink.LinkUrl" title="@featuredLink.LinkTitle">
+                                                @featuredLink.LinkTitle
+                                            </a>
+                                        </h4>
+                                        @if (featuredLink.ProductPrice != null)
+                                        {
+                                            if (featuredLink.ProductPrice.SalePrice > 0)
+                                            {
+                                                <span class="entry-meta">
+                                                    <del>$@featuredLink.ProductPrice.ProductPrice</del>
+                                                    $@featuredLink.ProductPrice.SalePrice
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="entry-meta">
+                                                    $@featuredLink.ProductPrice.ProductPrice
+                                                </span>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </section>
+                    }
+                </aside>
+            </div>
+        </div>
+    </div>
+
+}
