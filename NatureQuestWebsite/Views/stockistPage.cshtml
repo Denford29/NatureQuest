@@ -9,10 +9,17 @@
     <div class="container padding-bottom-3x mb-2">
         <div class="row">
 
-            @Html.Partial("/Views/Partials/PageContent/PageText.cshtml", Model)
+            @Html.Action("GetStockistDetailsView", "PageContent")
 
             @Html.Partial("/Views/Partials/PageContent/PageSideBar.cshtml", Model)
 
         </div>
     </div>
+}
+
+@section footerScripts{
+    @if (!string.IsNullOrWhiteSpace(Model.GoogleMapsApiKey))
+    {
+        <script src="https://maps.googleapis.com/maps/api/js?key=@Model.GoogleMapsApiKey" type="text/javascript"></script>
+    }
 }

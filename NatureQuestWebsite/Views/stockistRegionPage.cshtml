@@ -9,7 +9,7 @@
     <div class="container padding-bottom-3x mb-2">
         <div class="row">
 
-            @Html.Partial("/Views/Partials/PageContent/PageText.cshtml", Model)
+            @Html.Action("GetStockistListView", "PageContent")
 
             @Html.Partial("/Views/Partials/PageContent/PageSideBar.cshtml", Model)
 

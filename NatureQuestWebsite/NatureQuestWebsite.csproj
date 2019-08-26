@@ -679,8 +679,10 @@
     <Compile Include="Models\MainMenuModel.cs" />
     <Compile Include="Models\ProductCategoriesModel.cs" />
     <Compile Include="Models\ProductModel.cs" />
+    <Compile Include="Models\ProductsListModel.cs" />
     <Compile Include="Models\SliderItemModel.cs" />
     <Compile Include="Models\StandardPageViewModel.cs" />
+    <Compile Include="Models\StockistDetailsModel.cs" />
     <Compile Include="Models\StockistListModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ContentSavingComposer.cs" />
@@ -757,7 +759,11 @@
     <Content Include="Views\stockistRegionPage.cshtml" />
     <Content Include="Views\Partials\Global\SiteFooter.cshtml" />
     <Content Include="Views\Partials\PageContent\ContactPageDetails.cshtml" />
-    <Content Include="Views\Partials\Stockist\StockistList.cshtml" />
+    <Content Include="Views\Partials\Stockist\StockistDetails.cshtml" />
+    <Content Include="Views\Partials\Stockist\StockistsList.cshtml" />
+    <Content Include="Views\Partials\Products\ProductDetails.cshtml" />
+    <Content Include="Views\Partials\Products\RelatedProducts.cshtml" />
+    <Content Include="Views\Partials\Products\ProductsList.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

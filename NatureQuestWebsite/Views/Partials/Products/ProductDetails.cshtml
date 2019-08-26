@@ -1,0 +1,199 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<ProductModel>
+@{
+    var productImages = Model.ProductImages;
+    var productPrices = Model.ProductPrices;
+    var featurePrice = Model.FeaturedPrice;
+
+    <div class="row">
+        @if (productImages.Any())
+        {
+            var imageCounter = 0;
+            var thumbCounter = 0;
+            <div class="col-md-6">
+                <div class="product-gallery">
+                    @if (featurePrice.SalePercentage > 0)
+                    {
+                        <span class="product-badge text-danger">
+                            @featurePrice.SalePercentage% Off @featurePrice.ProductVariant
+                        </span>
+                    }
+                    <div class="product-carousel owl-carousel gallery-wrapper">
+                        @foreach (var productImage in productImages)
+                        {
+                            //increase the counter
+                            imageCounter++;
+                            <div class="gallery-item" data-hash="@imageCounter">
+                                <a href="@productImage.ImageUrl" title="@productImage.ImageAltText" data-size="1000x670">
+                                    <img src="@productImage.ImageUrl" alt="@productImage.ImageAltText">
+                                </a>
+                                <span class="caption">
+                                    @productImage.ImageAltText
+                                </span>
+                            </div>
+                        }
+                    </div>
+                    <ul class="product-thumbnails">
+                        @foreach (var productImage in productImages)
+                        {
+                            thumbCounter++;
+                            var thumbClass = thumbCounter == 1 ? "active" : "";
+                            <li class="@thumbClass">
+                                <a href="#@thumbCounter">
+                                    <img src="@productImage.ImageUrl" alt="@productImage.ImageAltText">
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+
+        <!-- Product Info-->
+        <div class="col-md-6">
+            @if (Model.ProductStarRating > 0)
+            {
+                var totalStars = 5;
+                <div class="rating-stars">
+                    @for (int i = 0; i < Model.ProductStarRating; i++)
+                    {
+                        totalStars--;
+                        <i class="icon-star filled"></i>
+                    }
+
+                    @for (int i = 0; i < totalStars; i++)
+                    {
+                        totalStars--;
+                        <i class="icon-star"></i>
+                    }
+                </div>
+            }
+
+            <h2 class="padding-top-1x text-normal">
+                @Model.ProductTitle @featurePrice.ProductVariant
+            </h2>
+            <span class="h2 d-block">
+                @if (featurePrice.SalePrice > 0)
+                {
+                    <del class="text-danger text-normal">$@featurePrice.ProductPrice</del>
+                    <text>$</text>@featurePrice.SalePrice
+                }
+                else
+                {
+                    <text>$</text>@featurePrice.ProductPrice
+                }
+            </span>
+            @if (!string.IsNullOrWhiteSpace(Model.ProductDescription))
+            {
+                <p>@Model.ProductDescription</p>
+            }
+
+            <div class="row margin-top-1x">
+                <div class="col-sm-12">
+                    <table class="table table-hover">
+                        <thead class="thead-default">
+                            <tr>
+                                <th>Size</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var price in productPrices)
+                            {
+                                var displayedPrice = price.SalePrice != 0 ? price.SalePrice : price.ProductPrice;
+                                <tr>
+                                    <td>
+                                        @price.ProductVariant
+                                    </td>
+                                    <td>
+                                        @displayedPrice
+                                    </td>
+                                    <td>
+                                        <input class="form-control" type="number" id="@price.ProductVariant-quantity">
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <hr class="mb-3">
+            <div class="d-flex flex-wrap justify-content-between">
+                <div class="entry-share mt-2 mb-2">
+                    <span class="text-muted">Share:</span>
+                    <div class="share-links">
+                        <a class="social-button shape-circle sb-facebook"
+                           href="#"
+                           data-toggle="tooltip"
+                           data-placement="top" title="Facebook">
+                            <i class="socicon-facebook"></i>
+                        </a>
+                        <a class="social-button shape-circle sb-twitter"
+                           href="#"
+                           data-toggle="tooltip"
+                           data-placement="top" title="Twitter">
+                            <i class="socicon-twitter"></i>
+                        </a>
+                        <a class="social-button shape-circle sb-instagram"
+                           href="#"
+                           data-toggle="tooltip"
+                           data-placement="top" title="Instagram">
+                            <i class="socicon-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="sp-buttons mt-2 mb-2">
+                    @*<button class="btn btn-outline-secondary btn-sm btn-wishlist" data-toggle="tooltip" title="Whishlist">
+                            <i class="icon-heart"></i>
+                        </button>*@
+                    <button class="btn btn-primary"
+                            data-toast data-toast-type="success"
+                            data-toast-position="topRight"
+                            data-toast-icon="icon-circle-check"
+                            data-toast-title="Product"
+                            data-toast-message="successfuly added to cart!">
+                        <i class="icon-bag"></i> Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    if (!string.IsNullOrWhiteSpace(Model.PageContentText))
+    {
+        <div class="row padding-top-3x mb-3">
+            <div class="col-lg-10 offset-lg-1">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#description" data-toggle="tab" role="tab">
+                            Description
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="description" role="tabpanel">
+                        @Html.Raw(Model.PageContentText)
+                        
+                        @if (Model.ProductIngredients.Any())
+                        {
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <dl>
+                                        <dt>Ingredients:</dt>
+                                        @foreach (var ingredient in Model.ProductIngredients)
+                                        {
+                                            <dd>@ingredient</dd>
+                                        }
+                                    </dl>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

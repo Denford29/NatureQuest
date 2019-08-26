@@ -41,9 +41,16 @@ namespace NatureQuestWebsite.Controllers
         private readonly IProductsService _productsService;
 
         /// <summary>
+        /// get the location service to use
+        /// </summary>
+        private readonly ILocationService _locationService;
+
+        /// <summary>
         /// initialise the controller
         /// </summary>
-        public PageContentController(IProductsService productsService)
+        public PageContentController(
+            IProductsService productsService,
+            ILocationService locationService)
         {
             //get the global site settings page to use
             var homePage = Umbraco.ContentAtRoot().FirstOrDefault(x => x.ContentType.Alias == "home");
@@ -83,6 +90,9 @@ namespace NatureQuestWebsite.Controllers
 
             //get the local product service to use
             _productsService = productsService;
+
+            //get the local location service to use
+            _locationService = locationService;
         }
 
         /// <summary>
@@ -344,13 +354,25 @@ namespace NatureQuestWebsite.Controllers
         public ActionResult GetStockistListView()
         {
             //create the new model to use
-            var model = new StockistListModel();
+            var model = new StockistListModel
+            {
+                PageTitle = CurrentPage.Name
+            };
+
+            //get the page title
+            if (CurrentPage.HasProperty("pageTitle") && CurrentPage.HasValue("pageTitle"))
+            {
+                model.PageTitle = CurrentPage.GetProperty("pageTitle").Value().ToString();
+            }
 
             //get the page html text
             if (CurrentPage.HasProperty("pageText") && CurrentPage.HasValue("pageText"))
             {
                 model.PageContentText = CurrentPage.GetProperty("pageText").Value().ToString();
             }
+
+            //create the states list
+            var statePages = new List<IPublishedContent>();
 
             //check if the current page is the stockist landing page
             if (CurrentPage.ContentType.Alias == "stockistLandingPage")
@@ -359,92 +381,280 @@ namespace NatureQuestWebsite.Controllers
                 model.IsStockistLanding = true;
 
                 //get the state page
-                var statePages = CurrentPage.Children.Where(page => 
+                statePages = CurrentPage.Children.Where(page =>
                     !page.Value<bool>("hideFromMenu")
                     && page.ContentType.Alias == "stockistRegionPage"
-                    && page.IsPublished()).
-                    ToList();
+                    && page.IsPublished()).ToList();
+            }
+            //if we are on a state page
+            else if (CurrentPage.ContentType.Alias == "stockistRegionPage")
+            {
+                //set the landing flag
+                model.IsStateLanding = true;
+                statePages.Add(CurrentPage);
+            }
 
-                //create the link models for the state pages
-                if (statePages.Any())
+            //create the link models for the state pages
+            if (statePages.Any())
+            {
+                foreach (var statePage in statePages)
                 {
-                    foreach (var statePage in statePages)
+                    //set the default page title
+                    var pageTitle = statePage.Name;
+                    //check if we have the page title set on the current page
+                    if (statePage.HasProperty("pageTitle") && statePage.HasValue("pageTitle"))
                     {
-                        //set the default page title
-                        var pageTitle = statePage.Name;
-                        //check if we have the page title set on the current page
-                        if (statePage.HasProperty("pageTitle") && statePage.HasValue("pageTitle"))
-                        {
-                            // set the page title to override the default
-                            pageTitle = statePage.GetProperty("pageTitle").Value().ToString();
-                        }
+                        // set the page title to override the default
+                        pageTitle = statePage.GetProperty("pageTitle").Value().ToString();
+                    }
 
-                        //create the landing page item
-                        var stateLinkItem = new LinkItemModel
-                        {
-                            LinkTitle = pageTitle,
-                            LinkUrl = statePage.Url,
-                            LinkPage = statePage
-                        };
+                    //create the landing page item
+                    var stateLinkItem = new LinkItemModel
+                    {
+                        LinkTitle = pageTitle,
+                        LinkUrl = statePage.Url,
+                        LinkPage = statePage
+                    };
 
-                        //check if this state page has got stockist pages 
-                        var stockistPages = statePage.Children.Where(page =>
-                                !page.Value<bool>("hideFromMenu")
-                                && page.ContentType.Alias == "stockistPage"
-                                && page.HasProperty("stockistLogo")
-                                && page.HasValue("stockistLogo")
-                                && page.IsPublished())
-                            .ToList();
+                    //check if this state page has got stockist pages 
+                    var stockistPages = statePage.Children.Where(page =>
+                            !page.Value<bool>("hideFromMenu")
+                            && page.ContentType.Alias == "stockistPage"
+                            && page.HasProperty("stockistLogo")
+                            && page.HasValue("stockistLogo")
+                            && page.IsPublished())
+                        .ToList();
 
-                        //get the stockist links
-                        if (stockistPages.Any())
+                    //get the stockist links
+                    if (stockistPages.Any())
+                    {
+                        foreach (var stockistPage in stockistPages)
                         {
-                            foreach (var stockistPage in stockistPages)
+                            stateLinkItem.HasChildLinks = true;
+                            //set the default page title
+                            var stockistPageTitle = stockistPage.Name;
+                            //check if we have the page title set on the current page
+                            if (stockistPage.HasProperty("pageTitle") && stockistPage.HasValue("pageTitle"))
                             {
-                                stateLinkItem.HasChildLinks = true;
-                                //set the default page title
-                                var stockistPageTitle = stockistPage.Name;
-                                //check if we have the page title set on the current page
-                                if (stockistPage.HasProperty("pageTitle") && stockistPage.HasValue("pageTitle"))
-                                {
-                                    // set the page title to override the default
-                                    stockistPageTitle = stockistPage.GetProperty("pageTitle").Value().ToString();
-                                }
-
-                                //create the landing page item
-                                var stockistLinkItem = new LinkItemModel
-                                {
-                                    LinkTitle = stockistPageTitle,
-                                    LinkUrl = stockistPage.Url,
-                                    LinkPage = stockistPage
-                                };
-
-                                //set feature product image
-                                var stockistLogo = stockistPage.Value<IPublishedContent>("stockistLogo");
-                                if (stockistLogo != null && stockistLogo.Id > 0)
-                                {
-                                    var defaultCropSize = stockistLogo.GetCropUrl("thumbNail");
-                                    var logoImage = !string.IsNullOrEmpty(defaultCropSize) ?
-                                        defaultCropSize :
-                                        stockistLogo.GetCropUrl(250, 250);
-                                    if (!string.IsNullOrWhiteSpace(logoImage))
-                                    {
-                                        stockistLinkItem.ThumbLinkImage = logoImage;
-                                    }
-                                }
-                                //add the stockist page to the state link
-                                stateLinkItem.ChildLinkItems.Add(stockistLinkItem);
+                                // set the page title to override the default
+                                stockistPageTitle = stockistPage.GetProperty("pageTitle").Value().ToString();
                             }
+
+                            //create the landing page item
+                            var stockistLinkItem = new LinkItemModel
+                            {
+                                LinkTitle = stockistPageTitle,
+                                LinkUrl = stockistPage.Url,
+                                LinkPage = stockistPage
+                            };
+
+                            //set stockist logo image
+                            var stockistLogo = stockistPage.Value<IPublishedContent>("stockistLogo");
+                            if (stockistLogo != null && stockistLogo.Id > 0)
+                            {
+                                var defaultCropSize = stockistLogo.GetCropUrl("thumbNail");
+                                var logoImage = !string.IsNullOrEmpty(defaultCropSize) ?
+                                    defaultCropSize :
+                                    stockistLogo.GetCropUrl(250, 250);
+                                if (!string.IsNullOrWhiteSpace(logoImage))
+                                {
+                                    stockistLinkItem.ThumbLinkImage = logoImage;
+                                }
+                            }
+                            //add the stockist page to the state link
+                            stateLinkItem.ChildLinkItems.Add(stockistLinkItem);
                         }
+                    }
 
-                        //add the stockist link item to the model
-                        model.StockistLinks.Add(stateLinkItem);
+                    //add the stockist link item to the model
+                    model.StockistLinks.Add(stateLinkItem);
 
+                }
+            }
+
+            //get the locations
+            model.StockistLocations.AddRange(GetPageLocations(CurrentPage));
+
+            return View("/Views/Partials/Stockist/StockistsList.cshtml", model);
+        }
+
+        /// <summary>
+        /// get the stockist details
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetStockistDetailsView()
+        {
+            //create the default model
+            var model = new StockistDetailsModel
+            {
+                PageTitle = CurrentPage.Name
+            };
+
+            //get the page title
+            if (CurrentPage.HasProperty("pageTitle") && CurrentPage.HasValue("pageTitle"))
+            {
+                model.PageTitle = CurrentPage.GetProperty("pageTitle").Value().ToString();
+            }
+
+            //get the page html text
+            if (CurrentPage.HasProperty("pageText") && CurrentPage.HasValue("pageText"))
+            {
+                model.PageContentText = CurrentPage.GetProperty("pageText").Value().ToString();
+            }
+
+            //get the stockist website
+            if (CurrentPage.HasProperty("stockistWebsite") && CurrentPage.HasValue("stockistWebsite"))
+            {
+                model.StockistWebsite = CurrentPage.GetProperty("stockistWebsite").Value().ToString();
+            }
+
+            //get the stockist phone number
+            if (CurrentPage.HasProperty("stockistPhoneNumber") && CurrentPage.HasValue("stockistPhoneNumber"))
+            {
+                model.StockistPhone = CurrentPage.GetProperty("stockistPhoneNumber").Value().ToString();
+            }
+
+            //get the page html text
+            if (CurrentPage.HasProperty("stockistEmailAddress") && CurrentPage.HasValue("stockistEmailAddress"))
+            {
+                model.StockistEmail = CurrentPage.GetProperty("stockistEmailAddress").Value().ToString();
+            }
+
+            //set stockist logo image
+            var stockistLogo = CurrentPage.Value<IPublishedContent>("stockistLogo");
+            if (stockistLogo != null && stockistLogo.Id > 0)
+            {
+                var defaultCropSize = stockistLogo.GetCropUrl("thumbNail");
+                var logoImage = !string.IsNullOrEmpty(defaultCropSize) ?
+                    defaultCropSize :
+                    stockistLogo.GetCropUrl(250, 250);
+                if (!string.IsNullOrWhiteSpace(logoImage))
+                {
+                    model.StockistLogo = logoImage;
+                }
+            }
+
+            //get the locations
+            model.StockistLocations.AddRange(GetPageLocations(CurrentPage));
+
+            return View("/Views/Partials/Stockist/StockistDetails.cshtml", model);
+        }
+
+        /// <summary>
+        /// get the locations for published page
+        /// </summary>
+        /// <param name="locationsParent"></param>
+        /// <returns></returns>
+        public List<LocationModel> GetPageLocations(IPublishedContent locationsParent)
+        {
+            //create the default locations
+            var pageLocations = new List<LocationModel>();
+
+            //check if the location page has got location address descendants
+            var locationPages = locationsParent.Descendants().Where(page =>
+                                                !page.Value<bool>("hideFromMenu")
+                                                && page.ContentType.Alias == "locationAddress"
+                                                && page.HasProperty("lat")
+                                                && page.HasValue("lat")
+                                                && page.HasProperty("long")
+                                                && page.HasValue("long")
+                                                && page.IsPublished())
+                                            .ToList();
+
+            //if we have the locations, send each one to the service to get the location models
+            if (locationPages.Any())
+            {
+                foreach (var locationPage in locationPages)
+                {
+                    var locationModel = _locationService.GetPageLocationDetails(locationPage);
+                    //check if the location model has the lat and long set
+                    if (!string.IsNullOrWhiteSpace(locationModel?.Lat) && 
+                        !string.IsNullOrWhiteSpace(locationModel.Long))
+                    {
+                        pageLocations.Add(locationModel);
                     }
                 }
             }
 
-            return View("/Views/Partials/Stockist/StockistList.cshtml", model);
+            //return the list of locations
+            return pageLocations;
+        }
+
+        /// <summary>
+        /// get the product details view with the model
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetProductDisplayModel()
+        {
+            //check if the current page is a product
+            if (CurrentPage.ContentType.Alias == "productPage" && !CurrentPage.Value<bool>("hideFromMenu"))
+            {
+                var model = _productsService.GetProductModel(CurrentPage);
+
+                //return the view with the model
+                return View("/Views/Partials/Products/ProductDetails.cshtml", model);
+            }
+
+            //if the request is not from a visible product page
+            return HttpNotFound();
+        }
+
+        /// <summary>
+        /// get the product page's related products
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GeRelatedProducts()
+        {
+            //check if the current page is a product
+            if (CurrentPage.ContentType.Alias == "productPage" && !CurrentPage.Value<bool>("hideFromMenu"))
+            {
+                var model = _productsService.GetProductModel(CurrentPage);
+
+                //get the products parent page
+                var productCategory = CurrentPage.Parent;
+                //check if the parent has got products to add as related products
+                if (productCategory.Children.FirstOrDefault(
+                        product => product.ContentType.Alias == "productPage") != null)
+                {
+                    var relatedProducts = productCategory.Children.Where(
+                            product => product.ContentType.Alias == "productPage"
+                                       && !product.Value<bool>("hideFromMenu")
+                                       && product.Id != CurrentPage.Id)
+                        .ToList();
+                    // get a model for each of related products
+                    foreach (var relatedProduct in relatedProducts)
+                    {
+                        var relatedProductModel = _productsService.GetProductModel(relatedProduct);
+                        if (!string.IsNullOrWhiteSpace(relatedProductModel?.ProductTitle))
+                        {
+                            model.RelatedProducts.Add(relatedProductModel);
+                        }
+                    }
+                }
+
+                //return the view with the model
+                return View("/Views/Partials/Products/RelatedProducts.cshtml", model);
+            }
+            //if the request is not from a visible product page
+            return HttpNotFound();
+        }
+
+        /// <summary>
+        /// get the list of products for a product listing page
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetProductsList()
+        {
+            //check if the current page is a product
+            if ((CurrentPage.ContentType.Alias == "productLandingPage" 
+                 || CurrentPage.ContentType.Alias == "productCategoryPage")
+                && !CurrentPage.Value<bool>("hideFromMenu"))
+            {
+                //return the view with the model
+                return View("/Views/Partials/Products/ProductsList.cshtml");
+            }
+            //if the request is not from a visible product landing or category page return a 404
+            return HttpNotFound();
         }
 
     }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Umbraco.Core.Models.PublishedContent;
+﻿using Umbraco.Core.Models.PublishedContent;
 
 namespace NatureQuestWebsite.Models
 {
@@ -49,11 +45,16 @@ namespace NatureQuestWebsite.Models
         /// <summary>
         /// get or set the address latitude
         /// </summary>
-        public decimal Lat { get; set; }
+        public string Lat { get; set; }
 
         /// <summary>
         /// get or set the address longitude
         /// </summary>
-        public decimal Long { get; set; }
+        public string Long { get; set; }
+
+        /// <summary>
+        /// get or set the location phone number
+        /// </summary>
+        public string PhoneNumber { get; set; }
     }
 }

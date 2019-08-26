@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using NatureQuestWebsite.Models;
 using Newtonsoft.Json;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web;
@@ -102,96 +102,6 @@ namespace NatureQuestWebsite.Services
         /// </summary>
         /// <param name="locationPage"></param>
         /// <returns></returns>
-        public bool UpdateContentLocationDetails(IContent locationPage)
-        {
-            try
-            {
-                var locationModel = new LocationModel();
-
-                //check if we have an address and create the full address to use to search with
-                var locationFullAddress = locationPage.GetValue<string>("streetAddress");
-                //add the street address to the model
-                locationModel.StreetAddress = locationPage.GetValue<string>("streetAddress");
-
-                //add the suburb to the address
-                if (locationPage.HasProperty("addressSuburb") &&
-                    !string.IsNullOrWhiteSpace(locationPage.GetValue<string>("addressSuburb")))
-                {
-                    locationFullAddress += ", " + locationPage.GetValue<string>("addressSuburb");
-                    //add the address suburb to the model
-                    locationModel.AddressSuburb = locationPage.GetValue<string>("addressSuburb");
-                }
-
-                //add the suburb to the city
-                if (locationPage.HasProperty("addressCity") &&
-                    !string.IsNullOrWhiteSpace(locationPage.GetValue<string>("addressCity")))
-                {
-                    locationFullAddress += ", " + locationPage.GetValue<string>("addressCity");
-                    //add the address suburb to the model
-                    locationModel.AddressCity = locationPage.GetValue<string>("addressCity");
-                }
-
-                //add the suburb to the postcode
-                if (locationPage.HasProperty("addressPostCode") &&
-                    !string.IsNullOrWhiteSpace(locationPage.GetValue<string>("addressPostCode")))
-                {
-                    locationFullAddress += ", " + locationPage.GetValue<string>("addressPostCode");
-                    //add the address suburb to the model
-                    locationModel.AddressPostCode = locationPage.GetValue<string>("addressPostCode");
-                }
-
-                //use the full address to search for the lat long
-                var geocodingModel = GetGeocodingModel(locationFullAddress);
-                if (!string.IsNullOrWhiteSpace(geocodingModel?.results[0].formatted_address))
-                {
-                    var firstResult = geocodingModel.results[0];
-
-                    locationModel.LatLong =$"{firstResult.geometry.location.lat},{firstResult.geometry.location.lng}";
-                    locationModel.FullAddress = firstResult.formatted_address;
-                    locationModel.Lat = firstResult.geometry.location.lat;
-                    locationModel.Long = firstResult.geometry.location.lng;
-                }
-                
-
-                //if we get a location model back then save the lat long value back
-                if (!string.IsNullOrWhiteSpace(locationModel.LatLong) 
-                    && !string.IsNullOrWhiteSpace(locationModel.FullAddress))
-                {
-                    locationPage.SetValue("LatLong", locationModel.LatLong);
-                    locationPage.SetValue("fullAddress", locationModel.FullAddress);
-                    locationPage.SetValue("lat", locationModel.Lat);
-                    locationPage.SetValue("long", locationModel.Long);
-                    //save the content item
-                    var saveResult = _contentService.SaveAndPublish(locationPage);
-                    
-                    if (saveResult.Success)
-                    {
-                        _logger.Info(Type.GetType("LocationService"), 
-                            $"The location address: {locationModel.FullAddress} has been updated with the lat long:{locationModel.LatLong}");
-                        //return true if we have update the content fine
-                        return true;
-                    }
-
-                    _logger.Error(Type.GetType("LocationService"), $"Error updating location on page: {locationPage.Name}");
-                    //return true if we have update the content fine
-                    return false;
-                }
-            }
-            catch (Exception ex)
-            {
-                ILogger logger = new DebugDiagnosticsLogger();
-                logger.Error(Type.GetType("LocationService"), ex, "Error getting location model");
-                return false;
-            }
-            //if we get this far something went wrong return false
-            return false;
-        }
-
-        /// <summary>
-        /// get a flag to indicate the location page has been updated
-        /// </summary>
-        /// <param name="locationPage"></param>
-        /// <returns></returns>
         public LocationModel GetPageLocationDetails(IPublishedContent locationPage)
         {
             try
@@ -204,41 +114,41 @@ namespace NatureQuestWebsite.Services
 
                 //check if we have an address and create the full address to use to search with
                 var locationFullAddress = locationPage.Value<string>("streetAddress");
-                //add the street address to the model
-                locationModel.StreetAddress = locationPage.Value<string>("streetAddress");
+                //add the street address to the model 
+                locationModel.StreetAddress = locationPage.GetProperty("streetAddress").Value().ToString();
 
                 //add the suburb to the address
                 if (locationPage.HasProperty("addressSuburb") && locationPage.HasValue("addressSuburb"))
                 {
-                    locationFullAddress += ", " + locationPage.Value<string>("addressSuburb");
+                    locationFullAddress += ", " + locationPage.GetProperty("addressSuburb").Value();
                     //add the address suburb to the model
-                    locationModel.AddressSuburb = locationPage.Value<string>("addressSuburb");
+                    locationModel.AddressSuburb = locationPage.GetProperty("addressSuburb").Value().ToString();
                 }
 
                 //add the suburb to the city
                 if (locationPage.HasProperty("addressCity") && locationPage.HasValue("addressCity"))
                 {
-                    locationFullAddress += ", " + locationPage.Value<string>("addressCity");
+                    locationFullAddress += ", " + locationPage.GetProperty("addressCity").Value();
                     //add the address suburb to the model
-                    locationModel.AddressCity = locationPage.Value<string>("addressCity");
+                    locationModel.AddressCity = locationPage.GetProperty("addressCity").Value().ToString();
                 }
 
                 //add the suburb to the postcode
                 if (locationPage.HasProperty("addressPostCode") && locationPage.HasValue("addressPostCode"))
                 {
-                    locationFullAddress += ", " + locationPage.Value<string>("addressPostCode");
+                    locationFullAddress += ", " + locationPage.GetProperty("addressPostCode").Value();
                     //add the address suburb to the model
-                    locationModel.AddressPostCode = locationPage.Value<string>("addressPostCode");
+                    locationModel.AddressPostCode = locationPage.GetProperty("addressPostCode").Value().ToString();
                 }
 
                 //check if the location page has got a full address and lat long set
                 if (locationPage.HasProperty("fullAddress") && locationPage.HasValue("fullAddress")
                    && locationPage.HasProperty("LatLong") &&locationPage.HasValue("LatLong"))
                 {
-                    locationModel.LatLong = locationPage.Value<string>("LatLong");
-                    locationModel.FullAddress = locationPage.Value<string>("fullAddress");
-                    locationModel.Lat = locationPage.Value<decimal>("lat");
-                    locationModel.Long = locationPage.Value<decimal>("long");
+                    locationModel.LatLong = locationPage.GetProperty("LatLong").Value().ToString();
+                    locationModel.FullAddress = locationPage.GetProperty("fullAddress").Value().ToString();
+                    locationModel.Lat = locationPage.GetProperty("lat").Value().ToString();
+                    locationModel.Long = locationPage.GetProperty("long").Value().ToString();
                 }
                 //if we don't have that set then get it from the service
                 else
@@ -251,8 +161,8 @@ namespace NatureQuestWebsite.Services
 
                         locationModel.LatLong = $"{firstResult.geometry.location.lat},{firstResult.geometry.location.lng}";
                         locationModel.FullAddress = firstResult.formatted_address;
-                        locationModel.Lat = firstResult.geometry.location.lat;
-                        locationModel.Long = firstResult.geometry.location.lng;
+                        locationModel.Lat = firstResult.geometry.location.lat.ToString(CultureInfo.InvariantCulture);
+                        locationModel.Long = firstResult.geometry.location.lng.ToString(CultureInfo.InvariantCulture);
                     }
 
                     //if we get a location model back then save the lat long value back

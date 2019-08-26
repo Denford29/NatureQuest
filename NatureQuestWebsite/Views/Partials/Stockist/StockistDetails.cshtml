@@ -1,0 +1,98 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<StockistDetailsModel>
+@{
+    <div class="col-lg-8">
+        <div class="row margin-bottom-1x">
+            <div class="d-table">
+                @if (!string.IsNullOrWhiteSpace(Model.StockistLogo))
+                {
+                    <div class="col-lg-5 text-center d-table-cell align-middle">
+                        <img class="d-block mx-auto img-thumbnail w-200"
+                             src="@Model.StockistLogo"
+                             alt="Team">
+                    </div>
+                }
+
+                <div class="col-sm-7 pl-3 d-table-cell align-middle">
+                    @if (!string.IsNullOrWhiteSpace(Model.PageContentText))
+                    {
+                        @Html.Raw(Model.PageContentText)
+                    }
+                    <ul class="list-icon">
+                        @if (!string.IsNullOrWhiteSpace(Model.StockistWebsite))
+                        {
+                            <li>
+                                <i class="icon-globe"></i>
+                                <a class="navi-link" href="@Model.StockistWebsite" target="_blank">
+                                    Website:&nbsp;@Model.StockistWebsite
+                                </a>
+                            </li>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(Model.StockistEmail))
+                        {
+                            <li>
+                                <i class="icon-mail"></i>
+                                <a class="navi-link" href="mailto:@Model.StockistEmail">
+                                    Email:&nbsp;@Model.StockistEmail
+                                </a>
+                            </li>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(Model.StockistPhone))
+                        {
+                            <li>
+                                <i class="icon-bell"></i>
+                                <a class="navi-link" href="tel:@Model.StockistPhone">
+                                    Phone:&nbsp;@Model.StockistPhone
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        @if (Model.StockistLocations.Any())
+        {
+            <h4 class="text-muted text-primary text-uppercase margin-top-1x margin-bottom-1x">
+                @Model.PageTitle Locations
+            </h4>
+            <hr class="margin-bottom-1x">
+            <div class="row">
+                @foreach (var location in Model.StockistLocations)
+                {
+                    var directionsUrl = "https://www.google.com/maps/dir/?api=1&destination=" + location.FullAddress.Replace(" ", "+");
+                    <div class="col-sm-4">
+                        <div class="card mb-30">
+                            <div class="google-map"
+                                 data-height="200"
+                                 data-address="@location.FullAddress"
+                                 data-zoom="15"
+                                 data-disable-controls="true"
+                                 data-scrollwheel="false"
+                                 data-marker="/Images/map-marker.png"
+                                 data-marker-title="@location.LocationPage.Name"
+                                 data-styles="[{&quot;featureType&quot;:&quot;administrative.country&quot;,&quot;elementType&quot;:&quot;geometry&quot;,&quot;stylers&quot;:[{&quot;visibility&quot;:&quot;simplified&quot;},{&quot;hue&quot;:&quot;#ff0000&quot;}]}]"></div>
+                            <div class="card-body">
+                                <ul class="list-icon">
+                                    <li>
+                                        <i class="icon-map"></i>@location.FullAddress
+                                    </li>
+                                    <li>
+                                        <a class="btn btn-sm btn-primary"
+                                           href="@directionsUrl"
+                                           target="_blank">
+                                            Directions
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+    </div>
+}

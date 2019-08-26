@@ -83,6 +83,41 @@ namespace NatureQuestWebsite.Services
                     //set the model title
                     model.ProductTitle = productTitle;
 
+                    //check if we have the product code set on the current product
+                    if (productPage.HasProperty("productCode") && productPage.HasValue("productCode"))
+                    {
+                        // save it to the model
+                        model.ProductCode = productPage.GetProperty("productCode").Value().ToString();
+                    }
+
+                    //check if we have the product code set on the current product
+                    if (productPage.HasProperty("productDescription") && productPage.HasValue("productDescription"))
+                    {
+                        // save it to the model
+                        model.ProductDescription = productPage.GetProperty("productDescription").Value().ToString();
+                    }
+
+                    //check if we have the product star rating set on the current product
+                    if (productPage.HasProperty("productStarRating") && productPage.HasValue("productStarRating"))
+                    {
+                        // save it to the model
+                        model.ProductStarRating = productPage.Value<int>("productStarRating");
+                    }
+
+                    //check if we have the product ingredients set on the current product
+                    if (productPage.HasProperty("productIngredients") && productPage.HasValue("productIngredients"))
+                    {
+                        // save it to the model
+                        model.ProductIngredients = productPage.Value<string[]>("productIngredients");
+                    }
+
+                    //check if we have the product code set on the current product
+                    if (productPage.HasProperty("pageText") && productPage.HasValue("pageText"))
+                    {
+                        // save it to the model
+                        model.PageContentText = productPage.GetProperty("pageText").Value().ToString();
+                    }
+
                     //set feature product image
                     var productImages = productPage.Value<IEnumerable<IPublishedContent>>("productImages").ToList();
                     if (productImages.Any())
@@ -129,7 +164,10 @@ namespace NatureQuestWebsite.Services
                     }
 
                     //get the price child items
-                    var productPrices = productPage.Children().Where(page => page.ContentType.Alias == "productPrice").ToList();
+                    var productPrices = productPage.Children().Where(page => 
+                                                            page.ContentType.Alias == "productPrice"
+                                                            && page.IsPublished()).
+                                                            ToList();
                     if (productPrices.Any())
                     {
                         //go through the prices and add the
@@ -162,7 +200,7 @@ namespace NatureQuestWebsite.Services
                                 priceVariant = productPrice.GetProperty("productVariant").Value().ToString();
                             }
 
-                            // get the flag ti indicate its a featured price
+                            // get the flag to indicate its a featured price
                             var isFeaturedPrice = false;
                             if (productPrice.HasProperty("featuredPrice") && productPrice.HasValue("featuredPrice"))
                             {
@@ -191,6 +229,14 @@ namespace NatureQuestWebsite.Services
                             model.ProductPrices.Add(priceModel);
                         }
                     }
+
+                    //from the prices get the featured price to show
+                    model.FeaturedPrice = model.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice) != null
+                                                                        ? model.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice)
+                                                                        : model.ProductPrices.FirstOrDefault();
+
+                    //check if this product i valid for ordering
+                    model.CanBeOrdered = model.FeaturedPrice != null && !string.IsNullOrWhiteSpace(model.ProductCode);
                 }
 
                 //return the model
@@ -201,7 +247,6 @@ namespace NatureQuestWebsite.Services
                 _logger.Error(Type.GetType("ProductsService"), ex, "Error getting product model");
                 return null;
             }
-
         }
     }
 }
