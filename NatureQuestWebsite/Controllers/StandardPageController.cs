@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using NatureQuestWebsite.Services;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 using Umbraco.Web.Models;
@@ -68,10 +69,18 @@ namespace NatureQuestWebsite.Controllers
         private readonly string _siteGoogleMapsApiKey = "AIzaSyC-vhODoo9YtzzoEyUlf4XwFBs3ZmQ7X9I";
 
         /// <summary>
+        /// get the products service
+        /// </summary>
+        private readonly IProductsService _productsService;
+
+        /// <summary>
         /// initialise the controller
         /// </summary>
-        public StandardPageController()
+        public StandardPageController(IProductsService productsService)
         {
+            //set the product service to use
+            _productsService = productsService;
+
             //get the global site settings page to use
             var homePage = Umbraco.ContentAtRoot().FirstOrDefault(x => x.ContentType.Alias == "home");
             if (homePage?.Id > 0)
@@ -632,63 +641,8 @@ namespace NatureQuestWebsite.Controllers
                 }
 
                 //get the category products to display
-                var categoryProducts = _homePage.Descendants().Where(page => page.ContentType.Alias == "productCategoryPage"
-                                                                             && page.IsPublished()
-                                                                             && !page.Value<bool>("hideFromMenu"))
-                    .ToList();
-                //check if we have the category pages
-                if (categoryProducts.Any())
-                {
-                    //go through each category page and add it to the list
-                    foreach (var categoryPage in categoryProducts)
-                    {
-                        //set the default category page title
-                        var categoryPageTitle = categoryPage.Name;
-                        //check if we have the page title set on the current page
-                        if (categoryPage.HasProperty("pageTitle") && categoryPage.HasValue("pageTitle"))
-                        {
-                            // set the page title to override the default
-                            categoryPageTitle = categoryPage.GetProperty("pageTitle").Value().ToString();
-                        }
+                menuItem.CategoryProductsLinks = _productsService.ProductCategoryLinks();
 
-                        //create the category page item
-                        var categoryItemLink = new LinkItemModel
-                        {
-                            LinkTitle = categoryPageTitle,
-                            LinkUrl = categoryPage.Url,
-                            LinkPage = categoryPage
-                        };
-
-                        //check if this category page has got child pages which can be displayed in the menu
-                        var categoryPageChildren = categoryPage.Children.Where(page => !page.Value<bool>("hideFromMenu")).ToList();
-                        //go through each of the product pages and add them to the item
-                        foreach (var productPage in categoryPageChildren)
-                        {
-                            //set the default product page title
-                            var productPageTitle = productPage.Name;
-                            //check if we have the page title set on the current page
-                            if (productPage.HasProperty("pageTitle") && productPage.HasValue("pageTitle"))
-                            {
-                                // set the page title to override the default
-                                productPageTitle = productPage.GetProperty("pageTitle").Value().ToString();
-                            }
-
-                            //create the child page item
-                            var productPageLink = new LinkItemModel
-                            {
-                                LinkTitle = productPageTitle,
-                                LinkUrl = productPage.Url,
-                                LinkPage = productPage
-                            };
-
-                            //add the product link to the category
-                            categoryItemLink.ChildLinkItems.Add(productPageLink);
-                        }
-
-                        //add the category link to the menu
-                        menuItem.CategoryProductsLinks.Add(categoryItemLink);
-                    }
-                }
             }
 
             //check if we have the site details page for the footer

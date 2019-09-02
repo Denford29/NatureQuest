@@ -19,7 +19,7 @@ using Umbraco.ModelsBuilder;
 using Umbraco.ModelsBuilder.Umbraco;
 
 [assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "66db86d6b1078c3d")]
+[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "9219f70675df4ec2")]
 [assembly:System.Reflection.AssemblyVersion("0.0.0.1")]
 
 namespace Umbraco.Web.PublishedModels
@@ -1215,6 +1215,13 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("guaranteeText")]
 		public string GuaranteeText => this.Value<string>("guaranteeText");
+
+		///<summary>
+		/// List Items Per Page: Enter the number of products shown on a product listing page.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("listItemsPerPage")]
+		public int ListItemsPerPage => this.Value<int>("listItemsPerPage");
 
 		///<summary>
 		/// Opening Hours: Enter the different opening hours to be displayed on the site

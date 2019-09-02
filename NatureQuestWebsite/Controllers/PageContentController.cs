@@ -45,6 +45,8 @@ namespace NatureQuestWebsite.Controllers
         /// </summary>
         private readonly ILocationService _locationService;
 
+        private int _pageSize = 9;
+
         /// <summary>
         /// initialise the controller
         /// </summary>
@@ -84,6 +86,13 @@ namespace NatureQuestWebsite.Controllers
                     {
                         //set the global site name
                         _siteName = siteDetailsPage.GetProperty("siteName").Value().ToString();
+                    }
+
+                    //get the site settings page size
+                    if (siteDetailsPage.HasProperty("ListItemsPerPage") && siteDetailsPage.HasValue("ListItemsPerPage"))
+                    {
+                        //set the global page size
+                        _pageSize = siteDetailsPage.Value<int>("ListItemsPerPage");
                     }
                 }
             }
@@ -568,7 +577,7 @@ namespace NatureQuestWebsite.Controllers
                 {
                     var locationModel = _locationService.GetPageLocationDetails(locationPage);
                     //check if the location model has the lat and long set
-                    if (!string.IsNullOrWhiteSpace(locationModel?.Lat) && 
+                    if (!string.IsNullOrWhiteSpace(locationModel?.Lat) &&
                         !string.IsNullOrWhiteSpace(locationModel.Long))
                     {
                         pageLocations.Add(locationModel);
@@ -643,18 +652,160 @@ namespace NatureQuestWebsite.Controllers
         /// get the list of products for a product listing page
         /// </summary>
         /// <returns></returns>
-        public ActionResult GetProductsList()
+        public ActionResult GetProductsList(string sortOption, int page = 1)
         {
             //check if the current page is a product
-            if ((CurrentPage.ContentType.Alias == "productLandingPage" 
+            if ((CurrentPage.ContentType.Alias == "productLandingPage"
                  || CurrentPage.ContentType.Alias == "productCategoryPage")
                 && !CurrentPage.Value<bool>("hideFromMenu"))
             {
+                //create the default model, and set a flag if its a category page
+                var model = new ProductsListModel
+                {
+                    IsCategoryPage = CurrentPage.ContentType.Alias == "productCategoryPage",
+                    CurrentPage = CurrentPage,
+                    SortOption = sortOption
+                };
+
+                //get the products from the current page's descendants
+                var displayProducts = CurrentPage.Descendants().Where(contentPage => contentPage.ContentType.Alias == "productPage"
+                                                                            && !contentPage.Value<bool>("hideFromMenu")
+                                                                            && contentPage.IsPublished())
+                                                                            .ToList();
+
+                //if we have the products to display, get the product models for each
+                if (displayProducts.Any())
+                {
+                    //use the helper to get the list of models
+                    var productModels = GetProductModels(displayProducts);
+                    //once we get the models use these for our list
+                    if (productModels.Any())
+                    {
+
+                        //check if we have a sort option set, and sort the products
+                        List<ProductModel> sortedProducts;
+                        switch (sortOption)
+                        {
+                            case "a-z":
+                                sortedProducts = productModels.OrderBy(product => product.ProductTitle).ToList();
+                                break;
+                            case "z-a":
+                                sortedProducts = productModels.OrderByDescending(product => product.ProductTitle).ToList();
+                                break;
+                            case "priceAsc":
+                                sortedProducts = productModels.OrderBy(product => product.FeaturedPrice.ProductPrice).ToList();
+                                break;
+                            case "priceDesc":
+                                sortedProducts = productModels.OrderByDescending(product => product.FeaturedPrice.ProductPrice).ToList();
+                                break;
+                            default:
+                                sortedProducts = productModels.OrderBy(product => product.FeaturedPrice.ProductPrice).ToList();
+                                break;
+                        }
+
+                        //add the products to display
+                        model.ProductsList = sortedProducts
+                                                            //.OrderBy(product => product.ProductTitle)
+                                                            .Skip((page - 1) * _pageSize)
+                                                            .Take(_pageSize)
+                                                            .ToList();
+
+                        //create the paging model
+                        var pagingModel = new PagingModel
+                        {
+                            CurrentPage = page,
+                            ItemsPerPage = _pageSize,
+                            TotalItems = productModels.Count
+                        };
+                        model.ProductsPaging = pagingModel;
+
+                        // default sort option
+                        var defaultSort = new SelectListItem
+                        {
+                            Value = "",
+                            Text = "Select option..."
+                        };
+                        //add it to the model
+                        model.SortOptions.Add(defaultSort);
+
+                        // sort a to z
+                        var sortAlphabeticallyAsc = new SelectListItem
+                        {
+                            Value = "a-z",
+                            Text = "A to Z",
+                            Selected = sortOption == "a-z"
+                        };
+                        //add it to the model
+                        model.SortOptions.Add(sortAlphabeticallyAsc);
+
+                        //sort z to a
+                        var sortAlphabeticallyDesc = new SelectListItem
+                        {
+                            Value = "z-a",
+                            Text = "Z to A",
+                            Selected = sortOption == "z-a"
+                        };
+                        //add it to the model
+                        model.SortOptions.Add(sortAlphabeticallyDesc);
+
+                        //sort price low to high
+                        var sortPriceAsc = new SelectListItem
+                        {
+                            Value = "priceAsc",
+                            Text = "Price low - High",
+                            Selected = sortOption == "priceAsc"
+                        };
+                        //add it to the model
+                        model.SortOptions.Add(sortPriceAsc);
+
+                        //sort price low to high
+                        var sortPriceDesc = new SelectListItem
+                        {
+                            Value = "priceDesc",
+                            Text = "Price High - low",
+                            Selected = sortOption == "priceDesc"
+                        };
+                        //add it to the model
+                        model.SortOptions.Add(sortPriceDesc);
+
+                        //get the product category links
+                        model.ProductCategoriesLinks = _productsService.ProductCategoryLinks();
+                    }
+                }
+
                 //return the view with the model
-                return View("/Views/Partials/Products/ProductsList.cshtml");
+                return View("/Views/Partials/Products/ProductsList.cshtml", model);
             }
             //if the request is not from a visible product landing or category page return a 404
             return HttpNotFound();
+        }
+
+        /// <summary>
+        /// get the list pf products models
+        /// </summary>
+        /// <param name="contentProducts"></param>
+        /// <returns></returns>
+        public List<ProductModel> GetProductModels(List<IPublishedContent> contentProducts)
+        {
+            //create the default list to return
+            var productModels = new List<ProductModel>();
+            //check if we have the products to use for the list
+            if (contentProducts.Any())
+            {
+                foreach (var product in contentProducts)
+                {
+                    //get the model
+                    var productModel = _productsService.GetProductModel(product);
+                    //check if its got prices and add it to the list
+                    if (productModel?.ProductPrices.Any() == true)
+                    {
+                        productModels.Add(productModel);
+                    }
+                }
+            }
+
+            //return the list
+            return productModels;
         }
 
     }

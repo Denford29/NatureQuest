@@ -15,13 +15,12 @@
                     var productPage = productModel.ProductPage;
                     var productFirstImage = productModel.ProductImages.FirstOrDefault();
                     //if we haven't got a featured price, then just get the 1st normal price
-                    var productFeaturedPrice = productModel.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice) ??
-                                                                   productModel.ProductPrices.FirstOrDefault();
+                    var productFeaturedPrice = productModel.FeaturedPrice;
 
                     //check if we have the image, product page and price
                     if (productPage?.Id > 0 &&
                         !string.IsNullOrWhiteSpace(productFirstImage?.ImageUrl) &&
-                        productFeaturedPrice != null) 
+                        productFeaturedPrice != null)
                     {
                         <!-- Product-->
                         <div class="grid-item">

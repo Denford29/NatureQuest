@@ -133,30 +133,30 @@
             @if (!string.IsNullOrWhiteSpace(siteMenuModel.SitePhoneNumber))
             {
                 <a class="hidden-md-down" href="tel:@siteMenuModel.SitePhoneNumber">
-                    <i class="icon-bell"></i>&nbsp; @siteMenuModel.SitePhoneNumber
+                    <i class="icon-bell"></i>&nbsp;@siteMenuModel.SitePhoneNumber
                 </a>
             }
         </div>
         <div class="topbar-column">
             @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteFacebook))
             {
-                <a class="social-button sb-facebook shape-none sb-dark" href="@siteMenuModel.SiteFacebook" target="_blank" tittle="Facebook">
-                    <i class="socicon-facebook"></i>
-                </a>
+            <a class="hidden-md-down" href="@siteMenuModel.SiteFacebook" target="_blank" tittle="Facebook">
+                <i class="socicon-facebook"></i>&nbsp;Facebook
+            </a>
             }
 
             @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteTwitter))
             {
-                <a class="social-button sb-twitter shape-none sb-dark" href="@siteMenuModel.SiteTwitter" target="_blank" title="Twitter">
-                    <i class="socicon-twitter"></i>
-                </a>
+            <a class="hidden-md-down" href="@siteMenuModel.SiteTwitter" target="_blank" title="Twitter">
+                <i class="socicon-twitter"></i>&nbsp;Twitter
+            </a>
             }
 
             @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteInstagram))
             {
-                <a class="social-button sb-instagram shape-none sb-dark" href="@siteMenuModel.SiteInstagram" target="_blank" title="Instagram">
-                    <i class="socicon-instagram"></i>
-                </a>
+            <a class="hidden-md-down" href="@siteMenuModel.SiteInstagram" target="_blank" title="Instagram">
+                <i class="socicon-instagram"></i>&nbsp;Instagram
+            </a>
             }
 
         </div>

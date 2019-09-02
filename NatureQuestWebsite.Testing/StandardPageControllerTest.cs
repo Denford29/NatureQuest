@@ -2,9 +2,12 @@
 using Moq;
 using NatureQuestWebsite.Controllers;
 using NatureQuestWebsite.Models;
+using NatureQuestWebsite.Services;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web;
 using Umbraco.Web.Models;
 using Zone.UmbracoMapper.V8;
 
@@ -19,6 +22,9 @@ namespace NatureQuestWebsite.Testing
         //create the private controller and mock published content
         private StandardPageController _controller;
         private Mock<IPublishedContent> _content;
+        private IProductsService _productService;
+        private ILogger _logger;
+        private IUmbracoContextFactory _contextFactory;
 
         /// <summary>
         /// set up the test
@@ -26,10 +32,15 @@ namespace NatureQuestWebsite.Testing
         [SetUp]
         public void SetUp()
         {
+            //create the mock items to use for testing
             Current.Factory = Mock.Of<IFactory>();
             _content = new Mock<IPublishedContent>();
-            //_controller = new StandardPageController(new UmbracoMapper(), new ContentModel(_content.Object));
-            _controller = new StandardPageController();
+            _logger = Mock.Of<DebugDiagnosticsLogger>(); 
+            _contextFactory = Mock.Of<IUmbracoContextFactory>();
+            //create the product service
+            _productService = new ProductsService(_logger, _contextFactory);
+            //pass this to the standard page mock controller
+            _controller = new StandardPageController(_productService);
         }
 
         /// <summary>

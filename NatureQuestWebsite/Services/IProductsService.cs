@@ -1,4 +1,5 @@
-﻿using NatureQuestWebsite.Models;
+﻿using System.Collections.Generic;
+using NatureQuestWebsite.Models;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace NatureQuestWebsite.Services
@@ -14,5 +15,11 @@ namespace NatureQuestWebsite.Services
         /// <param name="productPage"></param>
         /// <returns></returns>
         ProductModel GetProductModel(IPublishedContent productPage);
+
+        /// <summary>
+        /// get the list of product categories as links
+        /// </summary>
+        /// <returns></returns>
+        List<LinkItemModel> ProductCategoryLinks();
     }
 }

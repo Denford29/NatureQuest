@@ -665,6 +665,7 @@
     <Content Include="Media\yjvffltn\nature-quest-open-graph.jpg" />
     <Content Include="Media\z2hfjppx\natures-quest-healthy-elements.jpg" />
     <Content Include="Scripts\card.min.js" />
+    <Content Include="Scripts\custom.js" />
     <Content Include="Scripts\modernizr.min.js" />
     <Content Include="Scripts\scripts.min.js" />
     <Content Include="Scripts\vendor.min.js" />
@@ -692,6 +693,7 @@
     <Compile Include="Services\LocationService.cs" />
     <Compile Include="Services\ProductsService.cs" />
     <Compile Include="Services\ProductsServiceComposer.cs" />
+    <Compile Include="Services\SiteHelpers.cs" />
     <Compile Include="Services\UmbracoMapperComposer.cs" />
   </ItemGroup>
   <ItemGroup>

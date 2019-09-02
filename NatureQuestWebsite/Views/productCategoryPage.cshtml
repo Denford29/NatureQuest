@@ -1,8 +1,22 @@
 ﻿@using NatureQuestWebsite.Models
 @inherits Umbraco.Web.Mvc.UmbracoViewPage<StandardPageViewModel>
+
+@section headerCss{
+}
+
 @{
     Layout = "siteMaster.cshtml";
     var currentModel = Model;
-}
-@* the fun starts here *@
 
+    @Html.Partial("/Views/Partials/PageContent/PageHeader.cshtml", Model)
+
+    <div class="container padding-bottom-3x mb-1">
+
+        @Html.Action("GetProductsList", "PageContent")
+
+    </div>
+}
+
+@section footerScripts{
+    <script src="/Scripts/custom.js"></script>
+}

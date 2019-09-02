@@ -231,9 +231,8 @@ namespace NatureQuestWebsite.Services
                     }
 
                     //from the prices get the featured price to show
-                    model.FeaturedPrice = model.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice) != null
-                                                                        ? model.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice)
-                                                                        : model.ProductPrices.FirstOrDefault();
+                    model.FeaturedPrice = model.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice) ??
+                                                            model.ProductPrices.FirstOrDefault();
 
                     //check if this product i valid for ordering
                     model.CanBeOrdered = model.FeaturedPrice != null && !string.IsNullOrWhiteSpace(model.ProductCode);
@@ -247,6 +246,78 @@ namespace NatureQuestWebsite.Services
                 _logger.Error(Type.GetType("ProductsService"), ex, "Error getting product model");
                 return null;
             }
+        }
+
+        /// <summary>
+        /// get the list of product categories as links
+        /// </summary>
+        /// <returns></returns>
+        public List<LinkItemModel> ProductCategoryLinks()
+        {
+            //create the default list to return
+            var categoriesList = new List<LinkItemModel>();
+
+            //get the category products to display
+            var categoryProducts = _homePage.Descendants().Where(page => page.ContentType.Alias == "productCategoryPage"
+                                                                         && page.IsPublished()
+                                                                         && !page.Value<bool>("hideFromMenu"))
+                                                                         .ToList();
+            //check if we have the category pages
+            if (categoryProducts.Any())
+            {
+                //go through each category page and add it to the list
+                foreach (var categoryPage in categoryProducts)
+                {
+                    //set the default category page title
+                    var categoryPageTitle = categoryPage.Name;
+                    //check if we have the page title set on the current page
+                    if (categoryPage.HasProperty("pageTitle") && categoryPage.HasValue("pageTitle"))
+                    {
+                        // set the page title to override the default
+                        categoryPageTitle = categoryPage.GetProperty("pageTitle").Value().ToString();
+                    }
+
+                    //create the category page item
+                    var categoryItemLink = new LinkItemModel
+                    {
+                        LinkTitle = categoryPageTitle,
+                        LinkUrl = categoryPage.Url,
+                        LinkPage = categoryPage
+                    };
+
+                    //check if this category page has got child pages which can be displayed in the menu
+                    var categoryPageChildren = categoryPage.Children.Where(page => !page.Value<bool>("hideFromMenu")).ToList();
+                    //go through each of the product pages and add them to the item
+                    foreach (var productPage in categoryPageChildren)
+                    {
+                        //set the default product page title
+                        var productPageTitle = productPage.Name;
+                        //check if we have the page title set on the current page
+                        if (productPage.HasProperty("pageTitle") && productPage.HasValue("pageTitle"))
+                        {
+                            // set the page title to override the default
+                            productPageTitle = productPage.GetProperty("pageTitle").Value().ToString();
+                        }
+
+                        //create the child page item
+                        var productPageLink = new LinkItemModel
+                        {
+                            LinkTitle = productPageTitle,
+                            LinkUrl = productPage.Url,
+                            LinkPage = productPage
+                        };
+
+                        //add the product link to the category
+                        categoryItemLink.ChildLinkItems.Add(productPageLink);
+                    }
+
+                    //add the category link to the menu
+                    categoriesList.Add(categoryItemLink);
+                }
+            }
+
+            //return the list
+            return categoriesList;
         }
     }
 }

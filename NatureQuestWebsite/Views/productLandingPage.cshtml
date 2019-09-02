@@ -10,13 +10,13 @@
 
     @Html.Partial("/Views/Partials/PageContent/PageHeader.cshtml", Model)
 
-<div class="container padding-bottom-3x mb-1">
+    <div class="container padding-bottom-3x mb-1">
 
-    @Html.Partial("/Views/Partials/Products/ProductsList.cshtml", Model)
+        @Html.Action("GetProductsList", "PageContent")
 
-</div>
+    </div>
 }
 
 @section footerScripts{
-
+    <script src="/Scripts/custom.js"></script>
 }

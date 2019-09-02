@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace NatureQuestWebsite.Models
 {
@@ -9,6 +11,11 @@ namespace NatureQuestWebsite.Models
     /// </summary>
     public class ProductsListModel
     {
+        /// <summary>
+        /// get or set the current page where the product list is on
+        /// </summary>
+        public IPublishedContent CurrentPage { get; set; }
+
         /// <summary>
         /// get or set the list of product models
         /// </summary>
@@ -27,12 +34,18 @@ namespace NatureQuestWebsite.Models
         /// <summary>
         /// get or set the default or selected sort option
         /// </summary>
+        [Display(Name = "Sort by:")]
         public string SortOption { get; set; }
 
         /// <summary>
         /// get or set the category menu products
         /// </summary>
         public List<LinkItemModel> ProductCategoriesLinks { get; set; } = new List<LinkItemModel>();
+
+        /// <summary>
+        /// get or set a flag to indicate this is a category page
+        /// </summary>
+        public bool IsCategoryPage { get; set; }
     }
 
     /// <summary>
