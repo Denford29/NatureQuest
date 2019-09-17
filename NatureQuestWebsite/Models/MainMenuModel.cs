@@ -93,9 +93,5 @@ namespace NatureQuestWebsite.Models
         /// </summary>
         public List<LinkItemModel> FooterLinks { get; set; } = new List<LinkItemModel>();
 
-        /// <summary>
-        /// get or set the subscribe text
-        /// </summary>
-        public string SubscribeText { get; set; }
     }
 }

@@ -10,7 +10,7 @@
         {
             var imageCounter = 0;
             var thumbCounter = 0;
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <div class="product-gallery">
                     @if (featurePrice.SalePercentage > 0)
                     {
@@ -24,7 +24,10 @@
                             //increase the counter
                             imageCounter++;
                             <div class="gallery-item" data-hash="@imageCounter">
-                                <a href="@productImage.ImageUrl" title="@productImage.ImageAltText" data-size="1000x670">
+                                @*<a href="@productImage.ImageUrl" title="@productImage.ImageAltText" data-size="1000x670">
+                                        <img src="@productImage.ImageUrl" alt="@productImage.ImageAltText">
+                                    </a>*@
+                                <a href="@productImage.ImageUrl" title="@productImage.ImageAltText" data-size="350x500">
                                     <img src="@productImage.ImageUrl" alt="@productImage.ImageAltText">
                                 </a>
                                 <span class="caption">
@@ -50,7 +53,7 @@
         }
 
         <!-- Product Info-->
-        <div class="col-md-6">
+        <div class="col-md-7">
             @if (Model.ProductStarRating > 0)
             {
                 var totalStars = 5;
@@ -158,42 +161,48 @@
                     </button>
                 </div>
             </div>
-        </div>
-    </div>
 
-    if (!string.IsNullOrWhiteSpace(Model.PageContentText))
-    {
-        <div class="row padding-top-3x mb-3">
-            <div class="col-lg-10 offset-lg-1">
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#description" data-toggle="tab" role="tab">
-                            Description
-                        </a>
-                    </li>
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane fade show active" id="description" role="tabpanel">
-                        @Html.Raw(Model.PageContentText)
-                        
-                        @if (Model.ProductIngredients.Any())
-                        {
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <dl>
-                                        <dt>Ingredients:</dt>
+            @if (!string.IsNullOrWhiteSpace(Model.PageContentText))
+            {
+                <div class="row padding-top-1x mb-1">
+                    <div class="col-lg-12">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#description" data-toggle="tab" role="tab">
+                                    Description
+                                </a>
+                            </li>
+                            @if (Model.ProductIngredients.Any())
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#ingredients" data-toggle="tab" role="tab">
+                                        Ingredients
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="description" role="tabpanel">
+                                @Html.Raw(Model.PageContentText)
+                            </div>
+
+                            @if (Model.ProductIngredients.Any())
+                            {
+                                <div class="tab-pane fade show" id="ingredients" role="tabpanel">
+                                    <ul>
                                         @foreach (var ingredient in Model.ProductIngredients)
                                         {
-                                            <dd>@ingredient</dd>
+                                            <li>@ingredient</li>
                                         }
-                                    </dl>
+                                    </ul>
                                 </div>
-                            </div>
-                        }
+                            }
 
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
+
         </div>
-    }
+    </div>
 }

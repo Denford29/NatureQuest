@@ -7,151 +7,136 @@
     <footer class="site-footer">
         <div class="container">
             <div class="row">
-                <div class="col-lg-4 col-md-6">
-                    <!-- Contact Info-->
-                    <section class="widget widget-light-skin">
-                        <h3 class="widget-title">Get In Touch With Us</h3>
-                        @if (!string.IsNullOrWhiteSpace(siteMenuModel.SitePhoneNumber))
-                        {
-                            <p class="text-white">
-                                <a class="navi-link-light" href="tel:@siteMenuModel.SitePhoneNumber">
-                                    Phone:&nbsp; @siteMenuModel.SitePhoneNumber
-                                </a>
-                            </p>
-                        }
-
-                        @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteEmailAddress))
-                        {
-                            <p class="text-white">
-                                <a class="navi-link-light" href="mailto:@siteMenuModel.SiteEmailAddress">
-                                    Email:&nbsp; @siteMenuModel.SiteEmailAddress
-                                </a>
-                            </p>
-                        }
-                        
-                        @if (siteMenuModel.OpeningHours.Length > 0)
-                        {
-                            <ul class="list-unstyled text-sm text-white">
-                                @foreach (var detail in siteMenuModel.OpeningHours)
+                <div class="col-lg-7">
+                    <div class="row">
+                        <div class="col-lg-7">
+                            <!-- Contact Info-->
+                            <section class="widget widget-light-skin">
+                                <h3 class="widget-title">Get In Touch With Us</h3>
+                                @if (!string.IsNullOrWhiteSpace(siteMenuModel.SitePhoneNumber))
                                 {
-                                    <li>
-                                        <span class="opacity-80">
-                                            @detail
-                                        </span>
-                                    </li>
-                                }
-                            </ul>
-                        }
-                        
-                        @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteFacebook))
-                        {
-                            <a class="social-button shape-circle sb-facebook sb-light-skin" href="@siteMenuModel.SiteFacebook" target="_blank" tittle="Facebook">
-                                <i class="socicon-facebook"></i>
-                            </a>
-                        }
-
-                        @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteTwitter))
-                        {
-                            <a class="social-button shape-circle sb-twitter sb-light-skin" href="@siteMenuModel.SiteTwitter" target="_blank" title="Twitter">
-                                <i class="socicon-twitter"></i>
-                            </a>
-                        }
-
-                        @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteInstagram))
-                        {
-                            <a class="social-button shape-circle sb-instagram sb-light-skin" href="@siteMenuModel.SiteInstagram" target="_blank" title="Instagram">
-                                <i class="socicon-instagram"></i>
-                            </a>
-                        }
-
-                    </section>
-                </div>
-                
-                @if (siteMenuModel.FooterLinks.Any())
-                {
-                    <div class="col-lg-3 col-md-6">
-                        <section class="widget widget-links widget-light-skin">
-                            <h3 class="widget-title">About Us</h3>
-                            <ul>
-                                @foreach (var footerLink in siteMenuModel.FooterLinks)
-                                {
-                                    <li>
-                                        <a href="@footerLink.LinkUrl" title="@footerLink.LinkTitle">
-                                            @footerLink.LinkTitle
+                                    <p class="text-white">
+                                        <a class="navi-link-light" href="tel:@siteMenuModel.SitePhoneNumber">
+                                            Phone:&nbsp; @siteMenuModel.SitePhoneNumber
                                         </a>
-                                    </li>
+                                    </p>
                                 }
-                            </ul>
-                        </section>
+
+                                @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteEmailAddress))
+                                {
+                                    <p class="text-white">
+                                        <a class="navi-link-light" href="mailto:@siteMenuModel.SiteEmailAddress">
+                                            Email:&nbsp; @siteMenuModel.SiteEmailAddress
+                                        </a>
+                                    </p>
+                                }
+
+                                @if (siteMenuModel.OpeningHours.Length > 0)
+                                {
+                                    <ul class="list-unstyled text-sm text-white">
+                                        @foreach (var detail in siteMenuModel.OpeningHours)
+                                        {
+                                            <li>
+                                                <span class="opacity-80">
+                                                    @detail
+                                                </span>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteFacebook))
+                                {
+                                    <a class="social-button shape-circle sb-facebook sb-light-skin" href="@siteMenuModel.SiteFacebook" target="_blank" tittle="Facebook">
+                                        <i class="socicon-facebook"></i>
+                                    </a>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteTwitter))
+                                {
+                                    <a class="social-button shape-circle sb-twitter sb-light-skin" href="@siteMenuModel.SiteTwitter" target="_blank" title="Twitter">
+                                        <i class="socicon-twitter"></i>
+                                    </a>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteInstagram))
+                                {
+                                    <a class="social-button shape-circle sb-instagram sb-light-skin" href="@siteMenuModel.SiteInstagram" target="_blank" title="Instagram">
+                                        <i class="socicon-instagram"></i>
+                                    </a>
+                                }
+
+                            </section>
+                        </div>
+
+                        @if (siteMenuModel.FooterLinks.Any())
+                        {
+                            <div class="col-lg-5">
+                                <section class="widget widget-links widget-light-skin">
+                                    <h3 class="widget-title">About Us</h3>
+                                    <ul>
+                                        @foreach (var footerLink in siteMenuModel.FooterLinks)
+                                        {
+                                            <li>
+                                                <a href="@footerLink.LinkUrl" title="@footerLink.LinkTitle">
+                                                    @footerLink.LinkTitle
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </section>
+                            </div>
+                        }
                     </div>
-                }
+                    <div class="row">
+                        <div class="col-lg-12 padding-bottom-1x">
+                            <!-- Payment Methods-->
+                            <div class="margin-bottom-1x" style="max-width: 615px;">
+                                <img src="/Images/payment_methods-new.png" alt="Natures Quest - Payment Methods">
+                            </div>
+                        </div>
+                    </div>
+
+                    @Html.Action("GetSubscribeForm", "Accounts")
+
+                </div>
 
                 @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteFacebook))
                 {
-                <div class="col-lg-5 col-md-6 d-none d-md-block">
-                    <section class="widget widget-links widget-light-skin">
-                        <h3 class="widget-title">
-                            Latest from Facebook
-                        </h3>
-                        <div id="fb-root"></div>
-                        <script>
-                            (function (d, s, id) {
-                                var js, fjs = d.getElementsByTagName(s)[0];
-                                if (d.getElementById(id)) return;
-                                js = d.createElement(s);
-                                js.id = id;
-                                js.src =
-                                    "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.5&appId=2483746461853676";
-                                fjs.parentNode.insertBefore(js, fjs);
-                            }(document, 'script', 'facebook-jssdk'));
-                        </script>
-                        <div class="fb-page m-t-10"
-                             data-href="@siteMenuModel.SiteFacebook"
-                             data-tabs="timeline"
-                             data-width="450"
-                             data-height="250"
-                             data-small-header="false"
-                             data-adapt-container-width="true"
-                             data-hide-cover="false" data-show-facepile="false">
-                        </div>
-                    </section>
-                </div>
+                    <div class="col-lg-5 col-md-6 d-none d-md-block">
+                        <section class="widget widget-links widget-light-skin">
+                            <h3 class="widget-title">
+                                Latest from Facebook
+                            </h3>
+                            <div id="fb-root"></div>
+                            <script>
+                                (function (d, s, id) {
+                                    var js, fjs = d.getElementsByTagName(s)[0];
+                                    if (d.getElementById(id)) return;
+                                    js = d.createElement(s);
+                                    js.id = id;
+                                    js.src =
+                                        "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.5&appId=2483746461853676";
+                                    fjs.parentNode.insertBefore(js, fjs);
+                                }(document, 'script', 'facebook-jssdk'));
+                            </script>
+                            <div class="fb-page m-t-10"
+                                 data-href="@siteMenuModel.SiteFacebook"
+                                 data-tabs="timeline"
+                                 data-width="450"
+                                 data-height="500"
+                                 data-small-header="false"
+                                 data-adapt-container-width="true"
+                                 data-hide-cover="false" data-show-facepile="false">
+                            </div>
+                        </section>
+                    </div>
                 }
             </div>
-            <hr class="hr-light mt-2 margin-bottom-2x">
-            <div class="row">
-                <div class="col-md-7 padding-bottom-1x">
-                    <!-- Payment Methods-->
-                    <div class="margin-bottom-1x" style="max-width: 615px;">
-                        <img src="/Images/payment_methods-new.png" alt="Natures Quest - Payment Methods">
-                    </div>
-                </div>
-                <div class="col-md-5 padding-bottom-1x">
-                    <div class="margin-top-1x hidden-md-up"></div>
-                    <!--Subscription-->
-                    <form class="subscribe-form" 
-                          action="" 
-                          method="post" 
-                          target="_blank" novalidate>
-                        <div class="clearfix">
-                            <div class="input-group input-light">
-                                <input class="form-control" type="email" name="EMAIL" placeholder="Your e-mail">
-                                <span class="input-group-addon"><i class="icon-mail"></i></span>
-                            </div>
-                            <button class="btn btn-primary" type="submit"><i class="icon-check"></i></button>
-                        </div>
-                        @if (!string.IsNullOrWhiteSpace(siteMenuModel.SubscribeText))
-                        {
-                            <span class="form-text text-sm text-white opacity-50">
-                                @siteMenuModel.SubscribeText
-                            </span>
-                        }
-                    </form>
-                </div>
-            </div>
+
             <!-- Copyright-->
             <p class="footer-copyright">
-                @DateTime.Now.Year © All rights reserved. @siteMenuModel.SiteName 
+                @DateTime.Now.Year © All rights reserved. @siteMenuModel.SiteName
                 <span class="float-right text-right">
                     Crafted by &nbsp;<i class="icon-heart text-danger"></i>
                     <a href="https://rdmonline.com.au/" target="_blank"> &nbsp;RDM Online</a>

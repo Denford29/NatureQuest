@@ -398,6 +398,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Plugins\Cultiv.Tabify\tabify.css" />
+    <Content Include="App_Plugins\Cultiv.Tabify\tabify.html" />
+    <Content Include="App_Plugins\Cultiv.Tabify\tabify.js" />
+    <Content Include="App_Plugins\MediumEditor\configuration.html" />
+    <Content Include="App_Plugins\MediumEditor\configuration.js" />
+    <Content Include="App_Plugins\MediumEditor\index.html" />
+    <Content Include="App_Plugins\MediumEditor\script.js" />
+    <Content Include="App_Plugins\MediumEditor\style.css" />
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.html" />
     <Content Include="App_Plugins\ModelsBuilder\modelsbuilder.resource.js" />
@@ -656,14 +664,19 @@
     <Content Include="Media\3dsnfpvr\natures-quest-terrywhite-hemmart.png" />
     <Content Include="Media\3whgvvs2\nature-quest-banner.jpg" />
     <Content Include="Media\beel2mjs\nature-quest-body-care.jpg" />
+    <Content Include="Media\bwrli20q\nature-quest-wash.jpg" />
+    <Content Include="Media\cdrb33x1\natures-quest-logo.png" />
     <Content Include="Media\eescl4dw\natures-quest-mega-health.png" />
     <Content Include="Media\g0th4m4q\nq-bodylotion-500ml.png" />
     <Content Include="Media\hbpnztpt\nature-quest-natural-care.png" />
+    <Content Include="Media\n4nfjbec\natures-quest-lavendar_shampoo-edit-tall.png" />
     <Content Include="Media\pwuhmhte\natures-quest-chemplus.png" />
     <Content Include="Media\qy3h1g2c\natures-quest-healthy-life.png" />
+    <Content Include="Media\svsdb3i4\natures-quest-lavendar_shampoo-edit.jpg" />
     <Content Include="Media\wdeozifc\nature-quest-facial-care.jpg" />
     <Content Include="Media\yjvffltn\nature-quest-open-graph.jpg" />
     <Content Include="Media\z2hfjppx\natures-quest-healthy-elements.jpg" />
+    <Content Include="Media\zioh4ayl\nature-quest-natural-care.jpg" />
     <Content Include="Scripts\card.min.js" />
     <Content Include="Scripts\custom.js" />
     <Content Include="Scripts\modernizr.min.js" />
@@ -672,12 +685,14 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Controllers\PageContentController.cs" />
     <Compile Include="Controllers\StandardPageController.cs" />
     <Compile Include="Models\GoogleGeocodingModel.cs" />
     <Compile Include="Models\LinkItemModel.cs" />
     <Compile Include="Models\LocationModel.cs" />
     <Compile Include="Models\MainMenuModel.cs" />
+    <Compile Include="Models\MembersModel.cs" />
     <Compile Include="Models\ProductCategoriesModel.cs" />
     <Compile Include="Models\ProductModel.cs" />
     <Compile Include="Models\ProductsListModel.cs" />
@@ -689,12 +704,13 @@
     <Compile Include="Services\ContentSavingComposer.cs" />
     <Compile Include="Services\DefaultControllerComposer.cs" />
     <Compile Include="Services\ILocationService.cs" />
+    <Compile Include="Services\ISiteMembersService.cs" />
     <Compile Include="Services\IProductsService.cs" />
     <Compile Include="Services\LocationService.cs" />
+    <Compile Include="Services\SiteMembersService.cs" />
     <Compile Include="Services\ProductsService.cs" />
-    <Compile Include="Services\ProductsServiceComposer.cs" />
+    <Compile Include="Services\ServicesComposer.cs" />
     <Compile Include="Services\SiteHelpers.cs" />
-    <Compile Include="Services\UmbracoMapperComposer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="config\imageprocessor\security.config" />
@@ -719,6 +735,9 @@
     <Content Include="Fonts\socicon.eot" />
     <Content Include="Fonts\socicon.ttf" />
     <Content Include="Fonts\socicon.woff" />
+    <Content Include="App_Plugins\Cultiv.Tabify\package.manifest" />
+    <Content Include="App_Plugins\MediumEditor\package.manifest" />
+    <Content Include="App_Plugins\MediumEditor\style.scss" />
     <None Include="packages.config" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\Partials\Grid\Editors\Textstring.cshtml" />
@@ -766,6 +785,10 @@
     <Content Include="Views\Partials\Products\ProductDetails.cshtml" />
     <Content Include="Views\Partials\Products\RelatedProducts.cshtml" />
     <Content Include="Views\Partials\Products\ProductsList.cshtml" />
+    <Content Include="Views\Partials\Accounts\Subscribe.cshtml" />
+    <Content Include="Views\Partials\Samples\LoginSample.cshtml" />
+    <Content Include="Views\Partials\Samples\LoginStatusSample.cshtml" />
+    <Content Include="Views\Partials\Samples\RegisterSample.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -778,11 +801,7 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.6.1\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Media\bwrli20q\" />
-    <Folder Include="Media\dt1fcchz\" />
-    <Folder Include="Media\rhlhbh4k\" />
-    <Folder Include="Media\thdn5jrj\" />
-    <Folder Include="Media\zioh4ayl\" />
+    <Folder Include="Media\kn5bdw0z\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

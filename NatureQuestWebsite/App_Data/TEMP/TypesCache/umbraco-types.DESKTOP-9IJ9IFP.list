@@ -144,8 +144,8 @@ Umbraco.Core.Compose.RelateOnTrashComposer, Umbraco.Core, Version=8.0.0.0, Cultu
 Umbraco.Core.Services.Implement.KeyValueService+InitializeMigration, Umbraco.Core, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null
 NatureQuestWebsite.Services.ContentSavingComposer, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 NatureQuestWebsite.Services.DefaultControllerComposer, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-NatureQuestWebsite.Services.ProductsServiceComposer, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-NatureQuestWebsite.Services.UmbracoMapperComposer, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+NatureQuestWebsite.Services.ServicesComposer, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+NatureQuestWebsite.Controllers.AccountsController, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 NatureQuestWebsite.Controllers.PageContentController, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 NatureQuestWebsite.Controllers.StandardPageController, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 Umbraco.ModelsBuilder.Validation.ContentTypeModelValidator, Umbraco.ModelsBuilder, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -357,8 +357,7 @@ Umbraco.Core.Compose.RelateOnCopyComposer, Umbraco.Core, Version=8.0.0.0, Cultur
 Umbraco.Core.Compose.RelateOnTrashComposer, Umbraco.Core, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null
 NatureQuestWebsite.Services.ContentSavingComposer, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 NatureQuestWebsite.Services.DefaultControllerComposer, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-NatureQuestWebsite.Services.ProductsServiceComposer, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-NatureQuestWebsite.Services.UmbracoMapperComposer, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+NatureQuestWebsite.Services.ServicesComposer, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 Umbraco.ModelsBuilder.Umbraco.ModelsBuilderComposer, Umbraco.ModelsBuilder, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null
 Umbraco.Web.SignalR.PreviewHubComposer, Umbraco.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null
 Umbraco.Web.Search.ExamineComposer, Umbraco.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -413,6 +412,7 @@ Umbraco.Web.PropertyEditors.ValueConverters.RteMacroRenderingValueConverter, Umb
 
 Umbraco.Web.Mvc.PluginController
 
+NatureQuestWebsite.Controllers.AccountsController, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 NatureQuestWebsite.Controllers.PageContentController, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 Umbraco.Web.Controllers.UmbProfileController, Umbraco.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null
 Umbraco.Web.Controllers.UmbLoginStatusController, Umbraco.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null
@@ -498,6 +498,7 @@ Umbraco.Web.Editors.MediaController, Umbraco.Web, Version=8.0.0.0, Culture=neutr
 
 Umbraco.Web.Mvc.SurfaceController
 
+NatureQuestWebsite.Controllers.AccountsController, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 NatureQuestWebsite.Controllers.PageContentController, NatureQuestWebsite, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
 Umbraco.Web.Controllers.UmbProfileController, Umbraco.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null
 Umbraco.Web.Controllers.UmbLoginStatusController, Umbraco.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null

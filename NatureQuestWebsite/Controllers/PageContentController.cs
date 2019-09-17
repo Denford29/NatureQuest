@@ -633,7 +633,7 @@ namespace NatureQuestWebsite.Controllers
                     // get a model for each of related products
                     foreach (var relatedProduct in relatedProducts)
                     {
-                        var relatedProductModel = _productsService.GetProductModel(relatedProduct);
+                        var relatedProductModel = _productsService.GetProductModel(relatedProduct, true);
                         if (!string.IsNullOrWhiteSpace(relatedProductModel?.ProductTitle))
                         {
                             model.RelatedProducts.Add(relatedProductModel);

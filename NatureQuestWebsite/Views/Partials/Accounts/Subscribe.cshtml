@@ -1,0 +1,98 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<MembersModel>
+@{
+    //if the user is already subscribed, then display a message
+    if (Model.IsNewsletterMember)
+    {
+        <div class="row widget-light-skin">
+            <div class="col-lg-12">
+                <h3 class="widget-title">
+                    Newsletter subscription
+                </h3>
+                <p class="text-white">
+                    You are already on our newsletter subscription list.
+                </p>
+            </div>
+        </div>
+    }
+    //if the subscribe form has been submitted fine
+    else if (TempData.ContainsKey("subscriptionSuccess") || !string.IsNullOrWhiteSpace(Model.SubscribeMessage))
+    {
+        var successMessage = (string)TempData["subscriptionSuccess"];
+        if (string.IsNullOrWhiteSpace(successMessage))
+        {
+            successMessage = Model.SubscribeMessage;
+        }
+        <div class="row widget-light-skin">
+            <div class="col-lg-12">
+                <h3 class="widget-title">
+                    Newsletter subscription success
+                </h3>
+                <p class="text-success">@Html.Raw(successMessage)</p>
+            </div>
+        </div>
+    }
+    else if (!Model.IsNewsletterMember)
+    {
+        //if we have had an error from the 1st attempt display it here
+        if (TempData.ContainsKey("subscriptionError") || !string.IsNullOrWhiteSpace(Model.SubscribeMessage))
+        {
+            var errorMessage = (string)TempData["subscriptionError"];
+            if (string.IsNullOrWhiteSpace(errorMessage))
+            {
+                errorMessage = Model.SubscribeMessage;
+            }
+            <div class="row widget-light-skin">
+                <div class="col-lg-12">
+                    <h3 class="widget-title">
+                        Newsletter subscription error
+                    </h3>
+                    <p class="text-danger">@Html.Raw(errorMessage)</p>
+                </div>
+            </div>
+        }
+
+        using (Html.BeginUmbracoForm("ProcessSubscribeForm", "Accounts",
+            FormMethod.Post,
+            new { role = "form", id = "subscriptionForm", @class = "form-horizontal", novalidate = "novalidate" }))
+        {
+            //add the anti fogery token and the hidden fields
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => Model.IsShopCustomer)
+            @Html.HiddenFor(m => Model.IsNewsletterMember)
+            @Html.HiddenFor(m => Model.IsContactMember)
+            @Html.HiddenFor(m => Model.SubscribeText)
+            @Html.HiddenFor(m => Model.GoogleSiteKey)
+
+            <div class="row">
+                <div class="col-lg-6 margin-bottom-1x">
+                    <div class="input-group input-light">
+                        @Html.TextBoxFor(model => Model.Email, new { @class = "form-control", required = "", type = "email", placeholder = "Your Email Address" })
+                        <span class="input-group-addon"><i class="icon-mail"></i></span>
+                    </div>
+                    @Html.ValidationMessageFor(model => Model.Email, "", new { @class = "help-block text-danger" })
+                </div>
+
+                <div class="col-lg-6 margin-bottom-1x">
+                    <div class="g-recaptcha" data-sitekey="6Lfq1LYUAAAAAIMrgy2j2kNiABSAtPc1PZGy3f3F"></div>
+                </div>
+            </div>
+
+            <div class="row">
+                @if (!string.IsNullOrWhiteSpace(Model.SubscribeText))
+                {
+                    <span class="col-lg-8 form-text text-sm text-white opacity-50">
+                        @Model.SubscribeText
+                    </span>
+                }
+
+                <div class="col-lg-4 margin-bottom-1x">
+                    <button class="btn btn-primary" type="submit">
+                        Subscribe&nbsp;<i class="icon-check"></i>
+                    </button>
+                </div>
+            </div>
+
+        }
+    }
+}

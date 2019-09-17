@@ -685,13 +685,6 @@ namespace NatureQuestWebsite.Controllers
                         }
                     }
                 }
-
-                //get the opening hours if set
-                if (_globalDetailsPage.HasProperty("subscribeText") && _globalDetailsPage.HasValue("subscribeText"))
-                {
-                    //set the list of opening hours
-                    menuItem.SubscribeText = _globalDetailsPage.Value<string>("subscribeText");
-                }
             }
             //return the view model with the menu items added
             return model;

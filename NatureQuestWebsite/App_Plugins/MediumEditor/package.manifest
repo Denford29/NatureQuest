@@ -1,0 +1,33 @@
+{
+	propertyEditors: [
+		{
+			alias: "MediumEditor",
+			name: "Medium Editor",
+			icon: "icon-font",
+			group: "Rich Content",
+			editor: {
+				view: "~/App_Plugins/MediumEditor/index.html"
+			},
+			prevalues: {
+				fields: [
+					{
+						label: "Medium Editor Configuration",
+						description: "Just some settings for the Medium Editor.",
+						key: "mediumEditorConfig",
+						view: "~/App_Plugins/MediumEditor/configuration.html"
+					}
+				]
+			}
+		}
+	],
+	css: [
+		"https://cdn.jsdelivr.net/npm/medium-editor@latest/dist/css/medium-editor.min.css",
+		"https://cdn.jsdelivr.net/npm/medium-editor@5.23.3/dist/css/themes/beagle.min.css",
+		"~/App_Plugins/MediumEditor/style.css"
+	],
+	javascript: [
+		"https://cdn.jsdelivr.net/npm/medium-editor@latest/dist/js/medium-editor.min.js",
+		"~/App_Plugins/MediumEditor/script.js",
+		"~/App_Plugins/MediumEditor/configuration.js"
+	]
+}

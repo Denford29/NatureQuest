@@ -58,8 +58,9 @@ namespace NatureQuestWebsite.Services
         /// get the product model from an umbraco page
         /// </summary>
         /// <param name="productPage"></param>
+        /// <param name="getThumbnail"></param>
         /// <returns></returns>
-        public ProductModel GetProductModel(IPublishedContent productPage)
+        public ProductModel GetProductModel(IPublishedContent productPage, bool getThumbnail = false)
         {
             try
             {
@@ -129,10 +130,10 @@ namespace NatureQuestWebsite.Services
                             {
                                 //get the image url
                                 var imageLink = "/Images/Nature-Quest-Product-Default.png";
-                                var defaultCropSize = productImage.GetCropUrl("product");
+                                var defaultCropSize = getThumbnail ? productImage.GetCropUrl("thumbNail") : productImage.GetCropUrl("product");
                                 var productImagelink = !string.IsNullOrEmpty(defaultCropSize)
                                     ? defaultCropSize
-                                    : productImage.GetCropUrl(1000, 670);
+                                    : getThumbnail ? productImage.GetCropUrl(250, 250) : productImage.GetCropUrl(350, 500);
                                 if (!string.IsNullOrWhiteSpace(productImagelink))
                                 {
                                     imageLink = productImagelink;
@@ -152,7 +153,7 @@ namespace NatureQuestWebsite.Services
                     //add a default image model 
                     else
                     {
-                        var imageLink = "/Images/Nature-Quest-Product-Default.png";
+                        var imageLink = getThumbnail ? "/Images/Nature-Quest-Product-Default-thumb.png" : "/Images/Nature-Quest-Product-Default.png";
                         //create the product model
                         var imageModel = new ProductImageModel
                         {

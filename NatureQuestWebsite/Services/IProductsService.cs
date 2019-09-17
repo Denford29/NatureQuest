@@ -13,8 +13,9 @@ namespace NatureQuestWebsite.Services
         /// get the product model from an umbraco page
         /// </summary>
         /// <param name="productPage"></param>
+        /// <param name="getThumbnail"></param>
         /// <returns></returns>
-        ProductModel GetProductModel(IPublishedContent productPage);
+        ProductModel GetProductModel(IPublishedContent productPage, bool getThumbnail = false);
 
         /// <summary>
         /// get the list of product categories as links
