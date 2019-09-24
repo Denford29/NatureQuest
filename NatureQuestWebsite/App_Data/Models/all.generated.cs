@@ -8,7 +8,7 @@ using  Umbraco.Web;
 using  Umbraco.ModelsBuilder;
 using  Umbraco.ModelsBuilder.Umbraco;
 [assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "bfcf4afeca017f9c")]
+[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "646b26a8e489b2a2")]
 [assembly:System.Reflection.AssemblyVersion("0.0.0.1")]
 
 
@@ -1198,11 +1198,11 @@ namespace Umbraco.Web.PublishedModels
 		public string ContactFromEmailAddress => this.Value<string>("contactFromEmailAddress");
 
 		///<summary>
-		/// Contact To Email Address: Enter the email address (addresses separated by :) which will receive the emails sent by the site.
+		/// Site To Email Address: Enter the email address which will receive the emails sent by the site.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("contactToEmailAddress")]
-		public string ContactToEmailAddress => this.Value<string>("contactToEmailAddress");
+		public IEnumerable<string> ContactToEmailAddress => this.Value<IEnumerable<string>>("contactToEmailAddress");
 
 		///<summary>
 		/// Default Description: Default page description for pages with no meta description set.

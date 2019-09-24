@@ -81,7 +81,8 @@ namespace NatureQuestWebsite.Controllers
             // create the default
             var model = new MembersModel
             {
-                MemberCurrentLoginStatus = _currentLoginStatus
+                MemberCurrentLoginStatus = _currentLoginStatus,
+                ModelMemberType = _memberType
             };
 
             //if there is a user logged in get the model for that user
@@ -120,7 +121,7 @@ namespace NatureQuestWebsite.Controllers
             }
 
             //check if we have the email address to subscribe
-            if (!string.IsNullOrWhiteSpace(model?.Email))
+            if (string.IsNullOrWhiteSpace(model?.Email))
             {
                 // set the error message and return the current page
                 var errorMessage = "Ops... Subscription Error, Please fill in your email address and try again.";
@@ -144,7 +145,7 @@ namespace NatureQuestWebsite.Controllers
 
             //finally check if the email address has already subscribed
             var checkedMember = _siteMemberService.GetMemberByEmail(model, model.Email);
-            if(checkedMember.LoggedInMember != null && checkedMember.IsNewsletterMember)
+            if (checkedMember.LoggedInMember != null && checkedMember.IsNewsletterMember)
             {
                 // set the error message and return the current page
                 var errorMessage = "Ops... Subscription Error, This email address is already subscribed and try again.";
@@ -157,12 +158,138 @@ namespace NatureQuestWebsite.Controllers
             model.IsNewsletterMember = true;
             //subscribe the email
             var registeredModel = _siteMemberService.RegisterSiteMember(
-                model,
-                _memberType,
-                out MembershipCreateStatus createStatus);
+                                                model,
+                                                out MembershipCreateStatus createStatus);
 
-            //if not just go to the current page
-            return RedirectToCurrentUmbracoPage();
+            //check if we have a new member created
+            if (registeredModel.LoggedInMember == null || createStatus != MembershipCreateStatus.Success)
+            {
+                // set the error message and return the current page
+                var errorMessage = "Ops... Subscription Error, There was an error registration your newsletter account.";
+                TempData["subscriptionError"] = errorMessage;
+                model.SubscribeMessage = errorMessage;
+                return CurrentUmbracoPage();
+            }
+            else
+            {
+                // set the success message and return the current page
+                var successMessage = "Your newsletter account has been successfully created.";
+                TempData["subscriptionSuccess"] = successMessage;
+                model.SubscribeMessage = successMessage;
+                return CurrentUmbracoPage();
+            }
+        }
+
+        /// <summary>
+        /// get the contact form with the model
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetContactForm()
+        {
+            // create the default
+            var model = new MembersModel
+            {
+                MemberCurrentLoginStatus = _currentLoginStatus,
+                ModelMemberType = _memberType
+            };
+
+            //if there is a user logged in get the model for that user
+            if (_currentLoginStatus?.IsLoggedIn == true
+                && !string.IsNullOrWhiteSpace(_currentLoginStatus.Email))
+            {
+                //use themember service to check and get any user details
+                model = _siteMemberService.GetMemberByEmail(model, _currentLoginStatus.Email);
+            }
+            else
+            {
+                //use themember service to check and get any user details
+                model = _siteMemberService.GetMemberByEmail(model);
+            }
+
+            //return the model with the view
+            return View("/Views/Partials/Accounts/ContactForm.cshtml", model);
+        }
+
+        /// <summary>
+        /// process the contact form
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult ProcessContactForm(MembersModel model)
+        {
+            //check if the model is valid
+            if (!ModelState.IsValid)
+            {
+                // set the error message and return the current page
+                var errorMessage = "Ops... Contact Error, There was an error with your details please check them and try again.";
+                TempData["contactError"] = errorMessage;
+                model.SubscribeMessage = errorMessage;
+                return CurrentUmbracoPage();
+            }
+
+            //check if we have the email address to subscribe
+            if (string.IsNullOrWhiteSpace(model?.Email) ||
+                string.IsNullOrWhiteSpace(model?.FullName) ||
+                string.IsNullOrWhiteSpace(model?.ContactDetails))
+            {
+                // set the error message and return the current page
+                var errorMessage = "Ops... Contact Error, Please fill in all the details and try again.";
+                TempData["contactError"] = errorMessage;
+                model.SubscribeMessage = errorMessage;
+                return CurrentUmbracoPage();
+            }
+
+            //get the form data to use
+            var formData = Request.Form;
+            var captchaRequest = formData["g-recaptcha-response"];
+            //check if the model is valid
+            if (string.IsNullOrWhiteSpace(captchaRequest))
+            {
+                // set the error message and return the current page
+                var errorMessage = "Ops... Contact Error, Please check the Re-Captcha box and try again.";
+                TempData["contactError"] = errorMessage;
+                model.SubscribeMessage = errorMessage;
+                return CurrentUmbracoPage();
+            }
+
+            //add the member type to the model
+            model.ModelMemberType = _memberType;
+
+            //finally check if the email address has got a user, and if that person is logged in and save the login status
+            var checkedMember = _siteMemberService.GetMemberByEmail(model, model.Email);
+            if(checkedMember.LoggedInMember?.Id > 0 &&
+                _currentLoginStatus?.IsLoggedIn == true &&
+                _currentLoginStatus.Email == checkedMember.LoggedInMember.Email)
+            {
+                model.MemberCurrentLoginStatus = _currentLoginStatus;
+            }
+            //set which the subscription flag on the model to indicate which account to create
+            model.IsContactMember = true;
+            model.IsNewsletterMember = model.IsNewsletterMember;
+
+            //subscribe the email
+            var registeredModel = _siteMemberService.RegisterSiteMember(
+                                                model,
+                                                out MembershipCreateStatus createStatus);
+
+            //check if we have a new member created
+            if (registeredModel.LoggedInMember == null || createStatus != MembershipCreateStatus.Success)
+            {
+                // set the error message and return the current page
+                var errorMessage = "Ops... Contact Error, There was an error sub.";
+                TempData["contactError"] = errorMessage;
+                model.SubscribeMessage = errorMessage;
+                return CurrentUmbracoPage();
+            }
+            else
+            {
+                // set the success message and return the current page
+                var successMessage = "Your contact details have been submitted.";
+                TempData["contactSuccess"] = successMessage;
+                model.SubscribeMessage = successMessage;
+                return CurrentUmbracoPage();
+            }
         }
     }
 }

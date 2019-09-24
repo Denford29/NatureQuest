@@ -20,13 +20,11 @@ namespace NatureQuestWebsite.Services
         /// Register a new site member from the model
         /// </summary>
         /// <param name="memberModel"></param>
-        /// <param name="memberType"></param>
         /// <param name="status"></param>
         /// <param name="logMemberIn"></param>
         /// <returns></returns>
         MembersModel RegisterSiteMember(
             MembersModel memberModel,
-            IMemberType memberType,
             out MembershipCreateStatus status,
             bool logMemberIn = false);
     }

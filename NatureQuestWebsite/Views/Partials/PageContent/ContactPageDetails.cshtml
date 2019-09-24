@@ -19,46 +19,13 @@
                     Contact Us
                 </h3>
                 <hr class="margin-bottom-1x">
-                <form class="needs-validation" novalidate>
-                    <div class="row">
-                        <div class="col-sm-6 form-group">
-                            <label for="validationCustom01">Full Name</label>
-                            <input class="form-control" type="text" id="validationCustom01" placeholder="Full Name" value="" required>
-                            <div class="invalid-feedback">Please choose a username.</div>
-                            <div class="valid-feedback">Looks good!</div>
-                        </div>
 
-                        <div class="col-sm-6 form-group">
-                            <label for="validationCustom02">Email Address</label>
-                            <input class="form-control" type="text" id="validationCustom02" placeholder="Email Address" value="" required>
-                            <div class="invalid-feedback">Please choose a username.</div>
-                            <div class="valid-feedback">Looks good!</div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12 form-group">
-                            <label for="validationCustomUsername">
-                                Inquiry Details
-                            </label>
-                            <textarea class="form-control" id="textarea-input" rows="4">Hello World!</textarea>
-                            <div class="invalid-feedback">Please choose a username.</div>
-                            <div class="valid-feedback">Looks good!</div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="custom-control custom-checkbox">
-                            <input class="custom-control-input" type="checkbox" id="invalidCheck" required>
-                            <label class="custom-control-label" for="invalidCheck">Agree to terms and conditions</label>
-                            <div class="invalid-feedback">You must agree before submitting.</div>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" type="submit">Submit Form</button>
-                </form>
+                @Html.Action("GetContactForm", "Accounts")
 
                 @if (currentPage.HasProperty("fullAddress") && currentPage.HasValue("fullAddress"))
                 {
                     var fullAddress = currentPage.Value<string>("fullAddress");
-                    <hr class="margin-bottom-1x">
+                    <hr class="margin-bottom-1x margin-top-1x">
                     <h3 class="margin-top-1x text-center mb-10 text-primary">
                         Head Office location...
                     </h3>

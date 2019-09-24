@@ -67,7 +67,7 @@ namespace NatureQuestWebsite.Models
         public string GoogleSiteKey { get; set; }
 
         /// <summary>
-        /// /get or set the email address
+        /// get or set the email address
         /// </summary>
         [Required(ErrorMessage = "Please enter your email address")]
         [EmailAddress(ErrorMessage = "Please check your email address, doesn't look valid")]
@@ -76,14 +76,14 @@ namespace NatureQuestWebsite.Models
         public string Email { get; set; }
 
         /// <summary>
-        /// /get or set the password
+        /// get or set the password
         /// </summary>
         [Display(Name = "Password")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
         /// <summary>
-        /// /get or set the parent full name
+        /// /get or set the full name
         /// </summary>
         [Display(Name = "Full Name")]
         public string FullName { get; set; }
@@ -95,14 +95,31 @@ namespace NatureQuestWebsite.Models
         public string MobileNumber { get; set; }
 
         /// <summary>
+        /// /get or set the member home address
+        /// </summary>
+        [Display(Name = "Home Address")]
+        public string HouseAddress { get; set; }
+
+        /// <summary>
+        /// /get or set the inquiry details
+        /// </summary>
+        [Display(Name = "Inquiry Details")]
+        public string ContactDetails { get; set; }
+
+        /// <summary>
         /// get or set the member type of the user
+        /// </summary>
+        public IMemberType ModelMemberType { get; set; }
+
+        /// <summary>
+        /// get or set the member type alias of the user
         /// </summary>
         public string MemberTypeAlias { get; set; }
 
         /// <summary>
         /// get the list of editable member properties
         /// </summary>
-        public List<UmbracoProperty> MemberProperties { get; set; }
+        public PropertyCollection MemberProperties { get; set; } 
 
         /// <summary>
         /// get or set a flag to login the user or not after creation
