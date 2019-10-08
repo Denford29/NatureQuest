@@ -1,4 +1,5 @@
-﻿@using NatureQuestWebsite.Models
+﻿@using ClientDependency.Core.Mvc
+@using NatureQuestWebsite.Models
 @inherits Umbraco.Web.Mvc.UmbracoViewPage<StandardPageViewModel>
 @{
     var currentModel = Model;
@@ -46,6 +47,16 @@
 
     @RenderSection("footerScripts", false)
 
+    @{
+        Html.EnableClientValidation();
+        Html.EnableUnobtrusiveJavaScript();
+        Html.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js");
+        Html.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js");
+        Html.RequiresJs("https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js");
+    }
+
+    @Html.RenderJsHere()
+
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-145517845-1"></script>
     <script>
@@ -55,9 +66,9 @@
 
         gtag('config', 'UA-145517845-1');
     </script>
-    
-<!--Goggle Re captcha-->
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    <!--Goggle Re captcha-->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 
 </body>

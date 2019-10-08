@@ -8,7 +8,7 @@ using  Umbraco.Web;
 using  Umbraco.ModelsBuilder;
 using  Umbraco.ModelsBuilder.Umbraco;
 [assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "646b26a8e489b2a2")]
+[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "12263c259b90c344")]
 [assembly:System.Reflection.AssemblyVersion("0.0.0.1")]
 
 
@@ -1074,25 +1074,25 @@ namespace Umbraco.Web.PublishedModels
 	}
 
 	/// <summary>Customer Details Page</summary>
-	[PublishedModel("customer")]
-	public partial class Customer : SiteDefaultPage
+	[PublishedModel("customerDetailsPage")]
+	public partial class CustomerDetailsPage : SiteDefaultPage
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
-		public new const string ModelTypeAlias = "customer";
+		public new const string ModelTypeAlias = "customerDetailsPage";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		public new static PublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
-		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Customer, TValue>> selector)
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<CustomerDetailsPage, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
 		// ctor
-		public Customer(IPublishedContent content)
+		public CustomerDetailsPage(IPublishedContent content)
 			: base(content)
 		{ }
 

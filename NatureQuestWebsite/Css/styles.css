@@ -5,7 +5,7 @@
     position: absolute;
     top: 100%;
     left: 0;
-    width: 200px;
+    width: 250px;
     margin-top: -7px !important;
     padding: 10px 0 !important;
     border: 1px solid #e1e7ec;
@@ -20,7 +20,7 @@
         position: relative
     }
 
-        .sub-menu > li > a, .toolbar-dropdown > li > a {
+        .sub-menu > li > a, .toolbar-dropdown > li > a, .toolbar-dropdown li form a {
             display: block;
             padding: 5px 20px !important;
             transition: color .3s;
@@ -4635,10 +4635,12 @@ a.list-group-item {
     width: 100%;
     min-height: 580px;
     background-position: center;
-    background-color: #f5f5f5;
+    background-color: #fff;
     background-repeat: no-repeat;
     background-size: cover;
-    overflow: hidden
+    overflow: hidden;
+    border-bottom: 2px solid #e1e7ec;
+    border-top: 1px solid #e1e7ec;
 }
 
     .hero-slider > .owl-carousel {
@@ -6029,8 +6031,8 @@ video {
 }
 
 .site-logo {
-    width: 154px;
-    padding: 12px 0 12px 25px;
+    width: 200px;
+    padding: 12px 0 12px 15px;
     text-decoration: none
 }
 
@@ -6164,7 +6166,7 @@ video {
 .toolbar {
     position: absolute;
     top: 0;
-    right: 30px;
+    right: 25px;
     height: 100%;
     z-index: 5
 }

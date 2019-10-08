@@ -62,6 +62,16 @@ namespace NatureQuestWebsite.Models
         public string RegistrationMessage { get; set; }
 
         /// <summary>
+        /// get or set the login message
+        /// </summary>
+        public string LoginMessage { get; set; }
+
+        /// <summary>
+        /// get or set the update message
+        /// </summary>
+        public string UpdateMessage { get; set; }
+
+        /// <summary>
         /// get or set the google site key
         /// </summary>
         public string GoogleSiteKey { get; set; }
@@ -81,6 +91,13 @@ namespace NatureQuestWebsite.Models
         [Display(Name = "Password")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
+
+        /// <summary>
+        /// get or set the password confirm
+        /// </summary>
+        [Display(Name = "Confirm Password")]
+        [DataType(DataType.Password)]
+        public string PasswordConfirm { get; set; }
 
         /// <summary>
         /// /get or set the full name
@@ -115,11 +132,6 @@ namespace NatureQuestWebsite.Models
         /// get or set the member type alias of the user
         /// </summary>
         public string MemberTypeAlias { get; set; }
-
-        /// <summary>
-        /// get the list of editable member properties
-        /// </summary>
-        public PropertyCollection MemberProperties { get; set; } 
 
         /// <summary>
         /// get or set a flag to login the user or not after creation

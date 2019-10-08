@@ -52,7 +52,7 @@
     </div>
 
     <div class="offcanvas-container" id="mobile-menu">
-        <a class="account-link" href="account-orders.html">
+        <a class="account-link" href="@siteMenuModel.AccountDetailsPage.Url">
             <div class="user-ava">
                 <img src="/Images/account/user-ava-md.jpg" alt="Daniel Adams">
             </div>
@@ -140,23 +140,23 @@
         <div class="topbar-column">
             @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteFacebook))
             {
-            <a class="hidden-md-down" href="@siteMenuModel.SiteFacebook" target="_blank" tittle="Facebook">
-                <i class="socicon-facebook"></i>&nbsp;Facebook
-            </a>
+                <a class="hidden-md-down" href="@siteMenuModel.SiteFacebook" target="_blank" tittle="Facebook">
+                    <i class="socicon-facebook"></i>&nbsp;Facebook
+                </a>
             }
 
             @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteTwitter))
             {
-            <a class="hidden-md-down" href="@siteMenuModel.SiteTwitter" target="_blank" title="Twitter">
-                <i class="socicon-twitter"></i>&nbsp;Twitter
-            </a>
+                <a class="hidden-md-down" href="@siteMenuModel.SiteTwitter" target="_blank" title="Twitter">
+                    <i class="socicon-twitter"></i>&nbsp;Twitter
+                </a>
             }
 
             @if (!string.IsNullOrWhiteSpace(siteMenuModel.SiteInstagram))
             {
-            <a class="hidden-md-down" href="@siteMenuModel.SiteInstagram" target="_blank" title="Instagram">
-                <i class="socicon-instagram"></i>&nbsp;Instagram
-            </a>
+                <a class="hidden-md-down" href="@siteMenuModel.SiteInstagram" target="_blank" title="Instagram">
+                    <i class="socicon-instagram"></i>&nbsp;Instagram
+                </a>
             }
 
         </div>
@@ -319,6 +319,37 @@
                         </ul>
                     </li>
                 }
+
+                <!--Add the registration/login or account details page-->
+                @if (siteMenuModel.MemberCurrentLoginStatus.IsLoggedIn)
+                {
+                    if (siteMenuModel.AccountDetailsPage?.Id > 0)
+                    {
+                        var accountLink = siteMenuModel.AccountDetailsPage;
+                        //set the active class if the current page id is the same as the home page
+                        var activeClass = currentPageId == accountLink.Id ? "active" : "";
+                        <li class="@activeClass">
+                            <a href="@accountLink.Url" title="@accountLink.Name">
+                                <span>Account Details</span>
+                            </a>
+                        </li>
+                    }
+                }
+                else
+                {
+                    if (siteMenuModel.RegistrationLoginPage?.Id > 0)
+                    {
+                        var registerLink = siteMenuModel.RegistrationLoginPage;
+                        //set the active class if the current page id is the same as the home page
+                        var activeClass = currentPageId == registerLink.Id ? "active" : "";
+                        <li class="@activeClass">
+                            <a href="@registerLink.Url" title="@registerLink.Name">
+                                <span>Login</span>
+                            </a>
+                        </li>
+                    }
+                }
+
             </ul>
         </nav>
         <!--Toolbar-->
@@ -326,49 +357,89 @@
             <div class="inner">
                 <div class="tools">
                     <div class="search"><i class="icon-search"></i></div>
-                    @*<div class="account">
-                        <a href="account-orders.html"></a><i class="icon-head"></i>
-                        <ul class="toolbar-dropdown">
-                            <li class="sub-menu-user">
-                                <div class="user-ava">
-                                    <img src="/Images/account/user-ava-sm.jpg" alt="Daniel Adams">
-                                </div>
-                                <div class="user-info">
-                                    <h6 class="user-name">Daniel Adams</h6><span class="text-xs text-muted">290 Reward points</span>
-                                </div>
-                            </li>
-                            <li><a href="account-profile.html">My Profile</a></li>
-                            <li><a href="account-orders.html">Orders List</a></li>
-                            <li><a href="account-wishlist.html">Wishlist</a></li>
-                            <li class="sub-menu-separator"></li>
-                            <li><a href="#"> <i class="icon-unlock"></i>Logout</a></li>
-                        </ul>
-                    </div>
-                    <div class="cart">
-                        <a href="cart.html"></a><i class="icon-bag"></i><span class="count">3</span><span class="subtotal">$289.68</span>
-                        <div class="toolbar-dropdown">
-                            <div class="dropdown-product-item">
-                                <span class="dropdown-product-remove"><i class="icon-cross"></i></span><a class="dropdown-product-thumb" href="shop-single.html"><img src="/Images/cart-dropdown/01.jpg" alt="Product"></a>
-                                <div class="dropdown-product-info"><a class="dropdown-product-title" href="shop-single.html">Unionbay Park</a><span class="dropdown-product-details">1 x $43.90</span></div>
-                            </div>
-                            <div class="dropdown-product-item">
-                                <span class="dropdown-product-remove"><i class="icon-cross"></i></span><a class="dropdown-product-thumb" href="shop-single.html"><img src="/Images/cart-dropdown/02.jpg" alt="Product"></a>
-                                <div class="dropdown-product-info"><a class="dropdown-product-title" href="shop-single.html">Daily Fabric Cap</a><span class="dropdown-product-details">2 x $24.89</span></div>
-                            </div>
-                            <div class="dropdown-product-item">
-                                <span class="dropdown-product-remove"><i class="icon-cross"></i></span><a class="dropdown-product-thumb" href="shop-single.html"><img src="/Images/cart-dropdown/03.jpg" alt="Product"></a>
-                                <div class="dropdown-product-info"><a class="dropdown-product-title" href="shop-single.html">Haan Crossbody</a><span class="dropdown-product-details">1 x $200.00</span></div>
-                            </div>
-                            <div class="toolbar-dropdown-group">
-                                <div class="column"><span class="text-lg">Total:</span></div>
-                                <div class="column text-right"><span class="text-lg text-medium">$289.68&nbsp;</span></div>
-                            </div>
-                            <div class="toolbar-dropdown-group">
-                                <div class="column"><a class="btn btn-sm btn-block btn-secondary" href="cart.html">View Cart</a></div>
-                                <div class="column"><a class="btn btn-sm btn-block btn-success" href="checkout-address.html">Checkout</a></div>
-                            </div>
+                    <!-- if we have a user logged in show the account and basket link-->
+                    @if (siteMenuModel.MemberCurrentLoginStatus.IsLoggedIn)
+                    {
+                        <div class="account">
+                            @if (siteMenuModel.AccountDetailsPage?.Id > 0)
+                            {
+                                <a href="@siteMenuModel.AccountDetailsPage.Url"></a><i class="icon-head"></i>
+                            }
+                            <ul class="toolbar-dropdown">
+                                <li class="sub-menu-user">
+                                    <div class="user-ava">
+                                        <img src="/Images/account/user-ava-sm.jpg" alt="Daniel Adams">
+                                    </div>
+                                    <div class="user-info">
+                                        <h6 class="user-name">
+                                            @siteMenuModel.MemberCurrentLoginStatus.Name
+                                        </h6>
+                                    </div>
+                                </li>
+                                @if (siteMenuModel.AccountDetailsPage?.Id > 0)
+                                {
+                                    <li>
+                                        <a href="@siteMenuModel.AccountDetailsPage.Url">
+                                            @siteMenuModel.AccountDetailsPage.Name
+                                        </a>
+                                    </li>
+                                }
+                                <li class="sub-menu-separator"></li>
+                                <li>
+                                    @using (Html.BeginUmbracoForm("ProcessMemberLogout", "Accounts",
+                                        FormMethod.Post,
+                                        new { role = "form", id = "logoutForm", novalidate = "novalidate" }))
+                                    {
+                                        <a href="#" onclick="document.forms['logoutForm'].submit(); return false;">
+                                            <i class="icon-unlock"></i>Logout
+                                        </a>
+                                    }
+                                </li>
+                            </ul>
                         </div>
-                    </div>*@
+                        if (siteMenuModel.ShoppingCartPage?.Id > 0)
+                        {
+                            <div class="cart">
+                                <a href="@siteMenuModel.ShoppingCartPage.Url" title="@siteMenuModel.ShoppingCartPage.Name"></a><i class="icon-bag"></i>
+                                <span class="count">0</span><span class="subtotal">$00.00</span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="account">
+                            @if (siteMenuModel.RegistrationLoginPage?.Id > 0)
+                            {
+                                <a href="@siteMenuModel.RegistrationLoginPage.Url"></a><i class="icon-head"></i>
+                            }
+                            <ul class="toolbar-dropdown">
+                                @if (siteMenuModel.RegistrationLoginPage?.Id > 0)
+                                {
+                                    <li>
+                                        <a href="@siteMenuModel.RegistrationLoginPage.Url">
+                                            @siteMenuModel.RegistrationLoginPage.Name
+                                        </a>
+                                    </li>
+                                }
+                                <li class="sub-menu-separator"></li>
+                                @if (siteMenuModel.RegistrationLoginPage?.Id > 0)
+                                {
+                                    <li>
+                                        <a href="@siteMenuModel.RegistrationLoginPage.Url">
+                                            <i class="icon-lock"></i>Login
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                        if (siteMenuModel.ShoppingCartPage?.Id > 0)
+                        {
+                            <div class="cart">
+                                <a href="@siteMenuModel.ShoppingCartPage.Url" title="@siteMenuModel.ShoppingCartPage.Name"></a><i class="icon-bag"></i>
+                                <span class="count">0</span><span class="subtotal">$00.00</span>
+                            </div>
+                        }
+                    }
                 </div>
             </div>
         </div>

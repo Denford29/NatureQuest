@@ -560,6 +560,7 @@
     <Content Include="Images\mega-menu-home\04.jpg" />
     <Content Include="Images\Nature-Quest-Lavenders.png" />
     <Content Include="Images\Nature-Quest-Open-Graph.jpg" />
+    <Content Include="Images\Nature-Quest-Product-Default-thumb.png" />
     <Content Include="Images\Nature-Quest-Product-Default.png" />
     <Content Include="Images\NatureQuest-Logo-square.jpg" />
     <Content Include="Images\NatureQuest-Logo-square.png" />
@@ -665,25 +666,62 @@
     <Content Include="Images\video-covers\03.jpg" />
     <Content Include="Media\0dmdma51\natures-quest-go-vita.png" />
     <Content Include="Media\0n4lojcs\nature-quest-wash.png" />
+    <Content Include="Media\0rhlzbww\nature_s_quest-nourishing_care_conditioner_500ml-9342789003010.jpg" />
+    <Content Include="Media\2dddr5ok\nature_s_quest-nourishing_care_shampoo_500ml-9342789003065.jpg" />
     <Content Include="Media\2ezjln32\nq-bodywash-250.png" />
     <Content Include="Media\2l5c35sq\nature-quest-banner-1.jpg" />
     <Content Include="Media\2w3kigri\natures-quest-foodlandsa.png" />
     <Content Include="Media\3dsnfpvr\natures-quest-terrywhite-hemmart.png" />
     <Content Include="Media\3whgvvs2\nature-quest-banner.jpg" />
+    <Content Include="Media\402ptmyn\nature_s_quest-nourishing_care_shampoo_250ml-9342789002006.jpg" />
+    <Content Include="Media\40ypah0b\nature_s_quest-fortifying_conditioner_500ml-9342789003003.jpg" />
+    <Content Include="Media\5h3pxens\nature_s_quest-body_wash_1lt-9342789004048.jpg" />
+    <Content Include="Media\a2mbodwq\nature_s_quest-daily_conditioner_250ml-9342789002068.jpg" />
     <Content Include="Media\beel2mjs\nature-quest-body-care.jpg" />
     <Content Include="Media\bwrli20q\nature-quest-wash.jpg" />
     <Content Include="Media\cdrb33x1\natures-quest-logo.png" />
+    <Content Include="Media\d1hlshfc\nature_s_quest-lavender_conditioner_500ml-9342789003096.jpg" />
+    <Content Include="Media\d3bnbsq3\nature_s_quest-nourishing_care_shampoo_250ml-9342789002006.jpg" />
+    <Content Include="Media\d3ocwux1\nature_s_quest-lavender_250ml-9342789002075.jpg" />
+    <Content Include="Media\dgbjlljn\nature_s_quest-lavender_shampoo_1lt-9342789004017.jpg" />
+    <Content Include="Media\dgzfichs\nature_s_quest-daily_shampoo_250ml-9342789002013.jpg" />
     <Content Include="Media\eescl4dw\natures-quest-mega-health.png" />
+    <Content Include="Media\evcdyh1f\nature_s_quest-natural_facial_moisturiser_45gm-9342789000194.jpg" />
+    <Content Include="Media\fdlfn2ug\nature_s_quest-facial_cream_cleanser_125ml-9342789000040.jpg" />
     <Content Include="Media\g0th4m4q\nq-bodylotion-500ml.png" />
+    <Content Include="Media\gbbddnu4\nature_s_quest-lavendar_shampoo_250ml-9342789002020.jpg" />
     <Content Include="Media\hbpnztpt\nature-quest-natural-care.png" />
+    <Content Include="Media\hw5dwmls\nature_s_quest-facial_toner_125ml-9342789000071.jpg" />
+    <Content Include="Media\jchbcgf3\nature_s_quest-facial_scrub_125ml-9342789000064.jpg" />
+    <Content Include="Media\jpfdx1pd\nature_s_quest-body_lotion_250ml-9342789002129.jpg" />
+    <Content Include="Media\jzhnropd\nature_s_quest-body_lotion_500ml-9342789003102.jpg" />
+    <Content Include="Media\kn5bdw0z\nature_s_quest-lavendar_shampoo_250ml-9342789002020.jpg" />
+    <Content Include="Media\lguewm1h\nature_s_quest-lavender_shampoo_500ml-9342789003034.jpg" />
+    <Content Include="Media\lx5b5u1y\nature_s_quest-moroccan_shampoo_250ml-9342789000200.jpg" />
+    <Content Include="Media\mspjycel\nature_s_quest-fortifying_conditioner_250ml-9342789002082.jpg" />
     <Content Include="Media\n4nfjbec\natures-quest-lavendar_shampoo-edit-tall.png" />
+    <Content Include="Media\objiz321\nature_s_quest-body_wash_500ml-9342789003089.jpg" />
+    <Content Include="Media\oggkxmym\nature_s_quest-natural_hand_sanitiser_240ml-9342789000262.jpg" />
+    <Content Include="Media\peljwvy5\nature_s_quest-nourishing_care_conditioner_250ml-9342789002051.jpg" />
     <Content Include="Media\pwuhmhte\natures-quest-chemplus.png" />
+    <Content Include="Media\qafe2v31\nature_s_quest-hand_wash_250ml-9342789002112.jpg" />
+    <Content Include="Media\qfvoljk5\nature_s_quest-foaming_face_cleanser_125ml-9342789000088.jpg" />
+    <Content Include="Media\qhtl2ryo\nature_s_quest-tanning_lotion_250ml-9342789000279.jpg" />
     <Content Include="Media\qy3h1g2c\natures-quest-healthy-life.png" />
+    <Content Include="Media\r3jn1dzf\nature_s_quest-lavender_conditioner_1lt-9342789004031.jpg" />
+    <Content Include="Media\sn1j4vwm\nature_s_quest-fortifying_shampoo_250ml-9342789002037.jpg" />
     <Content Include="Media\svsdb3i4\natures-quest-lavendar_shampoo-edit.jpg" />
+    <Content Include="Media\vevdtxtz\nature_s_quest-fragrance_free_body_wash_250ml_9342789000224.jpg" />
     <Content Include="Media\wdeozifc\nature-quest-facial-care.jpg" />
+    <Content Include="Media\wlhhmweg\nature_s_quest-moroccan_conditioner_250ml-9342789000217.jpg" />
+    <Content Include="Media\y2ibm5ss\nature_s_quest-facial_moisturiser_125ml-9342789000057.jpg" />
     <Content Include="Media\yjvffltn\nature-quest-open-graph.jpg" />
+    <Content Include="Media\ysyjot2w\nature_s_quest-hand_wash_refill_1lt-9342789004062.jpg" />
     <Content Include="Media\z2hfjppx\natures-quest-healthy-elements.jpg" />
+    <Content Include="Media\zaejyewq\nature_s_quest-body_wash_250ml-9342789002167.jpg" />
+    <Content Include="Media\zdnphkyg\nature_s_quest-hand_sanitiser_50ml-9342789000255.jpg" />
     <Content Include="Media\zioh4ayl\nature-quest-natural-care.jpg" />
+    <Content Include="Media\zjzj2o2g\nature_s_quest-fortifying_shampoo_500ml-9342789003041.jpg" />
     <Content Include="Scripts\card.min.js" />
     <Content Include="Scripts\custom.js" />
     <Content Include="Scripts\modernizr.min.js" />
@@ -797,6 +835,8 @@
     <Content Include="Views\Partials\Samples\LoginStatusSample.cshtml" />
     <Content Include="Views\Partials\Samples\RegisterSample.cshtml" />
     <Content Include="Views\Partials\Accounts\ContactForm.cshtml" />
+    <Content Include="Views\Partials\Accounts\LoginRegisterForms.cshtml" />
+    <Content Include="Views\Partials\Accounts\MemberAcountDetails.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -809,7 +849,9 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.6.1\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Media\kn5bdw0z\" />
+    <Folder Include="Media\dt1fcchz\" />
+    <Folder Include="Media\rhlhbh4k\" />
+    <Folder Include="Media\thdn5jrj\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.Models;
 
 namespace NatureQuestWebsite.Models
 {
@@ -93,5 +94,24 @@ namespace NatureQuestWebsite.Models
         /// </summary>
         public List<LinkItemModel> FooterLinks { get; set; } = new List<LinkItemModel>();
 
+        /// <summary>
+        /// get or set the login status of the current member
+        /// </summary>
+        public LoginStatusModel MemberCurrentLoginStatus { get; set; }
+
+        /// <summary>
+        /// get or set the registration page
+        /// </summary>
+        public IPublishedContent RegistrationLoginPage { get; set; }
+
+        /// <summary>
+        /// get or set the registration page
+        /// </summary>
+        public IPublishedContent AccountDetailsPage { get; set; }
+
+        /// <summary>
+        /// get or set the shopping cart page
+        /// </summary>
+        public IPublishedContent ShoppingCartPage { get; set; }
     }
 }

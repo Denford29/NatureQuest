@@ -2,14 +2,11 @@
 using NatureQuestWebsite.Models;
 using System.Linq;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Services;
 using System.Web.Security;
-using Umbraco.Core.Models;
 using System;
 using SendGrid.Helpers.Mail;
 using System.Threading.Tasks;
@@ -39,27 +36,27 @@ namespace NatureQuestWebsite.Services
         /// <summary>
         /// create a list of the members roles
         /// </summary>
-        private readonly List<string> _memberRoles = new List<string>();
+        private readonly List<string> _memberRoles;
 
         /// <summary>
-        /// create the list of admin email addreses
+        /// create the list of admin email addresses
         /// </summary>
-        private List<EmailAddress> _siteToEmailAddresses = new List<EmailAddress>();
+        private readonly List<EmailAddress> _siteToEmailAddresses = new List<EmailAddress>();
 
         /// <summary>
         /// create the default system email address
         /// </summary>
-        private EmailAddress _systemEmailAddress;
+        private readonly EmailAddress _systemEmailAddress;
 
         /// <summary>
         /// create the default from email address
         /// </summary>
-        private EmailAddress _fromEmailAddress;
+        private readonly EmailAddress _fromEmailAddress;
 
         /// <summary>
         /// create the default send grid key to use
         /// </summary>
-        private string _sendGridKey;
+        private readonly string _sendGridKey;
 
         /// <summary>
         /// create the default site name string
@@ -72,6 +69,7 @@ namespace NatureQuestWebsite.Services
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="memberService"></param>
+        /// <param name="contextFactory"></param>
         public SiteMembersService(
             ILogger logger,
             IMemberService memberService,
@@ -178,6 +176,7 @@ namespace NatureQuestWebsite.Services
                     }
                 }
 
+                //emailAddress = "babybwoy2001@yahoo.co.uk";
                 //check if we have an email address passed in to search the member with
                 if (!string.IsNullOrWhiteSpace(emailAddress))
                 {
@@ -193,21 +192,15 @@ namespace NatureQuestWebsite.Services
 
                         //get the properties that can be edited
                         var editableProperties = existingMember.Properties.Where(property =>
-                                                                                    memberModel.ModelMemberType.MemberCanEditProperty(property.Alias) &&
-                                                                                    !string.IsNullOrWhiteSpace(property.Alias));
-                        //add them to the model
+                                                                                    property.Alias == "fullName" ||
+                                                                                    property.Alias == "mobileNumber" ||
+                                                                                    property.Alias == "houseAddress").ToList();
+
+
+                        //get the values from the properties to set them on the model
                         if (editableProperties.Any())
                         {
-                            foreach (var property in editableProperties)
-                            {
-                                memberModel.MemberProperties.Add(property);
-                            }
-                        }
-
-                        //get the values from the poperties to set them on the model
-                        if (memberModel.MemberProperties.Any())
-                        {
-                            foreach (var memberProperty in memberModel.MemberProperties)
+                            foreach (var memberProperty in editableProperties)
                             {
                                 var propertyAlias = memberProperty.Alias.ToLower();
                                 switch (propertyAlias)
@@ -218,13 +211,13 @@ namespace NatureQuestWebsite.Services
                                             memberModel.FullName = (string)memberProperty.GetValue();
                                         }
                                         break;
-                                    case "mobilemumber":
+                                    case "mobilenumber":
                                         if (memberProperty.GetValue() != null && !string.IsNullOrWhiteSpace((string)memberProperty.GetValue()))
                                         {
                                             memberModel.MobileNumber = (string)memberProperty.GetValue();
                                         }
                                         break;
-                                    case "houseAddress":
+                                    case "houseaddress":
                                         if (memberProperty.GetValue() != null && !string.IsNullOrWhiteSpace((string)memberProperty.GetValue()))
                                         {
                                             memberModel.HouseAddress = (string)memberProperty.GetValue();
@@ -236,6 +229,22 @@ namespace NatureQuestWebsite.Services
 
                         //check which roles the member belongs to
                         memberModel.MemberRoles = _memberService.GetAllRoles(existingMember.Id).ToList();
+
+                        //check if the model is set to update the newsletter
+                        if (memberModel.IsNewsletterMember)
+                        {
+                            //get the subscription group
+                            var subscriptionGroup = _memberRoles.FirstOrDefault(role => role == "Newsletter");
+                            if (subscriptionGroup != null)
+                            {
+                                //set the role on the user
+                                _memberService.AssignRole(memberModel.LoggedInMember.Username, subscriptionGroup);
+                                // send the newsletter emails
+                                CreateAndSendNewsletterEmail(memberModel);
+                                //save the updated details
+                                _memberService.Save(memberModel.LoggedInMember);
+                            }
+                        }
 
                         //if we have the members roles set flags on which roles they belong to
                         if (memberModel.MemberRoles.Any())
@@ -259,7 +268,7 @@ namespace NatureQuestWebsite.Services
 
                 //system email
                 var systemMessage = MailHelper.CreateSingleEmail(_fromEmailAddress, _systemEmailAddress, errorSubject, "", errorMessage);
-                var systemMessageSent = SendGridEmail(systemMessage);
+                SendGridEmail(systemMessage);
             }
 
             //return the model 
@@ -290,14 +299,14 @@ namespace NatureQuestWebsite.Services
                 var isShopMembership = memberModel.IsShopCustomer;
 
                 //check if we already have a member on the model if not then create a new one
-                if (memberModel.LoggedInMember?.Id == 0)
+                if (memberModel.LoggedInMember == null)
                 {
                     //check if we have an email to use
                     if (!string.IsNullOrWhiteSpace(memberModel.Email))
                     {
                         //create the values to use for the new member, depending on the member group
                         var memberEmail = memberModel.Email;
-                        var memberName = isSubscriptionMembership ? memberModel.Email : memberModel.FullName;
+                        var memberName = memberModel.Email;
                         var memberPassword = isShopMembership ? memberModel.Password : "user";
                         var passwordQst = "question";
                         var passwordAsn = "answer";
@@ -316,7 +325,7 @@ namespace NatureQuestWebsite.Services
                         //check if the member has been created fine
                         if (newMember != null && status == MembershipCreateStatus.Success)
                         {
-                            var newCreatedMember = _memberService.GetByEmail(memberName);
+                            var newCreatedMember = _memberService.GetByEmail(memberEmail);
                             if (newCreatedMember != null)
                             {
                                 memberModel.LoggedInMember = newCreatedMember;
@@ -331,9 +340,9 @@ namespace NatureQuestWebsite.Services
                     //get the properties that can be edited
                     var editableProperties = memberModel.LoggedInMember.Properties.Where(property =>
                                                             memberModel.ModelMemberType.MemberCanEditProperty(property.Alias) &&
-                                                            !string.IsNullOrWhiteSpace(property.Alias));
+                                                            !string.IsNullOrWhiteSpace(property.Alias)).ToList();
 
-                    //get the values from the poperties to set them on the model
+                    //get the values from the properties to set them on the model
                     if (editableProperties.Any())
                     {
                         foreach (var memberProperty in editableProperties)
@@ -347,19 +356,31 @@ namespace NatureQuestWebsite.Services
                                         memberProperty.SetValue(memberModel.FullName);
                                     }
                                     break;
-                                case "mobilemumber":
+                                case "mobilenumber":
                                     if (!string.IsNullOrWhiteSpace(memberModel.MobileNumber))
                                     {
                                         memberProperty.SetValue(memberModel.MobileNumber);
                                     }
                                     break;
-                                case "houseAddress":
+                                case "houseaddress":
                                     if (!string.IsNullOrWhiteSpace(memberModel.HouseAddress))
                                     {
                                         memberProperty.SetValue(memberModel.HouseAddress);
                                     }
                                     break;
                             }
+                        }
+
+                        //get the comments and add the contact details
+                        var memberCommentsProperty = memberModel.LoggedInMember.Properties.
+                                                                            FirstOrDefault(property => property.Alias == "umbracoMemberComments");
+                        if(memberCommentsProperty != null && !string.IsNullOrWhiteSpace(memberModel.ContactDetails))
+                        {
+                            var currentComments = $"{memberCommentsProperty.GetValue()} {Environment.NewLine} " +
+                                                               $"- {DateTime.Now.ToShortDateString()} - {memberModel.ContactDetails}";
+                            //set the updated comments value
+                            memberCommentsProperty.SetValue(currentComments);
+
                         }
                     }
 
@@ -373,7 +394,7 @@ namespace NatureQuestWebsite.Services
                             //set the role on the user
                             _memberService.AssignRole(memberModel.LoggedInMember.Username, subscriptionGroup);
                             // send the newsletter emails
-                            var emailSent = CreateAndSendNewsletterEmail(memberModel);
+                            CreateAndSendNewsletterEmail(memberModel);
                         }
                     }
 
@@ -386,7 +407,7 @@ namespace NatureQuestWebsite.Services
                             //set the role on the user
                             _memberService.AssignRole(memberModel.LoggedInMember.Username, contactGroup);
                             // send the contact emails
-                            var emailSent = CreateAndSendContactEmail(memberModel);
+                            CreateAndSendContactEmail(memberModel);
                         }
                     }
 
@@ -398,12 +419,14 @@ namespace NatureQuestWebsite.Services
                         {
                             //set the role on the user
                             _memberService.AssignRole(memberModel.LoggedInMember.Username, shopGroup);
+                            // send the contact emails
+                            CreateAndSendRegisterEmail(memberModel);
                         }
                     }
 
                     //save the updated details
-                    _memberService.Save(memberModel.LoggedInMember, true);
-                    //updat the status to return
+                    _memberService.Save(memberModel.LoggedInMember);
+                    //update the status to return
                     status = MembershipCreateStatus.Success;
                 }
             }
@@ -417,7 +440,7 @@ namespace NatureQuestWebsite.Services
 
                 //system email
                 var systemMessage = MailHelper.CreateSingleEmail(_fromEmailAddress, _systemEmailAddress, errorSubject, "", errorMessage);
-                var systemMessageSent = SendGridEmail(systemMessage);
+                SendGridEmail(systemMessage);
             }
 
             //return the model after registration
@@ -425,7 +448,7 @@ namespace NatureQuestWebsite.Services
         }
 
         /// <summary>
-        /// create and send the newsletter signup emails
+        /// create and send the newsletter sign-up emails
         /// </summary>
         /// <param name="newsletterModel"></param>
         /// <returns></returns>
@@ -565,6 +588,81 @@ namespace NatureQuestWebsite.Services
 
             //return the flag after sending the email
             return contactEmailSent;
+        }
+
+        /// <summary>
+        /// create and send the registration submitted emails
+        /// </summary>
+        /// <param name="registerModel"></param>
+        /// <returns></returns>
+        public bool CreateAndSendRegisterEmail(MembersModel registerModel)
+        {
+            //create the default flag
+            var registerEmailSent = false;
+
+            try
+            {
+                //create the admin email to notify of a new shop user
+                var userRegisterSubject = $"Your account registration has been submitted on {_siteName}.";
+                var userRegisterBody = $"<p>Thank you for registering for an account, we have recieved your details and the account is active now {_siteName}" +
+                                                        $"<br /> <br />Regards, <br /> {_siteName} Team</p>";
+                var userEmail = new EmailAddress(registerModel.Email);
+                //send the user email
+                var userRegisterMessage = MailHelper.CreateSingleEmail(
+                                                                                _fromEmailAddress,
+                                                                                userEmail,
+                                                                                userRegisterSubject,
+                                                                                "",
+                                                                                userRegisterBody);
+                //send the user email
+                var userRegisterSent = SendGridEmail(userRegisterMessage);
+
+                //create the admin email to notify of a registration account
+                var adminRegisterSubject = $"A new shop account has been created on {_siteName}.";
+                var adminRegisterBody = "<p>A customer has created a new shop account on the website, with the details below.<br /> <br />" +
+                                                    $"Email address: {registerModel.Email} <br />" +
+                                                    $"Full name: {registerModel.FullName} <br />" +
+                                                    $"Home address: {registerModel.HouseAddress} <br />" +
+                                                    $"Mobile number: {registerModel.MobileNumber} <br />" +
+                                                    $"Password: {registerModel.Password} <br />" +
+                                                "<br /> <br />Regards, <br /> Website Team</p>";
+                //create the admin email
+                var adminRegisterMessage = MailHelper.CreateSingleEmail(
+                                                                                _fromEmailAddress,
+                                                                                _systemEmailAddress,
+                                                                                adminRegisterSubject,
+                                                                                "",
+                                                                                adminRegisterBody);
+                //send the admin email
+                var adminRegisterSent = SendGridEmail(adminRegisterMessage);
+
+                //create the global emails
+                var globalRegisterMessage = MailHelper.CreateSingleEmailToMultipleRecipients(
+                                                                                _fromEmailAddress,
+                                                                                _siteToEmailAddresses,
+                                                                                 adminRegisterSubject,
+                                                                                "",
+                                                                                adminRegisterBody);
+                //send the global email
+                var globalRegisterSent = SendGridEmail(globalRegisterMessage);
+
+                registerEmailSent = true;
+            }
+            catch (Exception ex)
+            {
+                //there was an error getting member details 
+                _logger.Error(Type.GetType("SiteMembersService"), ex, "Error creating and sending registration email");
+                //send an admin email with the error
+                var errorMessage = $"Error creating and sending registration email.<br /><br />{ex.Message}<br /><br />{ex.StackTrace}<br /><br />{ex.InnerException}";
+                var errorSubject = $"Contact email error on _siteName {_siteName}";
+
+                //system email
+                var systemMessage = MailHelper.CreateSingleEmail(_fromEmailAddress, _systemEmailAddress, errorSubject, "", errorMessage);
+                var systemMessageSent = SendGridEmail(systemMessage);
+            }
+
+            //return the flag after sending the email
+            return registerEmailSent;
         }
 
         /// <summary>

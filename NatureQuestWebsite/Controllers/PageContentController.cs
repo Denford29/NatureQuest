@@ -204,7 +204,7 @@ namespace NatureQuestWebsite.Controllers
                 foreach (var featureProduct in featureProducts)
                 {
                     //get the feature model
-                    var featureProductModel = _productsService.GetProductModel(featureProduct);
+                    var featureProductModel = _productsService.GetProductModel(featureProduct, true);
 
                     //add it to the feature model
                     model.Add(featureProductModel);
@@ -266,7 +266,7 @@ namespace NatureQuestWebsite.Controllers
                         //get the model for each of the products
                         foreach (var product in modelProducts)
                         {
-                            var productModel = _productsService.GetProductModel(product);
+                            var productModel = _productsService.GetProductModel(product, true);
                             //add it to the category model
                             categoryModel.CategoriesProducts.Add(productModel);
                         }
@@ -795,7 +795,7 @@ namespace NatureQuestWebsite.Controllers
                 foreach (var product in contentProducts)
                 {
                     //get the model
-                    var productModel = _productsService.GetProductModel(product);
+                    var productModel = _productsService.GetProductModel(product, true);
                     //check if its got prices and add it to the list
                     if (productModel?.ProductPrices.Any() == true)
                     {

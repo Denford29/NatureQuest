@@ -34,6 +34,21 @@ namespace NatureQuestWebsite.Controllers
         private readonly IPublishedContent _homePage;
 
         /// <summary>
+        /// set the registration/login page
+        /// </summary>
+        private readonly IPublishedContent _registrationLoginPage;
+
+        /// <summary>
+        /// set the account details page
+        /// </summary>
+        private readonly IPublishedContent _accountDetailsPage;
+
+        /// <summary>
+        /// set the shopping cart details page
+        /// </summary>
+        private readonly IPublishedContent _shoppingCartPage;
+
+        /// <summary>
         /// create the default categories headline
         /// </summary>
         private readonly string _categoriesHeadline = "Shop Categories";
@@ -74,6 +89,11 @@ namespace NatureQuestWebsite.Controllers
         private readonly IProductsService _productsService;
 
         /// <summary>
+        /// set the current login status to use
+        /// </summary>
+        private readonly LoginStatusModel _currentLoginStatus;
+
+        /// <summary>
         /// initialise the controller
         /// </summary>
         public StandardPageController(IProductsService productsService)
@@ -81,12 +101,33 @@ namespace NatureQuestWebsite.Controllers
             //set the product service to use
             _productsService = productsService;
 
+            // get the login status
+            _currentLoginStatus = Members.GetCurrentLoginStatus();
+
             //get the global site settings page to use
             var homePage = Umbraco.ContentAtRoot().FirstOrDefault(x => x.ContentType.Alias == "home");
             if (homePage?.Id > 0)
             {
                 //save the home page for use later
                 _homePage = homePage;
+
+                //get the registration page
+                if(homePage.FirstChildOfType("regisrtationPage")?.Id > 0)
+                {
+                    _registrationLoginPage = homePage.FirstChildOfType("regisrtationPage");
+                }
+
+                //get the account details page
+                if (homePage.FirstChildOfType("customerDetailsPage")?.Id > 0)
+                {
+                    _accountDetailsPage = homePage.FirstChildOfType("customerDetailsPage");
+                }
+
+                //get the shopping cart details page
+                if (homePage.FirstChildOfType("shoppingCartPage")?.Id > 0)
+                {
+                    _shoppingCartPage = homePage.FirstChildOfType("shoppingCartPage");
+                }
             }
 
             //get the global site settings page to use
@@ -358,8 +399,21 @@ namespace NatureQuestWebsite.Controllers
         {
             //get the menu item from the model to use
             var menuItem = model.SiteMenu;
+
             //set the site name 
             menuItem.SiteName = _siteName;
+
+            //set the login status
+            menuItem.MemberCurrentLoginStatus = _currentLoginStatus;
+
+            //set the registration/login page
+            menuItem.RegistrationLoginPage = _registrationLoginPage;
+
+            //set the account details page
+            menuItem.AccountDetailsPage = _accountDetailsPage;
+
+            //set the shopping cart details page
+            menuItem.ShoppingCartPage = _shoppingCartPage;
 
             //get the site menu categories headline
             menuItem.CategoriesMenuTitle = _categoriesHeadline;
@@ -505,134 +559,22 @@ namespace NatureQuestWebsite.Controllers
                     //create the mega menu items for the feature products
                     foreach (var featureProduct in menuFeatureProducts)
                     {
-                        //set the default landing page title
-                        var productTitle = featureProduct.Name;
-                        //check if we have the page title set on the current page
-                        if (featureProduct.HasProperty("pageTitle") && featureProduct.HasValue("pageTitle"))
-                        {
-                            // set the page title to override the default
-                            productTitle = featureProduct.GetProperty("pageTitle").Value().ToString();
-                        }
+                        var featureProductModel = _productsService.GetProductModel(featureProduct, true);
+
+                        var productFirstImage = featureProductModel.ProductImages.FirstOrDefault();
+                        //if we haven't got a featured price, then just get the 1st normal price
+                        var productFeaturedPrice = featureProductModel.FeaturedPrice;
 
                         //create the landing page item
                         var featureProductLink = new LinkItemModel
                         {
-                            LinkTitle = productTitle,
-                            LinkUrl = featureProduct.Url,
-                            LinkPage = featureProduct,
-                            LinkImage = "/Images/NatureQuest-Logo-square.png",
-                            ThumbLinkImage = "/Images/NatureQuest-Logo-square.png"
+                            LinkTitle = featureProductModel.ProductTitle,
+                            LinkUrl = featureProductModel.ProductPage.Url,
+                            LinkPage = featureProductModel.ProductPage,
+                            LinkImage = productFirstImage != null ? productFirstImage.ImageUrl: "",
+                            ThumbLinkImage = productFirstImage != null ? productFirstImage.ImageUrl : "",
+                            ProductPrice = productFeaturedPrice != null ? productFeaturedPrice: null
                         };
-
-                        //get the price child items
-                        var productPrices = featureProduct.Children().Where(page => page.ContentType.Alias == "productPrice").ToList();
-                        if (productPrices.Any())
-                        {
-                            //if we have a featured price use that 1
-                            var displayedPrice = productPrices.FirstOrDefault(price =>
-                                price.HasProperty("featuredPrice")
-                                && price.HasValue("featuredPrice")
-                                && price.Value<bool>("featuredPrice"));
-
-                            //if we don't have the featured price then just get the 1st 1
-                            if (displayedPrice == null)
-                            {
-                                displayedPrice = productPrices.FirstOrDefault(price =>
-                                    price.HasProperty("normalPrice")
-                                    && price.HasValue("normalPrice")
-                                    && price.Value<decimal>("normalPrice") != 0);
-                            }
-
-                            //go through the prices and add the
-                            if (displayedPrice != null)
-                            {
-                                //set the default price
-                                decimal productOriginalPrice = 0;
-                                //check if we have a price set
-                                if (displayedPrice.HasProperty("normalPrice") && displayedPrice.HasValue("normalPrice"))
-                                {
-                                    // set the product price
-                                    productOriginalPrice = displayedPrice.Value<decimal>("normalPrice");
-                                }
-
-                                //set the default sale price
-                                decimal productSalePrice = 0;
-                                //check if we have a sale price
-                                if (displayedPrice.HasProperty("salePrice") && displayedPrice.HasValue("salePrice"))
-                                {
-                                    // set the sale price
-                                    productSalePrice = displayedPrice.Value<decimal>("salePrice");
-                                }
-
-                                //set the variant name
-                                var priceVariant = displayedPrice.Name;
-                                //check if we have the price variant set
-                                if (displayedPrice.HasProperty("productVariant") &&
-                                    displayedPrice.HasValue("productVariant"))
-                                {
-                                    // set the page title to override the default
-                                    priceVariant = displayedPrice.GetProperty("productVariant").Value().ToString();
-                                }
-
-                                // get the flag ti indicate its a featured price
-                                var isFeaturedPrice = false;
-                                if (displayedPrice.HasProperty("featuredPrice") &&
-                                    displayedPrice.HasValue("featuredPrice"))
-                                {
-                                    // set the page flag from the value
-                                    isFeaturedPrice = displayedPrice.Value<bool>("featuredPrice");
-                                }
-
-                                // calculate the percentage
-                                var salePercentage = 0;
-                                if (productSalePrice > 0)
-                                {
-                                    salePercentage =
-                                        100 - Convert.ToInt32(productSalePrice / productOriginalPrice * 100);
-                                }
-
-                                //create the new price model
-                                var priceModel = new ProductPriceModel
-                                {
-                                    ProductPrice = productOriginalPrice,
-                                    SalePrice = productSalePrice,
-                                    ProductVariant = priceVariant,
-                                    IsFeaturedPrice = isFeaturedPrice,
-                                    SalePercentage = salePercentage
-                                };
-
-                                // add the price to the model
-                                featureProductLink.ProductPrice = priceModel;
-                            }
-                        }
-
-                        //set feature product image
-                        var productImages = featureProduct.Value<IEnumerable<IPublishedContent>>("productImages").ToList();
-                        if (productImages.Any())
-                        {
-                            var firstImage = productImages.FirstOrDefault();
-                            if (firstImage != null && firstImage.Id > 0)
-                            {
-                                //get the normal image size
-                                var defaultCropSize = firstImage.GetCropUrl("product");
-                                var normaImagelink = !string.IsNullOrEmpty(defaultCropSize) ?
-                                    defaultCropSize :
-                                    firstImage.GetCropUrl(1000, 670);
-                                if (!string.IsNullOrWhiteSpace(normaImagelink))
-                                {
-                                    featureProductLink.LinkImage = normaImagelink;
-                                }
-                                //get the thumbnail image
-                                var thumbCropSize = firstImage.GetCropUrl("thumbNail");
-                                var thumbImagelink = !string.IsNullOrEmpty(thumbCropSize) ?
-                                    thumbCropSize :
-                                    firstImage.GetCropUrl(250, 250);
-                                if (!string.IsNullOrWhiteSpace(thumbImagelink))
-                                {
-                                    featureProductLink.ThumbLinkImage = thumbImagelink;
-                                }
-                            }
-                        }
 
                         //add the feature link to the model
                         menuItem.FeaturedProductsLinks.Add(featureProductLink);
@@ -690,6 +632,11 @@ namespace NatureQuestWebsite.Controllers
             return model;
         }
 
+        /// <summary>
+        /// prepare the page contents
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public StandardPageViewModel PreparePageContent(StandardPageViewModel model)
         {
             //get the breadcrumb parents
