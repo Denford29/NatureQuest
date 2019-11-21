@@ -137,5 +137,10 @@ namespace NatureQuestWebsite.Models
         /// get or set a flag to login the user or not after creation
         /// </summary>
         public bool LoginOnSuccess { get; set; }
+
+        /// <summary>
+        /// get or set the members model current cart
+        /// </summary>
+        public SiteShoppingCart MemberCart { get; set; }
     }
 }

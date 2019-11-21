@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Mvc;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
@@ -65,13 +66,14 @@ namespace NatureQuestWebsite.Services
             try
             {
                 //create the default model to use
-                var model = new ProductModel(productPage);
+                var model = new ProductModel();
                 //check if we can get the productPage from the homepage descendants
                 if (_homePage?.Id > 0 &&
                     _homePage.Descendants().FirstOrDefault(page => page.Id == productPage.Id) != null)
                 {
                     //get the properties from the product page and set them to the model
                     model.ProductPage = productPage;
+                    model.ProductPageId = productPage.Id;
 
                     //set the default product page title
                     var productTitle = productPage.Name;
@@ -81,6 +83,7 @@ namespace NatureQuestWebsite.Services
                         // set the page title to override the default
                         productTitle = productPage.GetProperty("pageTitle").Value().ToString();
                     }
+
                     //set the model title
                     model.ProductTitle = productTitle;
 
@@ -164,6 +167,15 @@ namespace NatureQuestWebsite.Services
                         model.ProductImages.Add(imageModel);
                     }
 
+                    //add the default price
+                    var defaultPrice = new SelectListItem
+                    {
+                        Text = "Select size require.",
+                        Value = "",
+                        Selected = true
+                    };
+                    model.ProductDisplayPrices.Add(defaultPrice);
+
                     //get the price child items
                     var productPrices = productPage.Children().Where(page => 
                                                             page.ContentType.Alias == "productPrice"
@@ -216,10 +228,21 @@ namespace NatureQuestWebsite.Services
                                 salePercentage = 100 - Convert.ToInt32(productSalePrice / productOriginalPrice * 100);
                             }
 
+                            //set the displayed details
+                            var selectPrice = productSalePrice != 0 ? productSalePrice : productOriginalPrice;
+                            var priceDisplayed = $"{priceVariant} - {selectPrice}";
+                            var productDisplayPrice = new SelectListItem
+                            {
+                                Text = priceDisplayed,
+                                Value = productPrice.Id.ToString()
+                            };
+                            model.ProductDisplayPrices.Add(productDisplayPrice);
+
                             //create the new price model
                             var priceModel = new ProductPriceModel
                             {
                                 ProductPrice = productOriginalPrice,
+                                ProductPricePage = productPrice,
                                 SalePrice = productSalePrice,
                                 ProductVariant = priceVariant,
                                 IsFeaturedPrice = isFeaturedPrice,

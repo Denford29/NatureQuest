@@ -21,10 +21,12 @@ namespace NatureQuestWebsite.Services
             composition.Register<IUmbracoMapper, UmbracoMapper>(Lifetime.Scope);
             //register the products service and its interface
             composition.Register<IProductsService, ProductsService>(Lifetime.Scope);
-            //register the site member service and its interface
+            //register the member service and its interface
             composition.Register<IMemberService, MemberService>(Lifetime.Scope);
             //register the site member service and its interface
             composition.Register<ISiteMembersService, SiteMembersService>(Lifetime.Scope);
+            //register the site shop service and its interface
+            composition.Register<IShoppingService, ShoppingService>(Lifetime.Scope);
         }
     }
 }

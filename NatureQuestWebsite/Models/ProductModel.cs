@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Models;
 
 namespace NatureQuestWebsite.Models
 {
     /// <summary>
     /// Create the model used for displaying products
     /// </summary>
-    public class ProductModel : ContentModel
+    public class ProductModel 
     {
-        /// <summary>
-        /// initiate the model with the content
-        /// </summary>
-        /// <param name="content"></param>
-        public ProductModel(IPublishedContent content) : base(content)
-        {
-        }
-
         /// <summary>
         /// get or set the product page
         /// </summary>
@@ -77,6 +69,30 @@ namespace NatureQuestWebsite.Models
         /// get the related products
         /// </summary>
         public List<ProductModel> RelatedProducts { get; set; } = new List<ProductModel>();
+
+        /// <summary>
+        /// get or set the displayed product prices
+        /// </summary>
+        public List<SelectListItem> ProductDisplayPrices { get; set; } = new List<SelectListItem>();
+
+        /// <summary>
+        /// get or set the customer selected price
+        /// </summary>
+        [Display(Name = "Product Size")]
+        [Required(ErrorMessage = "Please select the product size.")]
+        public string SelectedPricePageId { get; set; }
+
+        /// <summary>
+        /// get or set the customer selected quantity
+        /// </summary>
+        [Display(Name = "Quantity")]
+        [Required(ErrorMessage = "Please enter the required quantity.")]
+        public int SelectedQuantity { get; set; }
+
+        /// <summary>
+        /// get or set the product page id
+        /// </summary>
+        public int ProductPageId { get; set; }
     }
 
     /// <summary>
@@ -104,6 +120,11 @@ namespace NatureQuestWebsite.Models
         /// get or set the product price
         /// </summary>
         public decimal ProductPrice { get; set; }
+
+        /// <summary>
+        /// get or set the product price page
+        /// </summary>
+        public IPublishedContent ProductPricePage { get; set; }
 
         /// <summary>
         /// get or set the product sale price

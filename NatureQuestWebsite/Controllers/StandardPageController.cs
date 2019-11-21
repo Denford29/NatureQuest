@@ -94,12 +94,22 @@ namespace NatureQuestWebsite.Controllers
         private readonly LoginStatusModel _currentLoginStatus;
 
         /// <summary>
+        /// create the local read only shipping service
+        /// </summary>
+        private readonly IShoppingService _shoppingService;
+
+        /// <summary>
         /// initialise the controller
         /// </summary>
-        public StandardPageController(IProductsService productsService)
+        public StandardPageController(
+            IProductsService productsService,
+            IShoppingService shoppingService)
         {
             //set the product service to use
             _productsService = productsService;
+
+            //set the shopping cart service to use
+            _shoppingService = shoppingService;
 
             // get the login status
             _currentLoginStatus = Members.GetCurrentLoginStatus();

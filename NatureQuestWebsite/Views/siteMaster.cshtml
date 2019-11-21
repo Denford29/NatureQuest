@@ -13,10 +13,12 @@
     @Html.Partial("/Views/Partials/Global/MetaContent.cshtml", currentModel)
 
     <link rel="stylesheet" media="screen" href="/Css/vendor.min.css">
-    <link id="mainStyles" rel="stylesheet" media="screen" href="/Css/styles.css">
+    <link rel="stylesheet" media="screen" href="/Css/styles.css">
+    <link rel="stylesheet" media="screen" href="/Css/iziToast.css">
+
     <script src="/Scripts/modernizr.min.js"></script>
 
-    @RenderSection("headerCss", false) 
+    @RenderSection("headerCss", false)
 
 </head>
 
@@ -41,9 +43,12 @@
     </a>
 
     <div class="site-backdrop"></div>
-    <!-- JavaScript (jQuery) libraries, plugins and custom scripts-->
+
     <script src="/Scripts/vendor.min.js"></script>
     <script src="/Scripts/scripts.min.js"></script>
+    <script src="/Scripts/iziToast.js"></script>
+    <script src="/Scripts/app.js"></script>
+    <script src="/Scripts/custom.js"></script>
 
     @RenderSection("footerScripts", false)
 

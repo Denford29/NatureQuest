@@ -162,8 +162,6 @@
         </div>
     </div>
     <!-- Navbar-->
-
-    <!-- Remove "navbar-sticky" class to make navigation bar scrollable with the page.-->
     <header class="navbar navbar-sticky">
 
         <!-- Search form-->
@@ -397,13 +395,6 @@
                                 </li>
                             </ul>
                         </div>
-                        if (siteMenuModel.ShoppingCartPage?.Id > 0)
-                        {
-                            <div class="cart">
-                                <a href="@siteMenuModel.ShoppingCartPage.Url" title="@siteMenuModel.ShoppingCartPage.Name"></a><i class="icon-bag"></i>
-                                <span class="count">0</span><span class="subtotal">$00.00</span>
-                            </div>
-                        }
                     }
                     else
                     {
@@ -432,17 +423,12 @@
                                 }
                             </ul>
                         </div>
-                        if (siteMenuModel.ShoppingCartPage?.Id > 0)
-                        {
-                            <div class="cart">
-                                <a href="@siteMenuModel.ShoppingCartPage.Url" title="@siteMenuModel.ShoppingCartPage.Name"></a><i class="icon-bag"></i>
-                                <span class="count">0</span><span class="subtotal">$00.00</span>
-                            </div>
-                        }
                     }
+                    
+                    @*get the shopping cart*@
+                    @Html.Action("GetMiniCart", "Shop")
                 </div>
             </div>
         </div>
     </header>
-
 }

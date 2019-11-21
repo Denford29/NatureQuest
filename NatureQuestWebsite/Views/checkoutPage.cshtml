@@ -6,13 +6,51 @@
 
     @Html.Partial("/Views/Partials/PageContent/PageHeader.cshtml", Model)
 
-    <div class="container padding-bottom-3x mb-2">
+    <div class="container padding-bottom-1x mb-1">
         <div class="row">
+            @if (!string.IsNullOrWhiteSpace(currentModel.PageContentText))
+            {
+                @Html.Raw(currentModel.PageContentText)
+            }
 
-            @Html.Partial("/Views/Partials/PageContent/PageText.cshtml", Model)
-
-            @Html.Partial("/Views/Partials/PageContent/PageSideBar.cshtml", Model)
+            @*get the shopping cart*@
+            @Html.Action("GetCheckoutView", "Shop")
 
         </div>
     </div>
+
+    @*display the featured products*@
+    @Html.Action("GetFeatureProductsSlider", "PageContent")
+}
+
+@section footerScripts{
+
+    @* Process the result updating the shipping *@
+    @if (TempData.ContainsKey("shippingResult"))
+    {
+        var shippingResult = (AjaxCartResult) TempData["shippingResult"];
+        var resultMessage = shippingResult.ResultMessage;
+        if (shippingResult.ResultSuccess)
+        {
+            <script>
+                iziToast.success({
+                    title: "Success",
+                    message: "@resultMessage",
+                    timeout: 10000,
+                    position: "topRight"
+                });
+            </script>
+        }
+        else
+        {
+            <script>
+                iziToast.error({
+                    title: "Error",
+                    message: "@resultMessage",
+                    timeout: 10000,
+                    position: "topRight"
+                });
+            </script>
+        }
+    }
 }

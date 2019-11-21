@@ -1,105 +1,103 @@
 ﻿@using NatureQuestWebsite.Models
 @inherits Umbraco.Web.Mvc.UmbracoViewPage<MembersModel>
 @{
-                /**/
+    if (TempData.ContainsKey("contactSuccess") || !string.IsNullOrWhiteSpace(Model.ContactMessage))
+    {
+        var successMessage = (string)TempData["contactSuccess"];
+        if (string.IsNullOrWhiteSpace(successMessage))
+        {
+            successMessage = Model.SubscribeMessage;
+        }
+        <div class="row widget-light-skin">
+            <div class="col-lg-12">
+                <h3 class="widget-title">
+                    Contact form success
+                </h3>
+                <p class="text-success">@Html.Raw(successMessage)</p>
+            </div>
+        </div>
+    }
+    else
+    {
 
-                if (TempData.ContainsKey("contactSuccess") || !string.IsNullOrWhiteSpace(Model.ContactMessage))
-                {
-                    var successMessage = (string)TempData["contactSuccess"];
-                    if (string.IsNullOrWhiteSpace(successMessage))
-                    {
-                        successMessage = Model.SubscribeMessage;
-                    }
-                    <div class="row widget-light-skin">
-                        <div class="col-lg-12">
-                            <h3 class="widget-title">
-                                Contact form success
-                            </h3>
-                            <p class="text-success">@Html.Raw(successMessage)</p>
+        //if we have had an error from the 1st attempt display it here
+        if (TempData.ContainsKey("contactError") || !string.IsNullOrWhiteSpace(Model.ContactMessage))
+        {
+            var errorMessage = (string)TempData["contactError"];
+            if (string.IsNullOrWhiteSpace(errorMessage))
+            {
+                errorMessage = Model.SubscribeMessage;
+            }
+            <div class="row widget-light-skin">
+                <div class="col-lg-12">
+                    <h3 class="widget-title">
+                        Contact form error
+                    </h3>
+                    <p class="text-danger">@Html.Raw(errorMessage)</p>
+                </div>
+            </div>
+        }
+
+
+        using (Html.BeginUmbracoForm("ProcessContactForm", "Accounts",
+            FormMethod.Post,
+            new { role = "form", id = "contactForm", @class = "form-horizontal", novalidate = "novalidate" }))
+        {
+
+            //add the anti forgery token and the hidden fields
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(model => model.IsShopCustomer)
+            @Html.HiddenFor(model => model.IsContactMember)
+            @Html.HiddenFor(model => model.SubscribeText)
+            @Html.HiddenFor(model => model.GoogleSiteKey)
+
+            <div class="row">
+                <div class="col-sm-6 form-group">
+                    @Html.LabelFor(model => model.FullName)
+                    @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", required = "", type = "text", placeholder = "Your Full Name." })
+                    @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "invalid-feedback" })
+                    <div class="valid-feedback">Looks good!</div>
+                </div>
+
+                <div class="col-sm-6 form-group">
+                    @Html.LabelFor(model => model.Email)
+                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control", required = "", type = "email", placeholder = "Your Email Address." })
+                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "invalid-feedback" })
+                    <div class="valid-feedback">Looks good!</div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12 form-group">
+                    @Html.LabelFor(model => model.ContactDetails)
+                    @Html.TextAreaFor(model => model.ContactDetails, new { @class = "form-control", rows = "4" })
+                    @Html.ValidationMessageFor(model => model.ContactDetails, "", new { @class = "invalid-feedback" })
+                    <div class="valid-feedback">Looks good!</div>
+                </div>
+            </div>
+
+            if (!Model.IsNewsletterMember)
+            {
+                <div class="row">
+                    <div class="form-group col-sm-12">
+                        <div class="custom-control custom-checkbox custom-control-inline">
+                            @Html.CheckBoxFor(model => model.IsNewsletterMember, new { @class = "custom-control-input" })
+                            <label class="custom-control-label" for="IsNewsletterMember">@Model.SubscribeText</label>
                         </div>
                     </div>
-                }
-                else
-                {
+                </div>
+            }
 
-                    //if we have had an error from the 1st attempt display it here
-                    if (TempData.ContainsKey("contactError") || !string.IsNullOrWhiteSpace(Model.ContactMessage))
-                    {
-                        var errorMessage = (string)TempData["contactError"];
-                        if (string.IsNullOrWhiteSpace(errorMessage))
-                        {
-                            errorMessage = Model.SubscribeMessage;
-                        }
-                        <div class="row widget-light-skin">
-                            <div class="col-lg-12">
-                                <h3 class="widget-title">
-                                    Contact form error
-                                </h3>
-                                <p class="text-danger">@Html.Raw(errorMessage)</p>
-                            </div>
-                        </div>
-                    }
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="g-recaptcha" data-sitekey="@Model.GoogleSiteKey"></div>
+                </div>
 
-
-                    using (Html.BeginUmbracoForm("ProcessContactForm", "Accounts",
-                        FormMethod.Post,
-                        new { role = "form", id = "contactForm", @class = "form-horizontal", novalidate = "novalidate" }))
-                    {
-
-                        //add the anti fogery token and the hidden fields
-                        @Html.AntiForgeryToken()
-                        @Html.HiddenFor(model => model.IsShopCustomer)
-                        @Html.HiddenFor(model => model.IsContactMember)
-                        @Html.HiddenFor(model => model.SubscribeText)
-                        @Html.HiddenFor(model => model.GoogleSiteKey)
-
-                        <div class="row">
-                            <div class="col-sm-6 form-group">
-                                @Html.LabelFor(model => model.FullName)
-                                @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", required = "", type = "text", placeholder = "Your Full Name." })
-                                @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "invalid-feedback" })
-                                <div class="valid-feedback">Looks good!</div>
-                            </div>
-
-                            <div class="col-sm-6 form-group">
-                                @Html.LabelFor(model => model.Email)
-                                @Html.TextBoxFor(model => model.Email, new { @class = "form-control", required = "", type = "email", placeholder = "Your Email Address." })
-                                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "invalid-feedback" })
-                                <div class="valid-feedback">Looks good!</div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm-12 form-group">
-                                @Html.LabelFor(model => model.ContactDetails)
-                                @Html.TextAreaFor(model => model.ContactDetails, new { @class = "form-control", rows = "4" })
-                                @Html.ValidationMessageFor(model => model.ContactDetails, "", new { @class = "invalid-feedback" })
-                                <div class="valid-feedback">Looks good!</div>
-                            </div>
-                        </div>
-
-                        if (!Model.IsNewsletterMember)
-                        {
-                            <div class="row">
-                                <div class="form-group col-sm-12">
-                                    <div class="custom-control custom-checkbox custom-control-inline">
-                                        @Html.CheckBoxFor(model => model.IsNewsletterMember, new { @class = "custom-control-input" })
-                                        <label class="custom-control-label" for="IsNewsletterMember">@Model.SubscribeText</label>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="g-recaptcha" data-sitekey="@Model.GoogleSiteKey"></div>
-                            </div>
-
-                            <div class="col-lg-6">
-                                <button class="btn btn-primary" type="submit">Submit Form</button>
-                            </div>
-                        </div>
-                    }
-                }
+                <div class="col-lg-6">
+                    <button class="btn btn-primary" type="submit">Submit Form</button>
+                </div>
+            </div>
+        }
+    }
 
 }

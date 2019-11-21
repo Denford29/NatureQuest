@@ -7,9 +7,10 @@ using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Web;
 using Umbraco.Web.Models;
-using Zone.UmbracoMapper.V8;
 
 namespace NatureQuestWebsite.Testing
 {
@@ -25,7 +26,10 @@ namespace NatureQuestWebsite.Testing
         private IProductsService _productService;
         private ILogger _logger;
         private IUmbracoContextFactory _contextFactory;
-
+        private IMemberService _memberService;
+        private IShoppingService _shoppingService;
+        private IContentService _contentService;
+        private UmbracoHelper _umbracoHelper;
         /// <summary>
         /// set up the test
         /// </summary>
@@ -39,8 +43,21 @@ namespace NatureQuestWebsite.Testing
             _contextFactory = Mock.Of<IUmbracoContextFactory>();
             //create the product service
             _productService = new ProductsService(_logger, _contextFactory);
+            //create the mock content service
+            _contentService = Mock.Of<IContentService>();
+            //get the umbraco helper to use
+            _umbracoHelper = Mock.Of<UmbracoHelper>();
+
+            _memberService = Mock.Of<MemberService>();
+            _shoppingService = new ShoppingService(
+                                                    _logger, 
+                                                    _contextFactory, 
+                                                    _memberService,
+                                                    _contentService,
+                                                    _umbracoHelper,
+                                                    _productService);
             //pass this to the standard page mock controller
-            _controller = new StandardPageController(_productService);
+            _controller = new StandardPageController(_productService, _shoppingService);
         }
 
         /// <summary>

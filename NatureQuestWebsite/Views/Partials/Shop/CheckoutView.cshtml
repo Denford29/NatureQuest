@@ -1,0 +1,197 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<SiteShoppingCart>
+@{
+    var currentCart = Model;
+    if (currentCart != null)
+    {
+        var cartMember = currentCart.CartMembersModel;
+        <div class="row">
+            <!-- Checkout Address-->
+            <div class="col-xl-9 col-lg-8">
+                <div class="checkout-steps">
+                    <a href="#">
+                        3. Confirm
+                    </a>
+                    <a href="#">
+                        <span class="angle"></span>2. Payment
+                    </a>
+                    <a class="active" href="#">
+                        <span class="angle"></span>1. Shipping
+                    </a>
+                </div>
+                <h4>Shipping Details</h4>
+                <hr class="padding-bottom-1x">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => cartMember.FullName)
+                            @Html.TextBoxFor(model => cartMember.FullName, new { @class = "form-control", required = "", type = "text" })
+                            @Html.ValidationMessageFor(model => cartMember.FullName, "", new { @class = "help-block text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => cartMember.Email)
+                            @Html.TextBoxFor(model => cartMember.Email, new { @class = "form-control", required = "", type = "text" })
+                            @Html.ValidationMessageFor(model => cartMember.Email, "", new { @class = "help-block text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row padding-bottom-1x">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => cartMember.HouseAddress)
+                            @Html.TextBoxFor(model => cartMember.HouseAddress, new { @class = "form-control", required = "", type = "text" })
+                            @Html.ValidationMessageFor(model => cartMember.HouseAddress, "", new { @class = "help-block text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => cartMember.MobileNumber)
+                            @Html.TextBoxFor(model => cartMember.MobileNumber, new { @class = "form-control", required = "" })
+                            @Html.ValidationMessageFor(model => cartMember.MobileNumber, "", new { @class = "help-block text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <h4>Shipping Method</h4>
+                <hr class="padding-bottom-1x">
+
+                <div class="row shopping-cart cart-list-header">
+                    <div class="col-md-8 text-lg text-medium">
+                        Shipping method
+                    </div>
+                    <div class="col-md-2 text-center text-lg text-medium">
+                        Delivery time
+                    </div>
+                    <div class="col-md-2 text-right text-lg text-medium">
+                        Handling fee
+                    </div>
+                </div>
+
+                @if (currentCart.DisplayShippingOptions.Any())
+                {
+                    foreach (var option in currentCart.DisplayShippingOptions)
+                    {
+                        //get the matching select list option
+                        var optionSelectList = currentCart.SelectShippingOptions.FirstOrDefault(
+                            selectOption => selectOption.Value == option.ShippingPricePage.Id.ToString());
+                        if (optionSelectList != null)
+                        {
+                            var selectedText = optionSelectList.Selected ? "checked" : "";
+                            <div class="row shopping-cart cart-item">
+                                <div class="align-middle col-md-1 text-lg text-medium">
+                                    @using (Html.BeginUmbracoForm("AddShippingToCart", "Shop",
+                                        FormMethod.Post,
+                                        new { role = "form", id = "updateShippingForm" }))
+                                    {
+                                        <input id="SelectedShippingOption" name="SelectedShippingOption" type="hidden" value="@optionSelectList.Value">
+                                        <div class="custom-control custom-radio mb-0 ShippingOption">
+                                            <input class="custom-control-input"
+                                                   type="radio"
+                                                   id="@optionSelectList.Text"
+                                                   name="ShippingOption"
+                                                   value="@optionSelectList.Value"
+                                                   @selectedText>
+                                            <label class="custom-control-label" for="@optionSelectList.Text"></label>
+                                        </div>
+                                    }
+
+                                </div>
+                                <div class="align-middle col-md-7 text-lg text-medium">
+                                    <h5 class="text-medium">@option.ShippingPricePage.Name</h5>
+                                    <p class="text-sm">@option.ShippingDetails</p>
+                                </div>
+                                <div class="align-middle col-md-2 text-center text-lg text-medium">
+                                    @option.DeliveryTime
+                                </div>
+                                <div class="align-middle col-md-2 text-right text-lg text-medium">
+                                    @option.ShippingFee.ToString("c")
+                                </div>
+                            </div>
+                        }
+                    }
+
+                }
+
+                <div class="checkout-footer">
+                    <div class="column">
+                        <a class="btn btn-outline-secondary" href="@currentCart.ShoppingCartPage.Url" title="@currentCart.ShoppingCartPage.Name">
+                            <i class="icon-arrow-left"></i><span class="hidden-xs-down">&nbsp;Back To Cart</span>
+                        </a>
+                    </div>
+                    <div class="column">
+                        <a class="btn btn-primary" href="#">
+                            <span class="hidden-xs-down">Continue&nbsp;</span><i class="icon-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Sidebar -->
+            <div class="col-xl-3 col-lg-4">
+                <aside class="sidebar">
+                    <div class="padding-top-2x hidden-lg-up"></div>
+                    <!-- Order Products Widget-->
+                    <section class="widget widget-featured-products">
+                        <h3 class="widget-title">
+                            Order Products
+                        </h3>
+                        @if (currentCart.CartItems.Any())
+                        {
+                            foreach (var cartItem in currentCart.CartItems)
+                            {
+                                var cartItemPage = cartItem.ProductLinePage;
+                                var cartProduct = cartItem.MainProductPage;
+                                var cartItemName = $"{cartProduct.Name} - {cartItemPage.Name}";
+                                var itemTotal = cartItem.Quantity * cartItem.Price;
+                                <div class="entry">
+                                    <div class="entry-thumb">
+                                        <a class="dropdown-product-thumb" title="@cartItemName" href="@cartProduct.Url">
+                                            <img src="@cartItem.CartItemImage" alt="@cartItemName">
+                                        </a>
+                                    </div>
+                                    <div class="entry-content">
+                                        <h4 class="entry-title">
+                                            <a class="dropdown-product-title" title="@cartItemName" href="@cartProduct.Url">
+                                                @cartItemName
+                                            </a>
+                                        </h4>
+                                        <span class="entry-meta">
+                                            @cartItem.Quantity x @cartItem.Price.ToString("c") = @itemTotal.ToString("c")
+                                        </span>
+                                    </div>
+                                </div>
+                                <hr class="margin-bottom-1x margin-top-1x" />
+                            }
+                        }
+                    </section>
+                    <!-- Order Summary Widget-->
+                    <section class="widget widget-order-summary">
+                        <h3 class="widget-title">Order Summary</h3>
+                        <table class="table">
+                            <tr>
+                                <td>Cart Subtotal:</td>
+                                <td class="text-medium">
+                                    @currentCart.ComputeTotalValue().ToString("c")
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Shipping:</td>
+                                <td class="text-medium">@currentCart.ShippingTotal.ToString("c")</td>
+                            </tr>
+                            <tr>
+                                <td>Cart Total</td>
+                                <td class="text-lg text-medium">
+                                    @currentCart.ComputeTotalWithShippingValue().ToString("c")
+                                </td>
+                            </tr>
+                        </table>
+                    </section>
+                </aside>
+            </div>
+        </div>
+    }
+}

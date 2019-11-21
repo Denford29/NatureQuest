@@ -1,0 +1,57 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<SiteShoppingCart>
+@{
+    var currentCart = Model;
+    if (currentCart?.ShoppingCartPage != null)
+    {
+    <div class="cart">
+        <a href="@currentCart.ShoppingCartPage.Url" title="@currentCart.ShoppingCartPage.Name"></a><i class="icon-bag"></i>
+        <span class="count">@currentCart.CartItems.Count()</span>
+        <span class="subtotal">
+            @currentCart.ComputeTotalValue().ToString("c")
+        </span>
+        @if (currentCart.CartItems.Any())
+        {
+            <div class="toolbar-dropdown">
+                @foreach (var cartItem in currentCart.CartItems)
+                {
+                    var cartItemPage = cartItem.ProductLinePage;
+                    var cartProduct = cartItem.MainProductPage;
+                    var cartItemName = $"{cartProduct.Name} - {cartItemPage.Name}";
+                    var itemTotal = cartItem.Quantity * cartItem.Price;
+                    <div class="dropdown-product-item">
+                        <a class="dropdown-product-thumb" title="@cartItemName" href="@cartProduct.Url">
+                            <img src="@cartItem.CartItemImage" alt="@cartItemName">
+                        </a>
+                        <div class="dropdown-product-info">
+                            <a class="dropdown-product-title" title="@cartItemName" href="@cartProduct.Url">
+                                @cartItemName
+                            </a>
+                            <span class="dropdown-product-details">
+                                @cartItem.Quantity x @cartItem.Price.ToString("c") = @itemTotal.ToString("c")
+                            </span>
+                        </div>
+                    </div>
+                }
+
+                <div class="toolbar-dropdown-group">
+                    <div class="column"><span class="text-lg">Total:</span></div>
+                    <div class="column text-right">
+                        <span class="text-lg text-medium">
+                            @currentCart.ComputeTotalValue().ToString("c")&nbsp;
+                        </span>
+                    </div>
+                </div>
+                <div class="toolbar-dropdown-group">
+                    <div class="column">
+                        <a class="btn btn-sm btn-block btn-secondary" href="@currentCart.ShoppingCartPage.Url" title="@currentCart.ShoppingCartPage.Name">
+                            View Cart
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+    }
+}

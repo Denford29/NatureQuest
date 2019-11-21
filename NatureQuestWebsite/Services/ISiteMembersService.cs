@@ -27,5 +27,12 @@ namespace NatureQuestWebsite.Services
             MembersModel memberModel,
             out MembershipCreateStatus status,
             bool logMemberIn = false);
+
+        /// <summary>
+        /// get a member by email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        IMember GetMemberByEmail(string email);
     }
 }

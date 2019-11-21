@@ -59,7 +59,6 @@ namespace NatureQuestWebsite.Controllers
         /// </summary>
         private readonly IPublishedContent _registrationLoginPage;
 
-
         /// <summary>
         /// initiate the controller with the services used
         /// </summary>
@@ -202,14 +201,12 @@ namespace NatureQuestWebsite.Controllers
                 model.SubscribeMessage = errorMessage;
                 return CurrentUmbracoPage();
             }
-            else
-            {
-                // set the success message and return the current page
-                var successMessage = "Your newsletter account has been successfully created.";
-                TempData["subscriptionSuccess"] = successMessage;
-                model.SubscribeMessage = successMessage;
-                return CurrentUmbracoPage();
-            }
+
+            // set the success message and return the current page
+            var successMessage = "Your newsletter account has been successfully created.";
+            TempData["subscriptionSuccess"] = successMessage;
+            model.SubscribeMessage = successMessage;
+            return CurrentUmbracoPage();
         }
 
         /// <summary>
@@ -415,14 +412,12 @@ namespace NatureQuestWebsite.Controllers
                 model.RegistrationMessage = errorMessage;
                 return CurrentUmbracoPage();
             }
-            else
-            {
-                // set the success message and return the current page
-                var successMessage = "Your user account have been registered and ready to use, please login to place an order.";
-                TempData["registrationSuccess"] = successMessage;
-                model.RegistrationMessage = successMessage;
-                return CurrentUmbracoPage();
-            }
+
+            // set the success message and return the current page
+            var successMessage = "Your user account have been registered and ready to use, please login to place an order.";
+            TempData["registrationSuccess"] = successMessage;
+            model.RegistrationMessage = successMessage;
+            return CurrentUmbracoPage();
         }
 
         /// <summary>
@@ -547,7 +542,72 @@ namespace NatureQuestWebsite.Controllers
                 return CurrentUmbracoPage();
             }
 
-            //return to the current page
+            if (!string.IsNullOrWhiteSpace(model.Password) && !string.IsNullOrWhiteSpace(model.PasswordConfirm))
+            {
+                //check the passwords
+                var password = model.Password;
+                var confirmPassword = model.PasswordConfirm;
+                var passwordCheck = string.CompareOrdinal(password, confirmPassword);
+                if (string.IsNullOrWhiteSpace(password) ||
+                    string.IsNullOrWhiteSpace(confirmPassword) ||
+                    passwordCheck != 0)
+                {
+                    // set the error message and return the current page
+                    var errorMessage = "Ops... Update Error, Make sure the passwords match.";
+                    TempData["updateError"] = errorMessage;
+                    model.UpdateMessage = errorMessage;
+                    return CurrentUmbracoPage();
+                }
+            }
+
+            //check if we have the email address to subscribe
+            if (string.IsNullOrWhiteSpace(model.FullName) ||
+                string.IsNullOrWhiteSpace(model.HouseAddress) ||
+                string.IsNullOrWhiteSpace(model.MobileNumber))
+            {
+                // set the error message and return the current page
+                var errorMessage = "Ops... Update Error, Your name, address and mobile number must be filled in.'";
+                TempData["updateError"] = errorMessage;
+                model.RegistrationMessage = errorMessage;
+                return CurrentUmbracoPage();
+            }
+
+            //use the member service to find the member
+            model.ModelMemberType = _memberType;
+            var existingMember = _siteMemberService.GetMemberByEmail(model.Email);
+            if (existingMember?.Id != 0)
+            {
+                // add the member to the model
+                model.LoggedInMember = existingMember;
+            }
+            else
+            {
+                // set the error message and return the current page
+                var errorMessage = "Ops... Update Error, There was an error getting your account details";
+                TempData["updateError"] = errorMessage;
+                model.UpdateMessage = errorMessage;
+                return CurrentUmbracoPage();
+            }
+
+            //register the email
+                var registeredModel = _siteMemberService.RegisterSiteMember(
+                model,
+                out MembershipCreateStatus createStatus);
+
+            //check if we have a new member created
+            if (registeredModel.LoggedInMember == null || createStatus != MembershipCreateStatus.Success)
+            {
+                // set the error message and return the current page
+                var errorMessage = "Ops... Update Error, There was an error updating your account.";
+                TempData["updateError"] = errorMessage;
+                model.UpdateMessage = errorMessage;
+                return CurrentUmbracoPage();
+            }
+
+            // set the success message and return the current page
+            var successMessage = "Your user account have been updated successfully.";
+            TempData["updateSuccess"] = successMessage;
+            model.UpdateMessage = successMessage;
             return CurrentUmbracoPage();
         }
 

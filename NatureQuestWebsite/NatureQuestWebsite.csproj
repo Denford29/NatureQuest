@@ -151,6 +151,9 @@
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="PayPal, Version=1.9.1.0, Culture=neutral, PublicKeyToken=5b4afc1ccaef40fb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PayPal.1.9.1\lib\net451\PayPal.dll</HintPath>
+    </Reference>
     <Reference Include="Semver, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Semver.2.0.4\lib\net452\Semver.dll</HintPath>
     </Reference>
@@ -437,6 +440,7 @@
     <Content Include="config\Lang\zh-CN.user.xml" />
     <Content Include="config\logviewer.searches.config.js" />
     <Content Include="Css\card.min.css" />
+    <Content Include="Css\iziToast.css" />
     <Content Include="Css\styles.css" />
     <Content Include="Css\styles-2ecc71.min.css" />
     <Content Include="Css\styles-e74c3c.min.css" />
@@ -672,28 +676,38 @@
     <Content Include="Media\2l5c35sq\nature-quest-banner-1.jpg" />
     <Content Include="Media\2w3kigri\natures-quest-foodlandsa.png" />
     <Content Include="Media\3dsnfpvr\natures-quest-terrywhite-hemmart.png" />
+    <Content Include="Media\3lnoqfmw\nature_s_quest-ladies_deodorant_125ml-9342789000101.jpg" />
+    <Content Include="Media\3lwnzm5b\nature_s_quest-tiny_tots_bubble_bath-9342789002143.jpg" />
     <Content Include="Media\3whgvvs2\nature-quest-banner.jpg" />
     <Content Include="Media\402ptmyn\nature_s_quest-nourishing_care_shampoo_250ml-9342789002006.jpg" />
     <Content Include="Media\40ypah0b\nature_s_quest-fortifying_conditioner_500ml-9342789003003.jpg" />
     <Content Include="Media\5h3pxens\nature_s_quest-body_wash_1lt-9342789004048.jpg" />
+    <Content Include="Media\5mzb2ftl\nature_s_quest-natural_face___eye_serum_15ml-9342789000231.jpg" />
+    <Content Include="Media\a03dvg3q\nature_s_quest-tiny_tots_conditioner_250ml-9342789002099.jpg" />
     <Content Include="Media\a2mbodwq\nature_s_quest-daily_conditioner_250ml-9342789002068.jpg" />
     <Content Include="Media\beel2mjs\nature-quest-body-care.jpg" />
     <Content Include="Media\bwrli20q\nature-quest-wash.jpg" />
     <Content Include="Media\cdrb33x1\natures-quest-logo.png" />
+    <Content Include="Media\ctqm5bdt\nature_s_quest-moroccan_argan_oil_50ml-9342789000187.jpg" />
     <Content Include="Media\d1hlshfc\nature_s_quest-lavender_conditioner_500ml-9342789003096.jpg" />
     <Content Include="Media\d3bnbsq3\nature_s_quest-nourishing_care_shampoo_250ml-9342789002006.jpg" />
     <Content Include="Media\d3ocwux1\nature_s_quest-lavender_250ml-9342789002075.jpg" />
     <Content Include="Media\dgbjlljn\nature_s_quest-lavender_shampoo_1lt-9342789004017.jpg" />
     <Content Include="Media\dgzfichs\nature_s_quest-daily_shampoo_250ml-9342789002013.jpg" />
+    <Content Include="Media\duflrpbj\nature_s_quest-natural_chest_rub_45gm-9342789000170.jpg" />
     <Content Include="Media\eescl4dw\natures-quest-mega-health.png" />
     <Content Include="Media\evcdyh1f\nature_s_quest-natural_facial_moisturiser_45gm-9342789000194.jpg" />
     <Content Include="Media\fdlfn2ug\nature_s_quest-facial_cream_cleanser_125ml-9342789000040.jpg" />
     <Content Include="Media\g0th4m4q\nq-bodylotion-500ml.png" />
     <Content Include="Media\gbbddnu4\nature_s_quest-lavendar_shampoo_250ml-9342789002020.jpg" />
+    <Content Include="Media\gjlhzrh0\nature_s_quest-natural_baby_oil_125ml-9342789000026.jpg" />
+    <Content Include="Media\gnclvvgj\nature_s_quest-multi_purpose_cleaner_500ml-9342789003072.jpg" />
     <Content Include="Media\hbpnztpt\nature-quest-natural-care.png" />
+    <Content Include="Media\hinfai3x\nature_s_quest-men_s_deodorant_125ml-9342789000118.jpg" />
     <Content Include="Media\hw5dwmls\nature_s_quest-facial_toner_125ml-9342789000071.jpg" />
     <Content Include="Media\jchbcgf3\nature_s_quest-facial_scrub_125ml-9342789000064.jpg" />
     <Content Include="Media\jpfdx1pd\nature_s_quest-body_lotion_250ml-9342789002129.jpg" />
+    <Content Include="Media\jxipwfty\nature_s_quest-baby_lotion_125ml-9342789000033.jpg" />
     <Content Include="Media\jzhnropd\nature_s_quest-body_lotion_500ml-9342789003102.jpg" />
     <Content Include="Media\kn5bdw0z\nature_s_quest-lavendar_shampoo_250ml-9342789002020.jpg" />
     <Content Include="Media\lguewm1h\nature_s_quest-lavender_shampoo_500ml-9342789003034.jpg" />
@@ -710,20 +724,28 @@
     <Content Include="Media\qy3h1g2c\natures-quest-healthy-life.png" />
     <Content Include="Media\r3jn1dzf\nature_s_quest-lavender_conditioner_1lt-9342789004031.jpg" />
     <Content Include="Media\sn1j4vwm\nature_s_quest-fortifying_shampoo_250ml-9342789002037.jpg" />
+    <Content Include="Media\srwjvtgv\nature_s_quest-laundry_liquid_1lt-9342789004079.jpg" />
     <Content Include="Media\svsdb3i4\natures-quest-lavendar_shampoo-edit.jpg" />
+    <Content Include="Media\sxyenvjc\nature_s_quest-rosehip_oil_25ml-9342789000002.jpg" />
+    <Content Include="Media\ulrnn1cw\nature_s_quest-tiny_tots_bath_wash_250ml-9342789002150.jpg" />
+    <Content Include="Media\uptpsc4d\nature_s_quest-2_in_1_shampoo___bath_wash_250ml-9342789000248.jpg" />
     <Content Include="Media\vevdtxtz\nature_s_quest-fragrance_free_body_wash_250ml_9342789000224.jpg" />
     <Content Include="Media\wdeozifc\nature-quest-facial-care.jpg" />
     <Content Include="Media\wlhhmweg\nature_s_quest-moroccan_conditioner_250ml-9342789000217.jpg" />
+    <Content Include="Media\wmyd2swj\nature_s_quest-dishwashing_liquid_1lt-9342789004055.jpg" />
     <Content Include="Media\y2ibm5ss\nature_s_quest-facial_moisturiser_125ml-9342789000057.jpg" />
     <Content Include="Media\yjvffltn\nature-quest-open-graph.jpg" />
+    <Content Include="Media\ysqgpgqg\nature_s_quest-hand_cream_125ml-9342789000095.jpg" />
     <Content Include="Media\ysyjot2w\nature_s_quest-hand_wash_refill_1lt-9342789004062.jpg" />
     <Content Include="Media\z2hfjppx\natures-quest-healthy-elements.jpg" />
     <Content Include="Media\zaejyewq\nature_s_quest-body_wash_250ml-9342789002167.jpg" />
     <Content Include="Media\zdnphkyg\nature_s_quest-hand_sanitiser_50ml-9342789000255.jpg" />
     <Content Include="Media\zioh4ayl\nature-quest-natural-care.jpg" />
     <Content Include="Media\zjzj2o2g\nature_s_quest-fortifying_shampoo_500ml-9342789003041.jpg" />
+    <Content Include="Scripts\app.js" />
     <Content Include="Scripts\card.min.js" />
     <Content Include="Scripts\custom.js" />
+    <Content Include="Scripts\iziToast.js" />
     <Content Include="Scripts\modernizr.min.js" />
     <Content Include="Scripts\scripts.min.js" />
     <Content Include="Scripts\vendor.min.js" />
@@ -732,7 +754,9 @@
   <ItemGroup>
     <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Controllers\PageContentController.cs" />
+    <Compile Include="Controllers\ShopController.cs" />
     <Compile Include="Controllers\StandardPageController.cs" />
+    <Compile Include="Models\AjaxCartResult.cs" />
     <Compile Include="Models\GoogleGeocodingModel.cs" />
     <Compile Include="Models\LinkItemModel.cs" />
     <Compile Include="Models\LocationModel.cs" />
@@ -741,6 +765,7 @@
     <Compile Include="Models\ProductCategoriesModel.cs" />
     <Compile Include="Models\ProductModel.cs" />
     <Compile Include="Models\ProductsListModel.cs" />
+    <Compile Include="Models\SiteShoppingCart.cs" />
     <Compile Include="Models\SliderItemModel.cs" />
     <Compile Include="Models\StandardPageViewModel.cs" />
     <Compile Include="Models\StockistDetailsModel.cs" />
@@ -749,9 +774,11 @@
     <Compile Include="Services\ContentSavingComposer.cs" />
     <Compile Include="Services\DefaultControllerComposer.cs" />
     <Compile Include="Services\ILocationService.cs" />
+    <Compile Include="Services\IShoppingService.cs" />
     <Compile Include="Services\ISiteMembersService.cs" />
     <Compile Include="Services\IProductsService.cs" />
     <Compile Include="Services\LocationService.cs" />
+    <Compile Include="Services\ShoppingService.cs" />
     <Compile Include="Services\SiteMembersService.cs" />
     <Compile Include="Services\ProductsService.cs" />
     <Compile Include="Services\ServicesComposer.cs" />
@@ -837,6 +864,9 @@
     <Content Include="Views\Partials\Accounts\ContactForm.cshtml" />
     <Content Include="Views\Partials\Accounts\LoginRegisterForms.cshtml" />
     <Content Include="Views\Partials\Accounts\MemberAcountDetails.cshtml" />
+    <Content Include="Views\Partials\Accounts\MiniCartDetails.cshtml" />
+    <Content Include="Views\Partials\Shop\CartDetails.cshtml" />
+    <Content Include="Views\Partials\Shop\CheckoutView.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

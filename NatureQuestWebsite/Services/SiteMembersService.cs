@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Web.Configuration;
 using SendGrid;
 using System.Net;
+using Umbraco.Core.Models;
 
 namespace NatureQuestWebsite.Services
 {
@@ -63,7 +64,6 @@ namespace NatureQuestWebsite.Services
         /// </summary>
         private readonly string _siteName = "Natures Quest";
 
-
         /// <summary>
         /// initiate the site members service
         /// </summary>
@@ -98,7 +98,7 @@ namespace NatureQuestWebsite.Services
                 if (siteSettingsPage?.Id > 0)
                 {
                     //get the site details page
-                    var siteDetailsPage = siteSettingsPage.Descendants("globalDetails").FirstOrDefault();
+                    var siteDetailsPage = siteSettingsPage.ChildrenOfType("globalDetails").FirstOrDefault();
                     if (siteDetailsPage?.Id > 0)
                     {
                         //save the global details page to use later
@@ -176,12 +176,11 @@ namespace NatureQuestWebsite.Services
                     }
                 }
 
-                //emailAddress = "babybwoy2001@yahoo.co.uk";
                 //check if we have an email address passed in to search the member with
                 if (!string.IsNullOrWhiteSpace(emailAddress))
                 {
                     //use the member service to find the member
-                    var existingMember = _memberService.GetByEmail(emailAddress);
+                    var existingMember = GetMemberByEmail(emailAddress);
                     if (existingMember != null && existingMember.Id != 0)
                     {
                         // add the member to the model
@@ -337,8 +336,10 @@ namespace NatureQuestWebsite.Services
                 //check if we have a member on the model either new or existing one
                 if (memberModel.LoggedInMember?.Id > 0)
                 {
+                    //get the current member to use
+                    var currentMember = memberModel.LoggedInMember;
                     //get the properties that can be edited
-                    var editableProperties = memberModel.LoggedInMember.Properties.Where(property =>
+                    var editableProperties = currentMember.Properties.Where(property =>
                                                             memberModel.ModelMemberType.MemberCanEditProperty(property.Alias) &&
                                                             !string.IsNullOrWhiteSpace(property.Alias)).ToList();
 
@@ -372,7 +373,7 @@ namespace NatureQuestWebsite.Services
                         }
 
                         //get the comments and add the contact details
-                        var memberCommentsProperty = memberModel.LoggedInMember.Properties.
+                        var memberCommentsProperty = currentMember.Properties.
                                                                             FirstOrDefault(property => property.Alias == "umbracoMemberComments");
                         if(memberCommentsProperty != null && !string.IsNullOrWhiteSpace(memberModel.ContactDetails))
                         {
@@ -384,8 +385,25 @@ namespace NatureQuestWebsite.Services
                         }
                     }
 
-                    //set the new members group
-                    if (isSubscriptionMembership)
+                    //check which roles the member belongs to
+                    memberModel.MemberRoles = _memberService.GetAllRoles(currentMember.Id).ToList();
+
+                    //set the default flags for the members roles
+                    var isCurrentlySubscribe = false;
+                    var isCurrentlyContact = false;
+                    var isCurrentlyCustomer = false;
+
+                    //if we have the members roles set flags on which roles they belong to
+                    if (memberModel.MemberRoles.Any())
+                    {
+                        //set the flags for which roles the member is in
+                        isCurrentlyContact = memberModel.MemberRoles.FirstOrDefault(role => role == "Contact")?.Any() == true;
+                        isCurrentlySubscribe = memberModel.MemberRoles.FirstOrDefault(role => role == "Newsletter")?.Any() == true;
+                        isCurrentlyCustomer = memberModel.MemberRoles.FirstOrDefault(role => role == "Customer")?.Any() == true;
+                    }
+
+                    //set the new members group , if the member is not already in the groups
+                    if (isSubscriptionMembership && !isCurrentlySubscribe)
                     {
                         //get the subscription group
                         var subscriptionGroup = _memberRoles.FirstOrDefault(role => role == "Newsletter");
@@ -398,7 +416,7 @@ namespace NatureQuestWebsite.Services
                         }
                     }
 
-                    if (isContactMembership)
+                    if (isContactMembership && !isCurrentlyContact)
                     {
                         //get the subscription group
                         var contactGroup = _memberRoles.FirstOrDefault(role => role == "Contact");
@@ -411,7 +429,7 @@ namespace NatureQuestWebsite.Services
                         }
                     }
 
-                    if (isShopMembership)
+                    if (isShopMembership && !isCurrentlyCustomer)
                     {
                         //get the subscription group
                         var shopGroup = _memberRoles.FirstOrDefault(role => role == "Customer");
@@ -531,7 +549,7 @@ namespace NatureQuestWebsite.Services
             {
                 //create the admin email to notify of a new news letter user
                 var userContactSubject = $"Your contact has been submitted on {_siteName}.";
-                var userContactBody = $"<p>Thank you for submitting the contact form, we have recieved you inquiry and a member of the {_siteName}" +
+                var userContactBody = $"<p>Thank you for submitting the contact form, we have received you inquiry and a member of the {_siteName}" +
                                                         $" will get back to you shortly.<br /> <br />Regards, <br /> {_siteName} Team</p>";
                 var userEmail = new EmailAddress(contactModel.Email);
                 //send the user email
@@ -604,7 +622,7 @@ namespace NatureQuestWebsite.Services
             {
                 //create the admin email to notify of a new shop user
                 var userRegisterSubject = $"Your account registration has been submitted on {_siteName}.";
-                var userRegisterBody = $"<p>Thank you for registering for an account, we have recieved your details and the account is active now {_siteName}" +
+                var userRegisterBody = $"<p>Thank you for registering for an account, we have received your details and the account is active now {_siteName}" +
                                                         $"<br /> <br />Regards, <br /> {_siteName} Team</p>";
                 var userEmail = new EmailAddress(registerModel.Email);
                 //send the user email
@@ -691,6 +709,16 @@ namespace NatureQuestWebsite.Services
             }
             //return the flag
             return messageSent;
+        }
+
+        /// <summary>
+        /// get a member by email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public IMember GetMemberByEmail(string email)
+        {
+            return _memberService.GetByEmail(email);
         }
     }
 }

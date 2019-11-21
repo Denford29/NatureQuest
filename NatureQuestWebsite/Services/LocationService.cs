@@ -68,7 +68,7 @@ namespace NatureQuestWebsite.Services
                 if (siteSettingsPage?.Id > 0)
                 {
                     //get the site details page
-                    var siteDetailsPage = siteSettingsPage.Descendants("globalDetails").FirstOrDefault();
+                    var siteDetailsPage = siteSettingsPage.ChildrenOfType("globalDetails").FirstOrDefault();
                     if (siteDetailsPage?.Id > 0)
                     {
                         //save the global details page to use later
