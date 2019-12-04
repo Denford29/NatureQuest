@@ -12,11 +12,11 @@
             {
                 @Html.Raw(currentModel.PageContentText)
             }
-
-            @*get the shopping cart*@
-            @Html.Action("GetCheckoutView", "Shop")
-
         </div>
+
+        @*get the shopping cart*@
+        @Html.Action("GetCheckoutView", "Shop")
+
     </div>
 
     @*display the featured products*@
@@ -24,11 +24,39 @@
 }
 
 @section footerScripts{
+    @* Process the result updating the details shipping *@
+    @if (TempData.ContainsKey("shippingDetailsResult"))
+    {
+        var shippingDetailsResult = (AjaxCartResult)TempData["shippingDetailsResult"];
+        var detailsResultMessage = shippingDetailsResult.ResultMessage;
+        if (shippingDetailsResult.ResultSuccess)
+        {
+            <script>
+                iziToast.success({
+                    title: "Success",
+                    message: "@detailsResultMessage",
+                    timeout: 10000,
+                    position: "topRight"
+                });
+            </script>
+        }
+        else
+        {
+            <script>
+                iziToast.error({
+                    title: "Error",
+                    message: "@detailsResultMessage",
+                    timeout: 10000,
+                    position: "topRight"
+                });
+            </script>
+        }
+    }
 
-    @* Process the result updating the shipping *@
     @if (TempData.ContainsKey("shippingResult"))
     {
-        var shippingResult = (AjaxCartResult) TempData["shippingResult"];
+        @* Process the result updating the shipping *@
+        var shippingResult = (AjaxCartResult)TempData["shippingResult"];
         var resultMessage = shippingResult.ResultMessage;
         if (shippingResult.ResultSuccess)
         {
@@ -53,4 +81,8 @@
             </script>
         }
     }
+
+    @*get the stripe checkout script*@
+    @Html.Action("GetStripeCheckoutScript", "Shop")
+
 }

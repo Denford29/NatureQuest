@@ -1,8 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Web.Mvc;
 using NatureQuestWebsite.Models;
 using NatureQuestWebsite.Services;
-using Umbraco.Core.Models.PublishedContent;
+using Stripe;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
@@ -26,21 +27,6 @@ namespace NatureQuestWebsite.Controllers
         /// create the local read only shipping service
         /// </summary>
         private readonly IShoppingService _shoppingService;
-
-        /// <summary>
-        /// set the shopping cart details page
-        /// </summary>
-        private readonly IPublishedContent _shoppingCartPage;
-
-        /// <summary>
-        /// set the shopping checkout page
-        /// </summary>
-        private readonly IPublishedContent _checkoutPage;
-
-        /// <summary>
-        /// set the products page
-        /// </summary>
-        private readonly IPublishedContent _productsPage;
 
         /// <summary>
         /// set the umbraco helper
@@ -90,23 +76,6 @@ namespace NatureQuestWebsite.Controllers
             var homePage = Umbraco.ContentAtRoot().FirstOrDefault(x => x.ContentType.Alias == "home");
             if (homePage?.Id > 0)
             {
-                //get the shopping cart details page
-                if (homePage.FirstChildOfType("shoppingCartPage")?.Id > 0)
-                {
-                    _shoppingCartPage = homePage.FirstChildOfType("shoppingCartPage");
-                }
-
-                //get the checkout page
-                if (homePage.FirstChildOfType("checkoutPage")?.Id > 0)
-                {
-                    _checkoutPage = homePage.FirstChildOfType("checkoutPage");
-                }
-
-                //get the products page
-                if (homePage.FirstChildOfType("productLandingPage")?.Id > 0)
-                {
-                    _productsPage = homePage.FirstChildOfType("productLandingPage");
-                }
             }
         }
 
@@ -183,22 +152,8 @@ namespace NatureQuestWebsite.Controllers
         /// <returns></returns>
         public ActionResult GetMiniCart()
         {
-            SiteShoppingCart currentCart;
-
-            //if there is a user currently logged in use their email to get the cart
-            if (_currentLoginStatus.IsLoggedIn && !string.IsNullOrWhiteSpace(_currentLoginStatus.Email))
-            {
-                currentCart = _shoppingService.GetCurrentCart(_currentLoginStatus.Email);
-            }
-            //just get the browser cart to use
-            else
-            {
-                currentCart = _shoppingService.GetCurrentCart();
-            }
-            //set the cart page
-            currentCart.ShoppingCartPage = _shoppingCartPage;
             //return the view with the model
-            return View("/Views/Partials/Accounts/MiniCartDetails.cshtml", currentCart);
+            return View("/Views/Partials/Accounts/MiniCartDetails.cshtml", CurrentShoppingCart);
         }
 
         /// <summary>
@@ -219,10 +174,6 @@ namespace NatureQuestWebsite.Controllers
             {
                 currentCart = _shoppingService.GetCurrentCart();
             }
-            //set the checkout page
-            currentCart.CheckoutPage = _checkoutPage;
-            //set the products page
-            currentCart.ProductsPage = _productsPage;
             //return the view with the model
             return View("/Views/Partials/Shop/CartDetails.cshtml", currentCart);
         }
@@ -418,10 +369,6 @@ namespace NatureQuestWebsite.Controllers
                 //add the cart member model to the current cart
                 currentCart.CartMembersModel = cartMemberModel;
             }
-            //set the checkout page
-            currentCart.CheckoutPage = _checkoutPage;
-            //set the products page
-            currentCart.ProductsPage = _productsPage;
             //return the view with the model
             return View("/Views/Partials/Shop/CheckoutView.cshtml", currentCart);
         }
@@ -475,6 +422,135 @@ namespace NatureQuestWebsite.Controllers
             shippingResult.ResultMessage = resultMessage;
             TempData["shippingResult"] = shippingResult;
             return CurrentUmbracoPage();
+        }
+
+        /// <summary>
+        /// Update the shipping details
+        /// </summary>
+        /// <param name="shippingFullname"></param>
+        /// <param name="shippingEmail"></param>
+        /// <param name="shippingAddress"></param>
+        /// <param name="shippingMobileNumber"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult UpdateShippingDetails(
+            string shippingFullname,
+            string shippingEmail,
+            string shippingAddress,
+            string shippingMobileNumber)
+        {
+            var shippingDetailsResult = new AjaxCartResult();
+            //check if we have the page id set
+            if (string.IsNullOrWhiteSpace(shippingFullname) ||
+                string.IsNullOrWhiteSpace(shippingEmail) ||
+                string.IsNullOrWhiteSpace(shippingAddress) ||
+                string.IsNullOrWhiteSpace(shippingMobileNumber))
+            {
+                shippingDetailsResult.ResultSuccess = false;
+                shippingDetailsResult.ResultMessage = "Please add all the shipping details";
+                TempData["shippingDetailsResult"] = shippingDetailsResult;
+                return CurrentUmbracoPage();
+            }
+
+            //get the selected shipping option
+            var shippingOption = CurrentShoppingCart.SelectShippingOptions.FirstOrDefault(option => option.Selected);
+            var shippingCartDetails = "";
+            if (shippingOption != null)
+            {
+                //get the details that match to save
+                var shippingDetails = CurrentShoppingCart.DisplayShippingOptions.FirstOrDefault(details =>
+                    details.ShippingPageId.ToString() == shippingOption.Value);
+                if (shippingDetails != null)
+                {
+                    shippingCartDetails = $"Shipping fee: {shippingDetails.ShippingFee:c}, details :{shippingDetails.ShippingDetails}";
+                }
+            }
+
+            //create the shipping details
+            var newShippingDetails = new ShippingDetails
+            {
+                ShippingFullname = shippingFullname,
+                ShippingEmail = shippingEmail,
+                ShippingAddress = shippingAddress,
+                ShippingMobileNumber = shippingMobileNumber,
+                ShippingOptionDetails = shippingCartDetails
+            };
+            CurrentShoppingCart.CartShippingDetails = newShippingDetails;
+
+            //check if we have a current stripe session , if not then create 1
+            if (string.IsNullOrWhiteSpace(CurrentShoppingCart.StripeCartSession?.Id))
+            {
+                CurrentShoppingCart.StripeCartSessionId = _shoppingService.GetCartStripeSessionId(CurrentShoppingCart);
+            }
+
+            //we had an error updating the shipping selected
+            shippingDetailsResult.ResultSuccess = true;
+            shippingDetailsResult.ResultMessage = "Shipping details updated";
+            TempData["shippingDetailsResult"] = shippingDetailsResult;
+            return CurrentUmbracoPage();
+        }
+
+        /// <summary>
+        /// Get the stripe checkout script
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetStripeCheckoutScript()
+        {
+            //check if we have a current stripe session , if not then create 1
+            if (string.IsNullOrWhiteSpace(CurrentShoppingCart.StripeCartSession?.Id))
+            {
+                CurrentShoppingCart.StripeCartSessionId = _shoppingService.GetCartStripeSessionId(CurrentShoppingCart);
+            }
+
+            //return the view with the model
+            return View("/Views/Partials/Shop/StripeCheckoutScript.cshtml", CurrentShoppingCart);
+        }
+
+        /// <summary>
+        /// process the checkout process after stripe card has been validated
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult ProcessStripeCheckoutPayment()
+        {
+            //check if the submitted model is valid
+            if (!ModelState.IsValid)
+            {
+                return CurrentUmbracoPage();
+            }
+
+            //get the token in the submitted form
+            var formData = Request.Form;
+            var stripeToken = formData["stripeToken"];
+
+            StripeConfiguration.ApiKey = CurrentShoppingCart.IsStripeLiveMode
+                                                            ? CurrentShoppingCart.StripeLiveSecretKey
+                                                            : CurrentShoppingCart.StripeTestSecretKey;
+
+            var basketDescription = "";
+            //get the descriptions
+            foreach (var basketItem in CurrentShoppingCart.CartItems)
+            {
+                basketDescription += basketItem.Description + Environment.NewLine;
+            }
+
+            var options = new ChargeCreateOptions
+            {
+                Amount = (int)(CurrentShoppingCart.ComputeTotalWithShippingValue() * 100),
+                Currency = "aud",
+                Description = basketDescription,
+                Source = stripeToken,
+            };
+            var service = new ChargeService();
+            Charge charge = service.Create(options);
+
+            return CurrentUmbracoPage();
+        }
+
+        public ActionResult CheckStripePaymentResult()
+        {
+            var orderDetails = new OrderDetails();
+            return View("/Views/Partials/Shop/CheckoutProcessedDetails.cshtml", orderDetails);
         }
     }
 }

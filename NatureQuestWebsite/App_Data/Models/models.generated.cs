@@ -19,7 +19,7 @@ using Umbraco.ModelsBuilder;
 using Umbraco.ModelsBuilder.Umbraco;
 
 [assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "78a5eced90ebbfc7")]
+[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "9a6fb080c3001f80")]
 [assembly:System.Reflection.AssemblyVersion("0.0.0.1")]
 
 namespace Umbraco.Web.PublishedModels
@@ -1981,6 +1981,76 @@ namespace Umbraco.Web.PublishedModels
 		{ }
 
 		// properties
+
+		///<summary>
+		/// Live Client Id: PayPal live client id
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("liveClientId")]
+		public string LiveClientId => this.Value<string>("liveClientId");
+
+		///<summary>
+		/// Live Publishable Key: Stripe live publishable key
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("livePublishableKey")]
+		public string LivePublishableKey => this.Value<string>("livePublishableKey");
+
+		///<summary>
+		/// Live Secret: PayPal live secret
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("liveSecret")]
+		public string LiveSecret => this.Value<string>("liveSecret");
+
+		///<summary>
+		/// Live Secret Key: Stripe live secret key
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("liveSecretKey")]
+		public string LiveSecretKey => this.Value<string>("liveSecretKey");
+
+		///<summary>
+		/// PayPal Live Mode: Check this option for PayPal to process payment live, if not set stripe will use test mode and no charges will be made.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("payPalLiveMode")]
+		public bool PayPalLiveMode => this.Value<bool>("payPalLiveMode");
+
+		///<summary>
+		/// Stripe Live Mode: Check this option for stripe to process payment live, if not set stripe will use test mode and no charges will be made.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("stripeLiveMode")]
+		public bool StripeLiveMode => this.Value<bool>("stripeLiveMode");
+
+		///<summary>
+		/// Test Client Id: PayPal test client id
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("testClientId")]
+		public string TestClientId => this.Value<string>("testClientId");
+
+		///<summary>
+		/// Test Publishable Key: Stripe test publishable key
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("testPublishableKey")]
+		public string TestPublishableKey => this.Value<string>("testPublishableKey");
+
+		///<summary>
+		/// Test Secret: PayPal test secret
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("testSecret")]
+		public string TestSecret => this.Value<string>("testSecret");
+
+		///<summary>
+		/// Test Secret Key: Stripe test secret key
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("testSecretKey")]
+		public string TestSecretKey => this.Value<string>("testSecretKey");
 	}
 
 	/// <summary>Shipping Option</summary>
@@ -2028,6 +2098,72 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("shippingFee")]
 		public decimal ShippingFee => this.Value<decimal>("shippingFee");
+	}
+
+	/// <summary>Payment Option</summary>
+	[PublishedModel("paymentOption")]
+	public partial class PaymentOption : SiteSettings
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "paymentOption";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<PaymentOption, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public PaymentOption(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+
+		///<summary>
+		/// Payment Icon Image: Enter the image displayed with the payment option
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("paymentIconImage")]
+		public Image PaymentIconImage => this.Value<Image>("paymentIconImage");
+
+		///<summary>
+		/// Payment Link: Enter website link for the payment details.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("paymentLink")]
+		public Umbraco.Web.Models.Link PaymentLink => this.Value<Umbraco.Web.Models.Link>("paymentLink");
+	}
+
+	/// <summary>Checkout Confirm Page</summary>
+	[PublishedModel("checkoutConfirmPage")]
+	public partial class CheckoutConfirmPage : SiteDefaultPage
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "checkoutConfirmPage";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<CheckoutConfirmPage, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public CheckoutConfirmPage(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
 	}
 
 	/// <summary>Folder</summary>

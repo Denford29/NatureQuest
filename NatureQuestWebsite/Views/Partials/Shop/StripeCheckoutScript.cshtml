@@ -1,0 +1,53 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<SiteShoppingCart>
+@{
+    var currentShoppingCart = Model;
+
+    //get the stripe key from the config
+    var stripePublishableKey = currentShoppingCart.IsStripeLiveMode ?
+        currentShoppingCart.StripeLivePublishableKey :
+        currentShoppingCart.StripeTestPublishableKey;
+
+    //get the cart session
+    var stripeSessionId = currentShoppingCart.StripeCartSessionId;
+}
+
+<script src="https://js.stripe.com/v3/"></script>
+
+<script>
+    'use strict';
+    //create the stripe elements
+    var stripe = Stripe('@stripePublishableKey');
+
+    $("#processStripePayment").click(function(event) {
+        event.preventDefault();
+
+        //use the stripe checkout to process the payment
+        stripe.redirectToCheckout({
+            sessionId: "@stripeSessionId"
+        }).then(function (result) {
+        //check if we have an error back
+            if (result.error !== null) {
+                iziToast.error({
+                    title: "Error",
+                    message: "There was an error processing your payment.",
+                    timeout: 10000,
+                    position: "topRight"
+                });
+            } else {
+                iziToast.success({
+                    title: "Payment Processed",
+                    message: "Your payment has been processed",
+                    timeout: 10000,
+                    position: "topRight"
+                });
+
+                var processCheckoutForm = $(this).parents('form:first');
+                if (processCheckoutForm !== undefined && processCheckoutForm !== null) {
+                    processCheckoutForm.submit();
+                }
+            }
+        });
+    });
+
+</script>

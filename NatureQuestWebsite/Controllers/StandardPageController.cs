@@ -99,6 +99,11 @@ namespace NatureQuestWebsite.Controllers
         private readonly IShoppingService _shoppingService;
 
         /// <summary>
+        /// get the current shopping cart
+        /// </summary>
+        public SiteShoppingCart CurrentShoppingCart;
+
+        /// <summary>
         /// initialise the controller
         /// </summary>
         public StandardPageController(
@@ -114,8 +119,18 @@ namespace NatureQuestWebsite.Controllers
             // get the login status
             _currentLoginStatus = Members.GetCurrentLoginStatus();
 
+            //if there is a user currently logged in use their email to get the cart
+            if (_currentLoginStatus.IsLoggedIn && !string.IsNullOrWhiteSpace(_currentLoginStatus.Email))
+            {
+                CurrentShoppingCart = _shoppingService.GetCurrentCart(_currentLoginStatus.Email);
+            }
+            else
+            {
+                CurrentShoppingCart = _shoppingService.GetCurrentCart();
+            }
+
             //get the global site settings page to use
-            var homePage = Umbraco.ContentAtRoot().FirstOrDefault(x => x.ContentType.Alias == "home");
+                var homePage = Umbraco.ContentAtRoot().FirstOrDefault(x => x.ContentType.Alias == "home");
             if (homePage?.Id > 0)
             {
                 //save the home page for use later

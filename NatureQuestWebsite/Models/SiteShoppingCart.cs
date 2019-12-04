@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using Stripe.Checkout;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -56,11 +57,15 @@ namespace NatureQuestWebsite.Models
             return productsTotal;
         }
 
-
         /// <summary>
         /// get or set the shopping cart page
         /// </summary>
         public IPublishedContent ShoppingCartPage { get; set; }
+
+        /// <summary>
+        /// get or set the shopping success page
+        /// </summary>
+        public IPublishedContent ShoppingSuccessPage { get; set; }
 
         /// <summary>
         /// get or set the checkout page
@@ -96,6 +101,72 @@ namespace NatureQuestWebsite.Models
         /// get or set the selected shipping total
         /// </summary>
         public decimal ShippingTotal { get; set; }
+
+        /// <summary>
+        /// get or set the shipping details
+        /// </summary>
+        public ShippingDetails CartShippingDetails { get; set; } = new ShippingDetails();
+
+        /// <summary>
+        /// get or set the flag to indicate stripe is in live mode
+        /// </summary>
+        public bool IsStripeLiveMode { get; set; }
+
+        /// <summary>
+        /// get or set the stripe test publish key
+        /// </summary>
+        public string StripeTestPublishableKey { get; set; }
+
+        /// <summary>
+        /// get or set the stripe test secret key
+        /// </summary>
+        public string StripeTestSecretKey { get; set; }
+
+        /// <summary>
+        /// get or set the stripe live publish key
+        /// </summary>
+        public string StripeLivePublishableKey { get; set; }
+
+        /// <summary>
+        /// get or set the stripe live secret key
+        /// </summary>
+        public string StripeLiveSecretKey { get; set; }
+
+        /// <summary>
+        /// get or set the stripe session for the current cart
+        /// </summary>
+        public Session StripeCartSession { get; set; }
+
+        /// <summary>
+        /// get or set the stripe session id for the current cart
+        /// </summary>
+        public string StripeCartSessionId { get; set; }
+
+        /// <summary>
+        /// get or set the flag to indicate paypal is in live mode
+        /// </summary>
+        public bool IsPayPalLiveMode { get; set; }
+
+        /// <summary>
+        /// get or set the paypal test client id
+        /// </summary>
+        public string PayPalTestClientId { get; set; }
+
+        /// <summary>
+        /// get or set the paypal test secret
+        /// </summary>
+        public string PayPalTestSecret { get; set; }
+
+        /// <summary>
+        /// get or set the paypal live client id
+        /// </summary>
+        public string PayPalLiveClientId { get; set; }
+
+        /// <summary>
+        /// get or set the paypal live secret
+        /// </summary>
+        public string PayPalLiveSecret { get; set; }
+
     }
 
     /// <summary>
@@ -173,5 +244,36 @@ namespace NatureQuestWebsite.Models
         /// get or set the shipping page id
         /// </summary>
         public int ShippingPageId { get; set; }
+    }
+
+    /// <summary>
+    /// create the class for the shipping details
+    /// </summary>
+    public class ShippingDetails
+    {
+        /// <summary>
+        /// get or set the shipping full name
+        /// </summary>
+        public string ShippingFullname { get; set; }
+
+        /// <summary>
+        /// get or set the shipping email
+        /// </summary>
+        public string ShippingEmail { get; set; }
+
+        /// <summary>
+        /// get or set the shipping address
+        /// </summary>
+        public string ShippingAddress { get; set; }
+
+        /// <summary>
+        /// get or set the shipping mobile number
+        /// </summary>
+        public string ShippingMobileNumber { get; set; }
+
+        /// <summary>
+        /// get or set the shipping option details
+        /// </summary>
+        public string ShippingOptionDetails { get; set; }
     }
 }

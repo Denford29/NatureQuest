@@ -7179,10 +7179,11 @@ video {
             height: 1px;
             content: ''
         }
+
 .shopping-cart.cart-list-header {
     border-top: 1px solid #e1e7ec;
-    background-color:#f5f5f5;
-    color:#606975;
+    background-color: #f5f5f5;
+    color: #606975;
     padding: 0.5rem;
     font-weight: bold;
 }
@@ -7457,6 +7458,46 @@ video {
         .checkout-steps > a > .angle {
             display: none
         }
+}
+
+/*check out list*/
+.checkout-steps li {
+    display: block;
+    position: relative;
+    width: 33%;
+    height: 55px;
+    float: right;
+    transition: color .3s;
+    border-top: 1px solid #e1e7ec;
+    border-bottom: 1px solid #e1e7ec;
+    background-color: #fff;
+    color: #606975;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 53px;
+    text-decoration: none;
+    text-align: center
+}
+
+.checkout-tabs li a:hover {
+    color: #2ecc71
+}
+
+.checkout-tabs li a.nav-link.active {
+    background-color: #2ecc71;
+    color: #fff;
+    cursor: default;
+    pointer-events: none
+}
+
+@media (max-width: 576px) {
+    .checkout-tabs li {
+        width: 100%;
+        margin-bottom: 10px;
+        float: none;
+        border: 1px solid #e1e7ec;
+        border-radius: 7px
+    }
 }
 
 .checkout-footer {
@@ -8237,3 +8278,97 @@ video {
 .no-scroll {
     overflow: hidden
 }
+
+.stripe-credit-card {
+    background-color: #525f7f;
+}
+
+    .stripe-credit-card * {
+        font-family: Quicksand, Open Sans, Segoe UI, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .stripe-credit-card .fieldset {
+        margin: 0 15px 30px;
+        padding: 0;
+        border-style: none;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-flow: row wrap;
+        flex-flow: row wrap;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+    }
+
+        .stripe-credit-card .fieldset .field {
+            padding: 10px 20px 11px;
+            background-color: #7488aa;
+            border-radius: 20px;
+            width: 100%;
+        }
+
+            .stripe-credit-card .fieldset .field.half-width {
+                width: calc(50% - (5px / 2));
+            }
+
+            .stripe-credit-card .fieldset .field.third-width {
+                width: calc(33% - (5px / 3));
+            }
+
+            .stripe-credit-card .fieldset .field + .field {
+                margin-top: 6px;
+            }
+
+            .stripe-credit-card .fieldset .field.focus,
+            .stripe-credit-card .fieldset .field:focus {
+                color: #424770;
+                background-color: #f6f9fc;
+            }
+
+            .stripe-credit-card .fieldset .field.invalid {
+                background-color: #fa755a;
+            }
+
+                .stripe-credit-card .fieldset .field.invalid.focus {
+                    background-color: #f6f9fc;
+                }
+
+            .stripe-credit-card .fieldset .field.focus::-webkit-input-placeholder,
+            .stripe-credit-card .fieldset .field:focus::-webkit-input-placeholder {
+                color: #cfd7df;
+            }
+
+            .stripe-credit-card .fieldset .field.focus::-moz-placeholder,
+            .stripe-credit-card .fieldset .field:focus::-moz-placeholder {
+                color: #cfd7df;
+            }
+
+            .stripe-credit-card .fieldset .field.focus:-ms-input-placeholder,
+            .stripe-credit-card .fieldset .field:focus:-ms-input-placeholder {
+                color: #cfd7df;
+            }
+
+        /*.stripe-credit-card input, .stripe-credit-card button {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        outline: none;
+        border-style: none;
+    }*/
+
+        .stripe-credit-card .fieldset input {
+            color: #fff;
+        }
+
+            .stripe-credit-card .fieldset input::-webkit-input-placeholder {
+                color: #9bacc8;
+            }
+
+            .stripe-credit-card .fieldset input::-moz-placeholder {
+                color: #9bacc8;
+            }
+
+            .stripe-credit-card .fieldset input:-ms-input-placeholder {
+                color: #9bacc8;
+            }

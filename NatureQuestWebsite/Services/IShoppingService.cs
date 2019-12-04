@@ -1,4 +1,5 @@
 ﻿using NatureQuestWebsite.Models;
+using Stripe;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -102,5 +103,26 @@ namespace NatureQuestWebsite.Services
             ShippingOption shippingOption,
             SiteShoppingCart currentShoppingCart,
             out string resultMessage);
+
+        /// <summary>
+        /// Get the carts stripe session
+        /// </summary>
+        /// <param name="currentShoppingCart"></param>
+        /// <returns></returns>
+        string GetCartStripeSessionId(SiteShoppingCart currentShoppingCart);
+
+        /// <summary>
+        /// Finalise the stripe payment
+        /// </summary>
+        /// <param name="stripePaymentIntent"></param>
+        /// <returns></returns>
+        bool FinaliseStripePayment(PaymentIntent stripePaymentIntent);
+
+        /// <summary>
+        /// get or create the stripe customer from the cart details
+        /// </summary>
+        /// <param name="currentShoppingCart"></param>
+        /// <returns></returns>
+        Customer GetStripeCustomer(SiteShoppingCart currentShoppingCart);
     }
 }

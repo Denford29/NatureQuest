@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
+using Stripe;
+using Stripe.Checkout;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -69,10 +71,10 @@ namespace NatureQuestWebsite.Services
         /// </summary>
         private readonly IPublishedContent _globalCartsPage;
 
-        ///// <summary>
-        ///// set the global orders page
-        ///// </summary>
-        //private readonly IPublishedContent _globalOrdersPage;
+        /// <summary>
+        /// set the global orders page
+        /// </summary>
+        private readonly IPublishedContent _globalOrdersPage;
 
         /// <summary>
         /// create the member service to use
@@ -93,6 +95,26 @@ namespace NatureQuestWebsite.Services
         /// cart page item alias
         /// </summary>
         private const string CartPageItemAlias = "cartItem";
+
+        /// <summary>
+        /// set the shopping cart details page
+        /// </summary>
+        private readonly IPublishedContent _shoppingCartPage;
+
+        /// <summary>
+        /// set the shopping cart success page
+        /// </summary>
+        private readonly IPublishedContent _shoppingSuccessPage;
+
+        /// <summary>
+        /// set the shopping checkout page
+        /// </summary>
+        private readonly IPublishedContent _checkoutPage;
+
+        /// <summary>
+        /// set the products page
+        /// </summary>
+        private readonly IPublishedContent _productsPage;
 
         ///// <summary>
         ///// global order page alias
@@ -123,6 +145,26 @@ namespace NatureQuestWebsite.Services
         /// get the local shipping options
         /// </summary>
         private readonly List<IPublishedContent> _shippingOptionPages = new List<IPublishedContent>();
+
+        /// <summary>
+        /// get the local stripe test publish key
+        /// </summary>
+        public string _stripeTestPublishableKey = WebConfigurationManager.AppSettings["stripeTestPublishableKey"];
+
+        /// <summary>
+        /// get the local stripe test secret key
+        /// </summary>
+        public string _stripeTestSecretKey = WebConfigurationManager.AppSettings["stripeTestSecretKey"];
+
+        /// <summary>
+        /// get the local stripe live publish key
+        /// </summary>
+        public string _stripeLivePublishableKey = WebConfigurationManager.AppSettings["stripeLivePublishableKey"];
+
+        /// <summary>
+        /// get the local stripe live secret key
+        /// </summary>
+        public string _stripeLiveSecretKey = WebConfigurationManager.AppSettings["stripeLiveSecretKey"];
 
         /// <summary>
         /// initialise the shopping service
@@ -229,6 +271,30 @@ namespace NatureQuestWebsite.Services
                         {
                             _shippingOptionPages = shippingOptions;
                         }
+
+                        //get the stored stripe details
+                        if (storeDetailsPage.HasProperty("testPublishableKey") && storeDetailsPage.HasValue("testPublishableKey"))
+                        {
+                            _stripeTestPublishableKey = storeDetailsPage.Value<string>("testPublishableKey");
+                        }
+
+                        //get the stored stripe details
+                        if (storeDetailsPage.HasProperty("testSecretKey") && storeDetailsPage.HasValue("testSecretKey"))
+                        {
+                            _stripeTestSecretKey = storeDetailsPage.Value<string>("testSecretKey");
+                        }
+
+                        //get the stored stripe details
+                        if (storeDetailsPage.HasProperty("livePublishableKey") && storeDetailsPage.HasValue("livePublishableKey"))
+                        {
+                            _stripeLivePublishableKey = storeDetailsPage.Value<string>("livePublishableKey");
+                        }
+
+                        //get the stored stripe details
+                        if (storeDetailsPage.HasProperty("liveSecretKey") && storeDetailsPage.HasValue("liveSecretKey"))
+                        {
+                            _stripeLiveSecretKey = storeDetailsPage.Value<string>("liveSecretKey");
+                        }
                     }
                 }
 
@@ -249,7 +315,7 @@ namespace NatureQuestWebsite.Services
                     if (ordersPage?.Id > 0)
                     {
                         //save the global orders page to use later
-                        _globalCartsPage = ordersPage;
+                        _globalOrdersPage = ordersPage;
                     }
                 }
 
@@ -259,6 +325,36 @@ namespace NatureQuestWebsite.Services
                 if (homePage?.Id > 0)
                 {
                     HomePage = homePage;
+
+                    //get the shopping cart details page
+                    if (homePage.FirstChildOfType("shoppingCartPage")?.Id > 0)
+                    {
+                        //get the shopping cart page
+                        _shoppingCartPage = homePage.FirstChildOfType("shoppingCartPage");
+                        //get the checkout page
+                        _checkoutPage = homePage.FirstChildOfType("checkoutPage");
+                        //set the success page
+                        if (_checkoutPage?.Id > 0 && _checkoutPage.FirstChildOfType("checkoutConfirmPage") != null)
+                        {
+                            _shoppingSuccessPage = _checkoutPage.FirstChildOfType("checkoutConfirmPage");
+                        }
+                        else
+                        {
+                            _shoppingSuccessPage = homePage;
+                        }
+                    }
+
+                    //get the checkout page
+                    if (homePage.FirstChildOfType("checkoutPage")?.Id > 0)
+                    {
+                        _checkoutPage = homePage.FirstChildOfType("checkoutPage");
+                    }
+
+                    //get the products page
+                    if (homePage.FirstChildOfType("productLandingPage")?.Id > 0)
+                    {
+                        _productsPage = homePage.FirstChildOfType("productLandingPage");
+                    }
                 }
             }
         }
@@ -278,6 +374,18 @@ namespace NatureQuestWebsite.Services
                 currentCart = new SiteShoppingCart();
                 HttpContext.Current.Session["Cart"] = currentCart;
             }
+
+            //set the cart pages
+            currentCart.ShoppingCartPage = _shoppingCartPage;
+            currentCart.CheckoutPage = _checkoutPage;
+            currentCart.ProductsPage = _productsPage;
+            currentCart.ShoppingSuccessPage = _shoppingSuccessPage;
+
+            //set the stripe keys
+            currentCart.StripeTestPublishableKey = _stripeTestPublishableKey;
+            currentCart.StripeTestSecretKey = _stripeTestSecretKey;
+            currentCart.StripeLivePublishableKey = _stripeLivePublishableKey;
+            currentCart.StripeLiveSecretKey = _stripeLiveSecretKey;
 
             //add the shipping options
             if (_shippingOptionPages.Any() && !currentCart.DisplayShippingOptions.Any())
@@ -332,7 +440,6 @@ namespace NatureQuestWebsite.Services
                         //set the default selected option
                         currentCart.SelectedShippingOption = shippingOptionPage.Id.ToString();
                         currentCart.ShippingTotal = displayShippingOption.ShippingFee;
-
                     }
                     else
                     {
@@ -365,15 +472,49 @@ namespace NatureQuestWebsite.Services
                     //check if we have the page and use it to generate the cart with
                     if (cartPage?.Id > 0)
                     {
-                        //create a new cart with the member saved on the cart
-                        var savedShoppingCart = new SiteShoppingCart
+                        //save the cart member and member cart page to the current cart
+                        currentCart.CartMember = cartMember;
+                        currentCart.MemberCartPage = cartPage;
+
+                        //check if the cart has got a shipping page set
+                        if (cartPage.HasProperty("cartShipping") && cartPage.HasValue("cartShipping"))
                         {
-                            CartMember = cartMember,
-                            MemberCartPage = cartPage
-                        };
+                            //save the umbraco cart page id to the cart item
+                            var cartSavedShippingPage = cartPage.Value<IPublishedContent>("cartShipping");
+                            if (cartSavedShippingPage?.Id > 0)
+                            {
+                                //get the current selected option
+                                var currentSelectedOption = currentCart.SelectShippingOptions.
+                                    FirstOrDefault(option => option.Selected);
+                                if (currentSelectedOption != null)
+                                {
+                                    currentSelectedOption.Selected = false;
+                                }
+
+                                //set the new selected option
+                                var newSelectedOption = currentCart.SelectShippingOptions.
+                                    FirstOrDefault(option => option.Value == cartSavedShippingPage.Id.ToString());
+                                if (newSelectedOption != null)
+                                {
+                                    newSelectedOption.Selected = true;
+                                }
+                                var shippingOptionPage = currentCart.DisplayShippingOptions.
+                                    FirstOrDefault(page => page.ShippingPageId == cartSavedShippingPage.Id);
+                                if (shippingOptionPage != null)
+                                {
+                                    currentCart.SelectedShippingOption = shippingOptionPage.ShippingPageId.ToString();
+                                    currentCart.ShippingTotal = shippingOptionPage.ShippingFee;
+                                }
+
+                                currentCart.ComputeTotalWithShippingValue();
+                            }
+                        }
+
                         //check if the cart page has got items saved and add them to the saved cart
                         if (cartPage.Children("cartItem").Any())
                         {
+                            //reset the cart items before we add any new ones
+                            currentCart.CartItems.Clear();
                             foreach (var cartItemPage in cartPage.Children("cartItem"))
                             {
                                 var savedCartItem = new CartItem();
@@ -455,36 +596,29 @@ namespace NatureQuestWebsite.Services
                                 }
 
                                 //add the cart item to the carts list
-                                savedShoppingCart.CartItems.Add(savedCartItem);
+                                currentCart.CartItems.Add(savedCartItem);
                             }
                         }
-                        //clear the current session and add the new cart
-                        HttpContext.Current.Session["Cart"] = null;
-                        HttpContext.Current.Session["Cart"] = savedShoppingCart;
-                        // return the saved cart
-                        return savedShoppingCart;
                     }
-
-                    // if we cant find an existing cart create one and use that
-                    var newCartPage = CreateMemberCartPage(_globalCartsPage, cartMember);
-                    // if the new cart page is not null create the session with that and return it
-                    if (newCartPage != null && newCartPage.Id != 0)
+                    else
                     {
-                        //create a new cart with the member saved on the cart
-                        var newShoppingCart = new SiteShoppingCart
+                        // if we cant find an existing cart create one and use that
+                        var newCartPage = CreateMemberCartPage(_globalCartsPage, cartMember);
+                        // if the new cart page is not null create the session with that and return it
+                        if (newCartPage != null && newCartPage.Id != 0)
                         {
-                            CartMember = cartMember,
-                            MemberCartPage = newCartPage
-                        };
-                        //clear the current session and add the new cart
-                        HttpContext.Current.Session["Cart"] = null;
-                        HttpContext.Current.Session["Cart"] = newShoppingCart;
-                        // return the saved cart
-                        return newShoppingCart;
+                            //save the cart member and member cart page to the current cart
+                            currentCart.CartMember = cartMember;
+                            currentCart.MemberCartPage = cartPage;
+                        }
                     }
                 }
             }
-            //return the default one in the session
+
+            //clear the current session and add the new cart
+            HttpContext.Current.Session["Cart"] = null;
+            HttpContext.Current.Session["Cart"] = currentCart;
+            // return the saved cart
             return currentCart;
         }
 
@@ -1295,8 +1429,8 @@ namespace NatureQuestWebsite.Services
                     if (shippingOptionContent != null && cartMemberContent != null)
                     {
                         //update the member cart page
-
-                        cartMemberContent.SetValue("cartShipping", shippingOptionContent.Id);
+                        var shippingOptionUdi = shippingOptionContent.GetUdi().ToString();
+                        cartMemberContent.SetValue("cartShipping", shippingOptionUdi);
                         //save the content item
                         var saveResult = _contentService.SaveAndPublish(cartMemberContent);
 
@@ -1403,6 +1537,169 @@ namespace NatureQuestWebsite.Services
             }
             //return the flag
             return messageSent;
+        }
+
+        /// <summary>
+        /// Get the carts stripe session
+        /// </summary>
+        /// <param name="currentShoppingCart"></param>
+        /// <returns></returns>
+        public string GetCartStripeSessionId(SiteShoppingCart currentShoppingCart)
+        {
+            var stripeSessionId = string.Empty;
+            //check if the current cart has already got 1
+            if (!string.IsNullOrWhiteSpace(currentShoppingCart.StripeCartSession?.Id))
+            {
+                stripeSessionId = currentShoppingCart.StripeCartSession.Id;
+                return stripeSessionId;
+            }
+
+            //create the stripe line options
+            if (currentShoppingCart.CartItems.Any())
+            {
+                var lineItemOptions = new List<SessionLineItemOptions>();
+                foreach (var cartItem in currentShoppingCart.CartItems)
+                {
+                    var stripeItemOption = new SessionLineItemOptions
+                    {
+                        Name = $"{cartItem.MainProductPage.Name}-{cartItem.ProductLinePage.Name}",
+                        Description = cartItem.Description,
+                        Amount = (int)(cartItem.Price * 100),
+                        Currency = "aud",
+                        Quantity = cartItem.Quantity,
+                        Images = new List<string> { cartItem.CartItemImage }
+                    };
+                    //add it to the list
+                    lineItemOptions.Add(stripeItemOption);
+                }
+                //add the shipping
+                var shippingOption = new SessionLineItemOptions
+                {
+                    Name = $"{currentShoppingCart.SelectedShippingOption}",
+                    Description = currentShoppingCart.CartShippingDetails.ShippingOptionDetails,
+                    Amount = (int)(currentShoppingCart.ShippingTotal * 100),
+                    Currency = "aud",
+                    Quantity = 1
+                };
+                lineItemOptions.Add(shippingOption);
+
+                //get the stripe api key to use
+                StripeConfiguration.ApiKey = currentShoppingCart.IsStripeLiveMode ?
+                    currentShoppingCart.StripeLiveSecretKey :
+                    currentShoppingCart.StripeTestSecretKey;
+
+                //create the customer to use
+                var stripeCustomer = GetStripeCustomer(currentShoppingCart);
+
+                //create the session
+                var options = new SessionCreateOptions
+                {
+                    Customer = stripeCustomer.Id,
+                    PaymentMethodTypes = new List<string> {
+                        "card",
+                    },
+                    LineItems = lineItemOptions,
+                    SuccessUrl = currentShoppingCart.ShoppingSuccessPage?.UrlAbsolute(),
+                    CancelUrl = currentShoppingCart.CheckoutPage?.UrlAbsolute(),
+                    Mode = "payment",
+                    PaymentIntentData = new SessionPaymentIntentDataOptions
+                    {
+                        CaptureMethod = "automatic"
+                    },
+                    SubmitType = "pay"
+                };
+
+                var sessionService = new SessionService();
+                var stripeSession = sessionService.Create(options);
+                //check if we have a session and save it on the cart
+                if (!string.IsNullOrWhiteSpace(stripeSession?.Id))
+                {
+                    currentShoppingCart.StripeCartSession = stripeSession;
+                    currentShoppingCart.StripeCartSessionId = stripeSession.Id;
+                    stripeSessionId = stripeSession.Id;
+                }
+            }
+
+            //return the session id 
+            return stripeSessionId;
+        }
+
+        /// <summary>
+        /// Finalise the stripe payment
+        /// </summary>
+        /// <param name="stripePaymentIntent"></param>
+        /// <returns></returns>
+        public bool FinaliseStripePayment(PaymentIntent stripePaymentIntent)
+        {
+            //set the payment finalising flag(
+            var paymentFinalised = false;
+
+            //check the payment intent 
+            if (!string.IsNullOrWhiteSpace(stripePaymentIntent?.Id))
+            {
+                var currentCart = GetCurrentCart();
+                //check if this intent matches the cart
+                if (currentCart.StripeCartSession?.Id == stripePaymentIntent.Id 
+                    && stripePaymentIntent.Status == "succeeded")
+                {
+                    paymentFinalised = true;
+                }
+            }
+            //return the intent flag
+            return paymentFinalised;
+        }
+
+        /// <summary>
+        /// get or create the stripe customer from the cart details
+        /// </summary>
+        /// <param name="currentShoppingCart"></param>
+        /// <returns></returns>
+        public Customer GetStripeCustomer(SiteShoppingCart currentShoppingCart)
+        {
+            //check if we have am email address to use to get or create an account with
+            if (string.IsNullOrWhiteSpace(currentShoppingCart?.CartMember?.Email))
+            {
+                return null;
+            }
+            //create the email to use
+            var cartEmail = currentShoppingCart.CartMember.Email;
+            //get the shipping details to use
+            var cartMembersModel = currentShoppingCart.CartMembersModel;
+            //create the customer service to use
+            var customerService = new CustomerService();
+
+            var options = new CustomerListOptions
+            {
+                Email = cartEmail,
+            };
+            //check if we can get the customer from stripe
+            var stripeCustomer = customerService.List(options).FirstOrDefault(customer => customer.Email == cartEmail);
+            //if we cant find a matching customer create 1
+            if (stripeCustomer == null)
+            {
+                //create the options to use to create the customer with
+                var createOptions = new CustomerCreateOptions
+                {
+                    Email = cartEmail,
+                    Name = cartMembersModel.FullName,
+                    Description = cartMembersModel.FullName,
+                    Shipping = new ShippingOptions
+                    {
+                        Name = cartMembersModel.FullName,
+                        Phone = cartMembersModel.MobileNumber,
+                        Address = new AddressOptions
+                        {
+                            Line1 = cartMembersModel.HouseAddress
+                        }
+                    }
+                };
+
+                //use the service to create the customer
+                stripeCustomer = customerService.Create(createOptions);
+            }
+
+            //return the new or old customer
+            return stripeCustomer;
         }
 
         #endregion

@@ -7,9 +7,11 @@
             this.productSortOptions();
             this.addProductToCart();
             this.clearCart();
+            this.submitCart();
             this.removeCartItem();
             this.updateCartItem();
             this.shippingOptions();
+            this.cartReview();
         },
 
         //create the function to do the sorting
@@ -69,6 +71,21 @@
                 if (clearCartForm !== undefined && clearCartForm !== null) {
                     clearCartForm.submit();
                 }
+            });
+        },
+
+        //submit the cart
+        submitCart: function() {
+            $("#checkoutSubmitButton").click(function(event) {
+                //load the spinner
+                $.busyLoadFull("show",
+                    {
+                        background: "rgba(0, 0, 0, 0.21)",
+                        spinner: "circles",
+                        animation: "slide",
+                        text: "FINALISING YOUR CART ...",
+                        textPosition: "bottom"
+                    });
             });
         },
 
@@ -135,6 +152,62 @@
                     if (updateShippingForm !== undefined && updateShippingForm !== null) {
                         updateShippingForm.submit();
                     }
+                }
+            });
+        },
+
+        cartReview: function() {
+            $(".cart-review").on('click', function (event) {
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+                //load the spinner
+                $.busyLoadFull("show", {
+                    background: "rgba(0, 0, 0, 0.21)",
+                    spinner: "circles",
+                    animation: "slide",
+                    text: "UPDATING SHIPPING ...",
+                    textPosition: "bottom"
+                });
+
+                //check if we have shipping selected
+                var shippingOption = $('input[name="ShippingOption"]:checked').val();
+                //if we don''t have shipping selected, show an error message
+                if (shippingOption === "") {
+                    $.busyLoadFull("hide");
+                    iziToast.error({
+                        title: "Error",
+                        message: "Please select your shipping method",
+                        timeout: 10000,
+                        position: "topRight"
+                    });
+                }
+
+                //check the shipping details
+                var shippingFullname = $("#cartMember_FullName").val();
+                var shippingEmail = $("#cartMember_Email").val();
+                var shippingAddress = $("#cartMember_HouseAddress").val();
+                var shippingMobileNumber = $("#cartMember_MobileNumber").val();
+                //if we don''t have shipping selected, show an error message
+                if (shippingFullname === "" ||
+                    shippingEmail === "" ||
+                    shippingAddress === "" ||
+                    shippingMobileNumber === "") {
+                    $.busyLoadFull("hide");
+                    iziToast.error({
+                        title: "Error",
+                        message: "Please enter your shipping details",
+                        timeout: 10000,
+                        position: "topRight"
+                    });
+                } else {
+                    //add the values to the form value
+                    $("#shippingFullname").val(shippingFullname);
+                    $("#shippingEmail").val(shippingEmail);
+                    $("#shippingAddress").val(shippingAddress);
+                    $("#shippingMobileNumber").val(shippingMobileNumber);
+                    //get the form and submit it
+                    $("#shippingDetailsForm").submit();
+                    //$.busyLoadFull("hide");
                 }
             });
         }

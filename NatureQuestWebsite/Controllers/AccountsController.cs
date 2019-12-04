@@ -60,19 +60,28 @@ namespace NatureQuestWebsite.Controllers
         private readonly IPublishedContent _registrationLoginPage;
 
         /// <summary>
+        /// create the local read only shipping service
+        /// </summary>
+        private readonly IShoppingService _shoppingService;
+
+        /// <summary>
         /// initiate the controller with the services used
         /// </summary>
         /// <param name="siteMembersService"></param>
         /// <param name="memberTypeService"></param>
         public AccountsController(
             ISiteMembersService siteMembersService,
-            IMemberTypeService memberTypeService)
+            IMemberTypeService memberTypeService,
+            IShoppingService shoppingService)
         {
             //set the member service to use
             _siteMemberService = siteMembersService;
 
             //set the member type service to use
             _memberTypeService = memberTypeService;
+
+            //set the shopping cart service to use
+            _shoppingService = shoppingService;
 
             //get the member type
             _memberType = _memberTypeService.Get("Member");
@@ -473,6 +482,11 @@ namespace NatureQuestWebsite.Controllers
                 return CurrentUmbracoPage();
             }
 
+            //clear the current cart and get the user cart
+            System.Web.HttpContext.Current.Session["Cart"] = null;
+            var memberCart = _shoppingService.GetCurrentCart(model.Email);
+            System.Web.HttpContext.Current.Session["Cart"] = memberCart;
+
             //if we have logged in successfully, and have a account details page, redirect to the details page
             if (_accountDetailsPage?.Id > 0)
             {
@@ -493,6 +507,8 @@ namespace NatureQuestWebsite.Controllers
             if (_currentLoginStatus.IsLoggedIn)
             {
                 FormsAuthentication.SignOut();
+                //clear the current cart and get the user cart
+                System.Web.HttpContext.Current.Session["Cart"] = null;
                 //redirect to the home page after logging out
                 return Redirect("/");
             }
