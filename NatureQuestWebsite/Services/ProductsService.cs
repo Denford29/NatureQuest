@@ -259,7 +259,7 @@ namespace NatureQuestWebsite.Services
                                                             model.ProductPrices.FirstOrDefault();
 
                     //check if this product i valid for ordering
-                    model.CanBeOrdered = model.FeaturedPrice != null && !string.IsNullOrWhiteSpace(model.ProductCode);
+                    model.CanBeOrdered = model.FeaturedPrice != null;
                 }
 
                 //return the model

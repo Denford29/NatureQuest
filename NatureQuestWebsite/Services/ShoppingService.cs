@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
+using Newtonsoft.Json;
 using Stripe;
 using Stripe.Checkout;
 using Umbraco.Core;
@@ -116,15 +117,15 @@ namespace NatureQuestWebsite.Services
         /// </summary>
         private readonly IPublishedContent _productsPage;
 
-        ///// <summary>
-        ///// global order page alias
-        ///// </summary>
-        //private const string GlobalOrdersPageAlias = "ordersFolder";
+        /// <summary>
+        /// global order page alias
+        /// </summary>
+        private const string GlobalOrdersPageAlias = "ordersFolder";
 
-        ///// <summary>
-        ///// order page alias
-        ///// </summary>
-        //private const string OrderPageAlias = "shopOrder";
+        /// <summary>
+        /// order page alias
+        /// </summary>
+        private const string OrderPageAlias = "shopOrder";
 
         /// <summary>
         /// create the local content service to use
@@ -357,6 +358,7 @@ namespace NatureQuestWebsite.Services
                     }
                 }
             }
+
         }
 
         /// <summary>
@@ -956,6 +958,9 @@ namespace NatureQuestWebsite.Services
                     // the error flag here
                     return false;
                 }
+                //also clear the cart session if there is one
+                currentShoppingCart.StripeCartSession = null;
+                currentShoppingCart.StripeCartSessionId = string.Empty;
                 //set the result message
                 resultMessage = "The shopping cart has been cleared";
                 return true;
@@ -1468,14 +1473,158 @@ namespace NatureQuestWebsite.Services
                     return false;
                 }
             }
-
-            //clear the current session and add the new cart
-            //HttpContext.Current.Session["Cart"] = null;
-            //HttpContext.Current.Session["Cart"] = currentShoppingCart;
-
             //if we get this far all has gone well, return
             resultMessage = "Your shipping has been updated on the cart";
             return true;
+        }
+
+        /// <summary>
+        /// create the order page for a member
+        /// </summary>
+        /// <param name="ordersPage"></param>
+        /// <param name="cartMember"></param>
+        /// <param name="orderId"></param>
+        /// <param name="currentShoppingCart"></param>
+        /// <returns></returns>
+        public IPublishedContent CreateMemberOrderPage(
+            IPublishedContent ordersPage,
+            IMember cartMember,
+            string orderId,
+            SiteShoppingCart currentShoppingCart)
+        {
+            try
+            {
+                //check if we have the orders page for the parent
+                if (ordersPage?.Id != 0 && ordersPage?.ContentType.Alias == GlobalOrdersPageAlias
+                    && cartMember?.Id != 0 && !string.IsNullOrWhiteSpace(cartMember?.Email))
+                {
+                    //create the name to use
+                    var memberName = "Member";
+                    var memberNameProperty =
+                        cartMember.Properties.FirstOrDefault(property => property.Alias == "fullName");
+                    if (!string.IsNullOrWhiteSpace((string)memberNameProperty?.GetValue()))
+                    {
+                        memberName = (string)memberNameProperty.GetValue();
+                    }
+
+                    //generate the cart name
+                    var memberOrderName = $"{memberName.Trim().Replace(" ", "-")}-({cartMember.Email})-Order";
+                    //get the parent carts page
+                    var ordersParentPage = _contentService.GetById(ordersPage.Id);
+                    //use the content service to create the cart page
+                    var newMemberOrderPage = _contentService.CreateAndSave(memberOrderName, ordersParentPage, OrderPageAlias);
+                    //check if the new page has been created
+                    if (newMemberOrderPage != null)
+                    {
+                        //get the member cart page from the cart to move to the order
+                        var memberCartPage = currentShoppingCart.MemberCartPage;
+                        //set the payment method
+                        var paymentMethodValue = JsonConvert.SerializeObject(new[] { "Stripe" });
+                        //set the properties
+                        newMemberOrderPage.SetValue("orderMember", cartMember.Id);
+                        newMemberOrderPage.SetValue("isOrder", true);
+                        newMemberOrderPage.SetValue("orderId", orderId);
+                        newMemberOrderPage.SetValue("paymentMethod", paymentMethodValue);
+
+                        //set the shipping on the order
+                        if (!string.IsNullOrWhiteSpace(currentShoppingCart.SelectedShippingOption) &&
+                            Convert.ToInt32(currentShoppingCart.SelectedShippingOption) > 0)
+                        {
+                            var selectedCartShipping = Convert.ToInt32(currentShoppingCart.SelectedShippingOption);
+                            var shippingContentPage = _contentService.GetById(selectedCartShipping);
+                            if (shippingContentPage?.Id > 0)
+                            {
+                                var shippingOptionUdi = shippingContentPage.GetUdi().ToString();
+                                newMemberOrderPage.SetValue("orderShipping", shippingOptionUdi);
+                            }
+                        }
+
+                        //save the content item
+                        var saveResult = _contentService.SaveAndPublish(newMemberOrderPage);
+
+                        //move the cart items to the order
+                        if (memberCartPage.Children.Any())
+                        {
+                            foreach (var cartPage in memberCartPage.Children)
+                            {
+                                var cartContentPage = _contentService.GetById(cartPage.Id);
+                                _contentService.Copy(cartContentPage, newMemberOrderPage.Id, true);
+                            }
+                        }
+
+                        //save the content item
+                        saveResult = _contentService.SaveAndPublish(newMemberOrderPage);
+
+                        if (saveResult.Success)
+                        {
+                            _logger.Info(Type.GetType("ShoppingService"),
+                                $"A new shop order has been created for member: {cartMember.Email}");
+                        }
+                        // convert the content to the ipublished content to return
+                        var orderPublishedPage = _umbracoHelper.Content(newMemberOrderPage.Id);
+                        //check if we now have the published page, send an email out and return this page
+                        if (orderPublishedPage != null)
+                        {
+                            var shippingDetails = currentShoppingCart.CartShippingDetails;
+                            //create the admin email to notify of a new cart page
+                            var newCartSubject = "A new member order has been created.";
+                            var newCartBody = $"<p>A new member order with the name: {orderPublishedPage.Name} has been created with details.<br /> <br />" +
+                                              "Payment Method: Stripe<br />" +
+                                              $"Payment id: {orderId} <br />" +
+                                              $"Shipping name: {shippingDetails.ShippingFullname} <br />" +
+                                              $"Shipping email: {shippingDetails.ShippingEmail} <br />" +
+                                              $"Shipping address: {shippingDetails.ShippingAddress} <br />" +
+                                              $"Shipping details: {currentShoppingCart.CartShippingDetails.ShippingOptionDetails} <br />" +
+                                              $"<strong>Order total: {currentShoppingCart.ComputeTotalWithShippingValue():c}</strong> <br />" +
+                                              "<br /> <br />Regards, <br /> Website Team</p>";
+                            //create the admin email
+                            var adminNewCartMessage = MailHelper.CreateSingleEmail(
+                                _fromEmailAddress,
+                                _systemEmailAddress,
+                                newCartSubject,
+                                "",
+                                newCartBody);
+                            //send the admin email
+                            var unused1 = SendGridEmail(adminNewCartMessage);
+
+                            //create the global emails
+                            var globalNewCartMessage = MailHelper.CreateSingleEmailToMultipleRecipients(
+                                _fromEmailAddress,
+                                _siteToEmailAddresses,
+                                newCartSubject,
+                                "",
+                                newCartBody);
+                            //send the global email
+                            var unused = SendGridEmail(globalNewCartMessage);
+
+                            //return the page
+                            return orderPublishedPage;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //there was an error getting member details 
+                _logger.Error(Type.GetType("ShoppingService"), ex, $"Error creating new order for member :{cartMember?.Email}");
+                //send an admin email with the error
+                var errorMessage = $"Error creating new order for member :{cartMember?.Email}." +
+                                   $"<br /><br />{ex.Message}<br /><br />{ex.StackTrace}<br /><br />{ex.InnerException}";
+                var errorSubject = $"Error Creating new order on {_siteName}";
+
+                //system email
+                var systemMessage = MailHelper.CreateSingleEmail(
+                    _fromEmailAddress,
+                    _systemEmailAddress,
+                    errorSubject,
+                    "",
+                    errorMessage);
+                var systemMessageSent = SendGridEmail(systemMessage);
+                _logger.Info(Type.GetType("ShoppingService"), $"Error email send result:{systemMessageSent}");
+            }
+
+            //if we don''t have the cart page and member then just return null
+            return null;
         }
 
         #region Cart Helpers
@@ -1567,7 +1716,7 @@ namespace NatureQuestWebsite.Services
                         Amount = (int)(cartItem.Price * 100),
                         Currency = "aud",
                         Quantity = cartItem.Quantity,
-                        Images = new List<string> { cartItem.CartItemImage }
+                        Images = new List<string> { $"{HomePage.UrlAbsolute()}{cartItem.CartItemImage}" }
                     };
                     //add it to the list
                     lineItemOptions.Add(stripeItemOption);
@@ -1639,7 +1788,7 @@ namespace NatureQuestWebsite.Services
             {
                 var currentCart = GetCurrentCart();
                 //check if this intent matches the cart
-                if (currentCart.StripeCartSession?.Id == stripePaymentIntent.Id 
+                if (currentCart.StripeCartSession?.Id == stripePaymentIntent.Id
                     && stripePaymentIntent.Status == "succeeded")
                 {
                     paymentFinalised = true;
@@ -1700,6 +1849,120 @@ namespace NatureQuestWebsite.Services
 
             //return the new or old customer
             return stripeCustomer;
+        }
+
+        /// <summary>
+        /// place the stripe order and clear the cart
+        /// </summary>
+        /// <param name="currentShoppingCart"></param>
+        /// <param name="resultMessage"></param>
+        /// <param name="stripeOrderDetails"></param>
+        /// <returns></returns>
+        public bool PlaceStripeCartOrder(
+            SiteShoppingCart currentShoppingCart,
+            out string resultMessage,
+            out OrderDetails stripeOrderDetails)
+        {
+            //create the 
+            resultMessage = "There was an placing your order";
+            stripeOrderDetails = new OrderDetails();
+            stripeOrderDetails.OrderItems.AddRange(currentShoppingCart.CartItems);
+
+            //get the stripe api key to use
+            StripeConfiguration.ApiKey = currentShoppingCart.IsStripeLiveMode ?
+                currentShoppingCart.StripeLiveSecretKey :
+                currentShoppingCart.StripeTestSecretKey;
+
+            // set the default result
+            var orderPlaced = false;
+            // get the cart stripe customer to check for order and payment
+            var orderCustomer = GetStripeCustomer(currentShoppingCart);
+            if (!string.IsNullOrWhiteSpace(orderCustomer?.Id))
+            {
+                //get the intent and check if it has succeeded
+                var cartSessionPaymentIntentId = currentShoppingCart.StripeCartSession?.PaymentIntentId;
+                if (!string.IsNullOrWhiteSpace(cartSessionPaymentIntentId))
+                {
+                    var paymentIntentService = new PaymentIntentService();
+                    var paymentIntent = paymentIntentService.Get(cartSessionPaymentIntentId);
+                    if (paymentIntent?.Status == "succeeded")
+                    {
+                        //if we have a member save the order
+                        if (currentShoppingCart.CartMember?.Id > 0)
+                        {
+                            var memberOrder = CreateMemberOrderPage(
+                                _globalOrdersPage,
+                                currentShoppingCart.CartMember,
+                                paymentIntent.Id,
+                                currentShoppingCart);
+                            //create the member order page first
+                            if (memberOrder?.Id > 0)
+                            {
+                                //clear the cart once we have the member order
+                                var cartCleared = ClearShoppingCart(currentShoppingCart, out _);
+                                if (cartCleared)
+                                {
+                                    orderPlaced = true;
+                                    resultMessage = "Your Order has been placed and saved in your account";
+                                }
+                            }
+                        }
+                        //its an anonymous cart
+                        else
+                        {
+                            var cartTotal = currentShoppingCart.ComputeTotalWithShippingValue().ToString("c");
+                            //clear the cart
+                            var cartCleared = ClearShoppingCart(currentShoppingCart, out _);
+                            //if the cart is cleared, then set the result message
+                            if (cartCleared)
+                            {
+                                var shippingDetails = currentShoppingCart.CartShippingDetails;
+                                //create the admin email to notify of a new order page
+                                var newCartSubject = "A new order has been paid using Stripe.";
+                                var newCartBody = $"<p>A none site member name: {shippingDetails.ShippingFullname} has paid for an order on Stripe.<br /> <br />" +
+                                                  "Payment Method: Stripe<br />" +
+                                                  $"Payment id: {paymentIntent.Id} <br />" +
+                                                  $"Shipping name: {shippingDetails.ShippingFullname} <br />" +
+                                                  $"Shipping email: {shippingDetails.ShippingEmail} <br />" +
+                                                  $"Shipping address: {shippingDetails.ShippingAddress} <br />" +
+                                                  $"Shipping details: {currentShoppingCart.CartShippingDetails.ShippingOptionDetails} <br />" +
+                                                  $"<strong>Order total: {cartTotal}</strong> <br />" +
+                                                  "<br /> <br />Regards, <br /> Website Team</p>";
+                                //create the admin email
+                                var adminNewCartMessage = MailHelper.CreateSingleEmail(
+                                    _fromEmailAddress,
+                                    _systemEmailAddress,
+                                    newCartSubject,
+                                    "",
+                                    newCartBody);
+                                //send the admin email
+                                var unused1 = SendGridEmail(adminNewCartMessage);
+
+                                //create the global emails
+                                var globalNewCartMessage = MailHelper.CreateSingleEmailToMultipleRecipients(
+                                    _fromEmailAddress,
+                                    _siteToEmailAddresses,
+                                    newCartSubject,
+                                    "",
+                                    newCartBody);
+                                //send the global email
+                                var unused = SendGridEmail(globalNewCartMessage);
+
+                                orderPlaced = true;
+                                resultMessage = "Your Order has been placed";
+                            }
+                        }
+
+                        //fill in the order details to return to the view page
+                        stripeOrderDetails.OrderId = cartSessionPaymentIntentId;
+                        stripeOrderDetails.OrderProcessedMessage = resultMessage;
+                        stripeOrderDetails.OrderPaidSuccess = orderPlaced;
+                    }
+                }
+            }
+
+            //return the result
+            return orderPlaced;
         }
 
         #endregion

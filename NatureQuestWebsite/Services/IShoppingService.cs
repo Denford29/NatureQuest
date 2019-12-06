@@ -105,6 +105,20 @@ namespace NatureQuestWebsite.Services
             out string resultMessage);
 
         /// <summary>
+        /// create the order page for a member
+        /// </summary>
+        /// <param name="ordersPage"></param>
+        /// <param name="cartMember"></param>
+        /// <param name="orderId"></param>
+        /// <param name="currentShoppingCart"></param>
+        /// <returns></returns>
+        IPublishedContent CreateMemberOrderPage(
+            IPublishedContent ordersPage,
+            IMember cartMember,
+            string orderId,
+            SiteShoppingCart currentShoppingCart);
+
+        /// <summary>
         /// Get the carts stripe session
         /// </summary>
         /// <param name="currentShoppingCart"></param>
@@ -124,5 +138,15 @@ namespace NatureQuestWebsite.Services
         /// <param name="currentShoppingCart"></param>
         /// <returns></returns>
         Customer GetStripeCustomer(SiteShoppingCart currentShoppingCart);
+
+        /// <summary>
+        /// place the stripe order and clear the cart
+        /// </summary>
+        /// <param name="currentShoppingCart"></param>
+        /// <param name="resultMessage"></param>
+        /// <param name="stripeOrderDetails"></param>
+        /// <returns></returns>
+        bool PlaceStripeCartOrder(SiteShoppingCart currentShoppingCart,
+            out string resultMessage, out OrderDetails stripeOrderDetails);
     }
 }

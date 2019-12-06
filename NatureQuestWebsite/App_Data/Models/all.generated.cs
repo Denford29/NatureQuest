@@ -8,7 +8,7 @@ using  Umbraco.Web;
 using  Umbraco.ModelsBuilder;
 using  Umbraco.ModelsBuilder.Umbraco;
 [assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "9a6fb080c3001f80")]
+[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "a2d181575c14c6ff")]
 [assembly:System.Reflection.AssemblyVersion("0.0.0.1")]
 
 
@@ -1844,6 +1844,13 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("orderMember")]
 		public IPublishedContent OrderMember => this.Value<IPublishedContent>("orderMember");
+
+		///<summary>
+		/// Order Shipping: Selected shipping for the order.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("orderShipping")]
+		public IPublishedContent OrderShipping => this.Value<IPublishedContent>("orderShipping");
 
 		///<summary>
 		/// Payment Method: The payment method used to pay the order

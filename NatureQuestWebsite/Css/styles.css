@@ -6096,7 +6096,7 @@ video {
     }
 
         .site-menu ul > li > a {
-            padding: 0 15px;
+            padding: 0 10px;
             transition: color .3s;
             color: #606975;
             font-size: 14px;
@@ -6129,7 +6129,7 @@ video {
                 height: 100%;
                 min-height: 100%;
                 border-top: 1px solid transparent;
-                letter-spacing: .05em;
+                letter-spacing: .03em;
                 text-transform: uppercase
             }
 

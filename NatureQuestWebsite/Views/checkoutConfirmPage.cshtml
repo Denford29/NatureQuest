@@ -39,3 +39,34 @@
         @Html.Action("GetFeatureProductsSlider", "PageContent")
     </div>
 }
+
+@section footerScripts{
+    @* Process the result updating the details shipping *@
+    @if (TempData.ContainsKey("paymentResult"))
+    {
+        var paymentResult = (AjaxCartResult) TempData["paymentResult"];
+        var detailsResultMessage = paymentResult.ResultMessage;
+        if (paymentResult.ResultSuccess)
+        {
+            <script>
+                iziToast.success({
+                    title: "Success",
+                    message: "@detailsResultMessage",
+                    timeout: 10000,
+                    position: "topRight"
+                });
+            </script>
+        }
+        else
+        {
+            <script>
+                iziToast.error({
+                    title: "Error",
+                    message: "@detailsResultMessage",
+                    timeout: 10000,
+                    position: "topRight"
+                });
+            </script>
+        }
+    }
+}

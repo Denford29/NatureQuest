@@ -1,5 +1,55 @@
 ﻿@using NatureQuestWebsite.Models
 @inherits Umbraco.Web.Mvc.UmbracoViewPage<OrderDetails>
 @{
+    if (Model.OrderPaidSuccess)
+    {
+        <h3 class="widget-title">
+            Order placed successfully
+        </h3>
+        <div class="alert alert-success alert-dismissible fade show text-center margin-bottom-1x">
+            <span class="alert-close" data-dismiss="alert"></span>
+            <i class="icon-help"></i>&nbsp;&nbsp;
+            <strong>@Model.OrderProcessedMessage</strong>
+        </div>
+        if (Model.OrderItems.Any())
+        {
+            foreach (var cartItem in Model.OrderItems)
+            {
+                var cartItemPage = cartItem.ProductLinePage;
+                var cartProduct = cartItem.MainProductPage;
+                var cartItemName = $"{cartProduct.Name} - {cartItemPage.Name}";
+                var itemTotal = cartItem.Quantity * cartItem.Price;
+                <div class="entry">
+                    <div class="entry-thumb">
+                        <a class="dropdown-product-thumb" title="@cartItemName" href="@cartProduct.Url">
+                            <img src="@cartItem.CartItemImage" alt="@cartItemName">
+                        </a>
+                    </div>
+                    <div class="entry-content">
+                        <h4 class="entry-title">
+                            <a class="dropdown-product-title" title="@cartItemName" href="@cartProduct.Url">
+                                @cartItemName
+                            </a>
+                        </h4>
+                        <span class="entry-meta">
+                            @cartItem.Quantity x @cartItem.Price.ToString("c") = @itemTotal.ToString("c")
+                        </span>
+                    </div>
+                </div>
+                <hr class="margin-bottom-1x margin-top-1x" />
+            }
+        }
+    }
+    else
+    {
+        <h3 class="widget-title">
+            Error Processing you order
+        </h3>
+        <div class="alert alert-danger alert-dismissible fade show text-center margin-bottom-1x">
+            <span class="alert-close" data-dismiss="alert"></span>
+            <i class="icon-ban"></i>
+            &nbsp;&nbsp;<strong>@Model.OrderProcessedMessage</strong>
+        </div>
+    }
 
 }

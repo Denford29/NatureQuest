@@ -496,12 +496,6 @@ namespace NatureQuestWebsite.Controllers
         /// <returns></returns>
         public ActionResult GetStripeCheckoutScript()
         {
-            //check if we have a current stripe session , if not then create 1
-            if (string.IsNullOrWhiteSpace(CurrentShoppingCart.StripeCartSession?.Id))
-            {
-                CurrentShoppingCart.StripeCartSessionId = _shoppingService.GetCartStripeSessionId(CurrentShoppingCart);
-            }
-
             //return the view with the model
             return View("/Views/Partials/Shop/StripeCheckoutScript.cshtml", CurrentShoppingCart);
         }
@@ -547,9 +541,29 @@ namespace NatureQuestWebsite.Controllers
             return CurrentUmbracoPage();
         }
 
+        /// <summary>
+        /// Get the stripe payment result
+        /// </summary>
+        /// <returns></returns>
         public ActionResult CheckStripePaymentResult()
         {
-            var orderDetails = new OrderDetails();
+            //create the payment result
+            var paymentResult = new AjaxCartResult();
+
+            //use the service to check the order
+            var orderPlaced = _shoppingService.PlaceStripeCartOrder(CurrentShoppingCart, out string paymentResultMessage, out OrderDetails orderDetails);
+            if (orderPlaced)
+            {
+                paymentResult.ResultSuccess = true;
+                paymentResult.ResultMessage = paymentResultMessage;
+                TempData["paymentResult"] = paymentResult;
+            }
+            else
+            {
+                paymentResult.ResultSuccess = false;
+                paymentResult.ResultMessage = paymentResultMessage;
+                TempData["paymentResult"] = paymentResult;
+            }
             return View("/Views/Partials/Shop/CheckoutProcessedDetails.cshtml", orderDetails);
         }
     }
