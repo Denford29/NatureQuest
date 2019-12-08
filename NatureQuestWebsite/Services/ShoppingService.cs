@@ -789,6 +789,7 @@ namespace NatureQuestWebsite.Services
                                 currentCartItem.PriceDiscount = cartDiscount == 0 ? 0 : cartDiscount * currentCartItem.Quantity;
                                 currentCartItem.ProductLinePage = selectedPriceProduct;
                                 currentCartItem.MainProductPage = productPage;
+                                currentCartItem.ProductVariantCode = modelPricePage.ProductVariantCode;
                                 //add the cart item page id to the cart item
                                 currentCartItem.CartItemPageId = 0;
                                 //add it back to the cart
@@ -827,7 +828,8 @@ namespace NatureQuestWebsite.Services
                                 ProductLinePage = selectedPriceProduct,
                                 MainProductPage = productPage,
                                 CartItemImage = "/Images/Nature-Quest-Product-Default.png",
-                                CartItemPageId = selectedPriceProduct.Id
+                                CartItemPageId = selectedPriceProduct.Id,
+                                ProductVariantCode = modelPricePage.ProductVariantCode
                             };
 
                             //add the cart item image
@@ -1339,6 +1341,7 @@ namespace NatureQuestWebsite.Services
                         cartItemContentPage.SetValue("itemDiscount", productCartItem.PriceDiscount);
                         cartItemContentPage.SetValue("itemDescription", productCartItem.Description);
                         cartItemContentPage.SetValue("productId", productCartItem.ProductLinePage.Id);
+                        cartItemContentPage.SetValue("productCode", productCartItem.ProductVariantCode);
                         //save the content item
                         var saveResult = _contentService.SaveAndPublish(cartItemContentPage);
 
@@ -1712,7 +1715,7 @@ namespace NatureQuestWebsite.Services
                     var stripeItemOption = new SessionLineItemOptions
                     {
                         Name = $"{cartItem.MainProductPage.Name}-{cartItem.ProductLinePage.Name}",
-                        Description = cartItem.Description,
+                        Description = $"{cartItem.Description} - Product Code: {cartItem.ProductVariantCode}",
                         Amount = (int)(cartItem.Price * 100),
                         Currency = "aud",
                         Quantity = cartItem.Quantity,
@@ -1728,7 +1731,8 @@ namespace NatureQuestWebsite.Services
                     Description = currentShoppingCart.CartShippingDetails.ShippingOptionDetails,
                     Amount = (int)(currentShoppingCart.ShippingTotal * 100),
                     Currency = "aud",
-                    Quantity = 1
+                    Quantity = 1,
+                    Images = new List<string> { $"{HomePage.UrlAbsolute()}/Images/NatureQuest-Logo-square.png" }
                 };
                 lineItemOptions.Add(shippingOption);
 
@@ -1806,12 +1810,15 @@ namespace NatureQuestWebsite.Services
         public Customer GetStripeCustomer(SiteShoppingCart currentShoppingCart)
         {
             //check if we have am email address to use to get or create an account with
-            if (string.IsNullOrWhiteSpace(currentShoppingCart?.CartMember?.Email))
+            if (string.IsNullOrWhiteSpace(currentShoppingCart?.CartMember?.Email) &&
+                string.IsNullOrWhiteSpace(currentShoppingCart?.CartShippingDetails?.ShippingEmail))
             {
                 return null;
             }
             //create the email to use
-            var cartEmail = currentShoppingCart.CartMember.Email;
+            var cartEmail = !string.IsNullOrWhiteSpace(currentShoppingCart.CartMember?.Email)
+                ? currentShoppingCart.CartMember?.Email
+                : currentShoppingCart.CartShippingDetails?.ShippingEmail;
             //get the shipping details to use
             var cartMembersModel = currentShoppingCart.CartMembersModel;
             //create the customer service to use

@@ -145,5 +145,10 @@ namespace NatureQuestWebsite.Models
         /// get or set the flag if the product is set as a featured product
         /// </summary>
         public bool IsFeaturedPrice { get; set; }
+
+        /// <summary>
+        /// get or set the product variant code
+        /// </summary>
+        public string ProductVariantCode { get; set; }
     }
 }

@@ -213,6 +213,11 @@ namespace NatureQuestWebsite.Models
         /// get the cart item image
         /// </summary>
         public string CartItemImage { get; set; }
+
+        /// <summary>
+        /// get the product variant code
+        /// </summary>
+        public string ProductVariantCode { get; set; }
     }
 
     /// <summary>

@@ -54,19 +54,20 @@
                                     </h4>
                                 }
 
-                                <div class="product-buttons">
-                                    @*<button class="btn btn-outline-secondary btn-sm btn-wishlist" data-toggle="tooltip" title="Wish-list">
-                                        <i class="icon-heart"></i>
-                                    </button>*@
-                                    <button class="btn btn-outline-primary btn-sm"
-                                            data-toast data-toast-type="success"
-                                            data-toast-position="topRight"
-                                            data-toast-icon="icon-circle-check"
-                                            data-toast-title="Product"
-                                            data-toast-message="successfully added to cart!">
-                                        Add to Cart
-                                    </button>
-                                </div>
+                                @using (Html.BeginUmbracoForm("AddProductToCart", "Shop",
+                                    FormMethod.Post,
+                                    new { role = "form", id = "addToCartForm" }))
+                                {
+                                    <input id="ProductPageId" name="ProductPageId" type="hidden" value="@productModel.ProductPageId">
+                                    <input id="ProductCode" name="ProductCode" type="hidden" value="@productFeaturedPrice.ProductVariantCode">
+                                    <input id="SelectedQuantity" name="SelectedQuantity" type="hidden" value="1">
+                                    <input id="SelectedPricePageId" name="SelectedPricePageId" type="hidden" value="@productFeaturedPrice.ProductPricePage.Id">
+                                    <div class="product-buttons">
+                                        <button class="btn btn-outline-primary btn-sm AddToCartBtn">
+                                            <i class="icon-bag"></i> Add to Cart
+                                        </button>
+                                    </div>
+                                }
                             </div>
                         </div>
                     }

@@ -35,7 +35,7 @@
         //create the function to add the product to the cart
         addProductToCart: function () {
 
-            $("#AddToCartBtn").click(function (event) {
+            $(".AddToCartBtn").click(function (event) {
                 event.preventDefault();
                 //load the spinner
                 $.busyLoadFull("show", {

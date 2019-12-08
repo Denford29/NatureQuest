@@ -221,6 +221,14 @@ namespace NatureQuestWebsite.Services
                                 isFeaturedPrice = productPrice.Value<bool>("featuredPrice");
                             }
 
+                            var productCode = string.Empty;
+                            //check if we have the product code set on the current product
+                            if (productPrice.HasProperty("productCode") && productPrice.HasValue("productCode"))
+                            {
+                                // save it to the model
+                                productCode = productPrice.GetProperty("productCode").Value().ToString();
+                            }
+
                             // calculate the percentage
                             var salePercentage = 0;
                             if (productSalePrice > 0)
@@ -246,7 +254,8 @@ namespace NatureQuestWebsite.Services
                                 SalePrice = productSalePrice,
                                 ProductVariant = priceVariant,
                                 IsFeaturedPrice = isFeaturedPrice,
-                                SalePercentage = salePercentage
+                                SalePercentage = salePercentage,
+                                ProductVariantCode = productCode
                             };
 
                             // add the price to the model

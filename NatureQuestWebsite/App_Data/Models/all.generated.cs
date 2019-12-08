@@ -8,7 +8,7 @@ using  Umbraco.Web;
 using  Umbraco.ModelsBuilder;
 using  Umbraco.ModelsBuilder.Umbraco;
 [assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "a2d181575c14c6ff")]
+[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "237cf783583c16b9")]
 [assembly:System.Reflection.AssemblyVersion("0.0.0.1")]
 
 
@@ -1912,6 +1912,13 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("product")]
 		public IEnumerable<IPublishedContent> Product => this.Value<IEnumerable<IPublishedContent>>("product");
+
+		///<summary>
+		/// Product Code: Selected product' code
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("productCode")]
+		public string ProductCode => this.Value<string>("productCode");
 
 		///<summary>
 		/// Product Id: Cart item selected product

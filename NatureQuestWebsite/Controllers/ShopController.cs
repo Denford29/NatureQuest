@@ -551,7 +551,10 @@ namespace NatureQuestWebsite.Controllers
             var paymentResult = new AjaxCartResult();
 
             //use the service to check the order
-            var orderPlaced = _shoppingService.PlaceStripeCartOrder(CurrentShoppingCart, out string paymentResultMessage, out OrderDetails orderDetails);
+            var orderPlaced = _shoppingService.PlaceStripeCartOrder(
+                CurrentShoppingCart, 
+                out string paymentResultMessage,
+                out OrderDetails orderDetails);
             if (orderPlaced)
             {
                 paymentResult.ResultSuccess = true;

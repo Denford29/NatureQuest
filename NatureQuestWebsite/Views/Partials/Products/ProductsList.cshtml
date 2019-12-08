@@ -83,19 +83,22 @@
                                     }
                                 }
 
-                                <div class="product-buttons">
-                                    @*<button class="btn btn-outline-secondary btn-sm btn-wishlist" data-toggle="tooltip" title="Whishlist">
-                                            <i class="icon-heart"></i>
-                                        </button>*@
-                                    <button class="btn btn-outline-primary btn-sm"
-                                            data-toast data-toast-type="success"
-                                            data-toast-position="topRight"
-                                            data-toast-icon="icon-circle-check"
-                                            data-toast-title="Product"
-                                            data-toast-message="successfuly added to cart!">
-                                        Add to Cart
-                                    </button>
-                                </div>
+                            <div class="product-buttons">
+                                @using (Html.BeginUmbracoForm("AddProductToCart", "Shop",
+                                    FormMethod.Post,
+                                    new { role = "form", id = "addToCartForm" }))
+                                {
+                                    <input id="ProductPageId" name="ProductPageId" type="hidden" value="@product.ProductPageId">
+                                    <input id="ProductCode" name="ProductCode" type="hidden" value="@featurePrice.ProductVariantCode">
+                                    <input id="SelectedQuantity" name="SelectedQuantity" type="hidden" value="1">
+                                    <input id="SelectedPricePageId" name="SelectedPricePageId" type="hidden" value="@featurePrice.ProductPricePage.Id">
+                                    <div class="product-buttons">
+                                        <button class="btn btn-outline-primary btn-sm AddToCartBtn">
+                                            <i class="icon-bag"></i> Add to Cart
+                                        </button>
+                                    </div>
+                                }
+                            </div>
                             </div>
                         </div>
                     }

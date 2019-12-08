@@ -109,39 +109,10 @@
                 </div>
 
                 <div class="d-flex flex-wrap justify-content-between mt-2 mb-2">
-                    <div class="entry-share mt-2 mb-2">
-                        @*<span class="text-muted">Share:</span>
-                            <div class="share-links">
-                                <a class="social-button shape-circle sb-facebook"
-                                   href="#"
-                                   data-toggle="tooltip"
-                                   data-placement="top" title="Facebook">
-                                    <i class="socicon-facebook"></i>
-                                </a>
-                                <a class="social-button shape-circle sb-twitter"
-                                   href="#"
-                                   data-toggle="tooltip"
-                                   data-placement="top" title="Twitter">
-                                    <i class="socicon-twitter"></i>
-                                </a>
-                                <a class="social-button shape-circle sb-instagram"
-                                   href="#"
-                                   data-toggle="tooltip"
-                                   data-placement="top" title="Instagram">
-                                    <i class="socicon-instagram"></i>
-                                </a>
-                            </div>*@
-                    </div>
                     <div class="sp-buttons mt-2 mb-2">
                         @if (Model.CanBeOrdered)
                         {
-                            @*<button
-                                    class="btn btn-primary"
-                                    id="AddToCartBtn"
-                                    type="submit">
-                                    <i class="icon-bag"></i> Add to Cart
-                                </button>*@
-                            <button class="btn btn-primary" id="AddToCartBtn">
+                            <button class="btn btn-primary AddToCartBtn">
                                 <i class="icon-bag"></i> Add to Cart
                             </button>
                         }
@@ -191,3 +162,27 @@
         </div>
     </div>
 }
+
+@*<div class="entry-share mt-2 mb-2">
+        <span class="text-muted">Share:</span>
+            <div class="share-links">
+                <a class="social-button shape-circle sb-facebook"
+                   href="#"
+                   data-toggle="tooltip"
+                   data-placement="top" title="Facebook">
+                    <i class="socicon-facebook"></i>
+                </a>
+                <a class="social-button shape-circle sb-twitter"
+                   href="#"
+                   data-toggle="tooltip"
+                   data-placement="top" title="Twitter">
+                    <i class="socicon-twitter"></i>
+                </a>
+                <a class="social-button shape-circle sb-instagram"
+                   href="#"
+                   data-toggle="tooltip"
+                   data-placement="top" title="Instagram">
+                    <i class="socicon-instagram"></i>
+                </a>
+            </div>
+    </div>*@

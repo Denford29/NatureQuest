@@ -52,6 +52,35 @@
 
     @RenderSection("footerScripts", false)
 
+    @if (TempData.ContainsKey("cartResult"))
+    {
+        var cartResult = (AjaxCartResult)TempData["cartResult"];
+        var resultMessage = cartResult.ResultMessage;
+        if (cartResult.ResultSuccess)
+        {
+            <script>
+            iziToast.success({
+                title: "Success",
+                message: "@resultMessage",
+                timeout: 10000,
+                position: "topRight"
+            });
+            </script>
+        }
+        else
+        {
+            <script>
+            iziToast.error({
+                title: "Error",
+                message: "@resultMessage",
+                timeout: 10000,
+                position: "topRight"
+            });
+            </script>
+        }
+    }
+
+
     @{
         Html.EnableClientValidation();
         Html.EnableUnobtrusiveJavaScript();

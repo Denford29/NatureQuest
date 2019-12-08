@@ -13,31 +13,34 @@
         </div>
         if (Model.OrderItems.Any())
         {
-            foreach (var cartItem in Model.OrderItems)
-            {
-                var cartItemPage = cartItem.ProductLinePage;
-                var cartProduct = cartItem.MainProductPage;
-                var cartItemName = $"{cartProduct.Name} - {cartItemPage.Name}";
-                var itemTotal = cartItem.Quantity * cartItem.Price;
-                <div class="entry">
-                    <div class="entry-thumb">
-                        <a class="dropdown-product-thumb" title="@cartItemName" href="@cartProduct.Url">
-                            <img src="@cartItem.CartItemImage" alt="@cartItemName">
-                        </a>
-                    </div>
-                    <div class="entry-content">
-                        <h4 class="entry-title">
-                            <a class="dropdown-product-title" title="@cartItemName" href="@cartProduct.Url">
-                                @cartItemName
+            <div class="isotope-grid cols-3 mb-2">
+                <div class="gutter-sizer"></div>
+                <div class="grid-sizer"></div>
+                @foreach (var cartItem in Model.OrderItems)
+                {
+                    var cartItemPage = cartItem.ProductLinePage;
+                    var cartProduct = cartItem.MainProductPage;
+                    var cartItemName = $"{cartProduct.Name} - {cartItemPage.Name}";
+                    var itemTotal = cartItem.Quantity * cartItem.Price;
+                    <div class="grid-item">
+                        <div class="product-card">
+                            <a class="product-thumb" title="@cartItemName" href="@cartProduct.Url">
+                                <img src="@cartItem.CartItemImage" alt="@cartItemName">
                             </a>
-                        </h4>
-                        <span class="entry-meta">
-                            @cartItem.Quantity x @cartItem.Price.ToString("c") = @itemTotal.ToString("c")
-                        </span>
+
+                            <h3 class="product-title">
+                                <a class="dropdown-product-title" title="@cartItemName" href="@cartProduct.Url">
+                                    @cartItemName
+                                </a>
+                            </h3>
+
+                            <h4 class="product-price">
+                                @cartItem.Quantity x @cartItem.Price.ToString("c") = @itemTotal.ToString("c")
+                            </h4>
+                        </div>
                     </div>
-                </div>
-                <hr class="margin-bottom-1x margin-top-1x" />
-            }
+                }
+            </div>
         }
     }
     else
