@@ -12,6 +12,8 @@
             this.updateCartItem();
             this.shippingOptions();
             this.cartReview();
+            this.submitLoginForm();
+            this.submitRegistrationForm();
         },
 
         //create the function to do the sorting
@@ -76,7 +78,7 @@
 
         //submit the cart
         submitCart: function() {
-            $("#checkoutSubmitButton").click(function(event) {
+            $("#checkoutSubmitButton").click(function() {
                 //load the spinner
                 $.busyLoadFull("show",
                     {
@@ -210,6 +212,48 @@
                     //$.busyLoadFull("hide");
                 }
             });
+        },
+
+        //create the function to submit the login form
+        submitLoginForm: function () {
+
+            $("#submitLoginForm").click(function (event) {
+                event.preventDefault();
+                //load the spinner
+                $.busyLoadFull("show", {
+                    background: "rgba(0, 0, 0, 0.21)",
+                    spinner: "circles",
+                    animation: "slide",
+                    text: "LOGGING YOU IN ...",
+                    textPosition: "bottom"
+                });
+                //get the form to submit
+                var loginForm = $(this).parents('form:first');
+                if (loginForm !== undefined && loginForm !== null) {
+                    loginForm.submit();
+                }
+            });
+        },
+
+        //create the function to submit the registration form
+        submitRegistrationForm: function () {
+
+            $("#submitRegisterButton").click(function (event) {
+                event.preventDefault();
+                //load the spinner
+                $.busyLoadFull("show", {
+                    background: "rgba(0, 0, 0, 0.21)",
+                    spinner: "circles",
+                    animation: "slide",
+                    text: "CREATING YOUR ACCOUNT ...",
+                    textPosition: "bottom"
+                });
+                //get the form to submit
+                var productForm = $(this).parents('form:first');
+                if (productForm !== undefined && productForm !== null) {
+                    productForm.submit();
+                }
+            });
         }
 
     };
@@ -221,65 +265,3 @@
 
 })(jQuery);
 
-
-            //$("#AddToCartBtn").click(function () {
-            //    //get selected price page id
-            //    var selectedPricePageId = $("#SelectedPricePageId :selected").val();
-            //    //get set quantity
-            //    var selectedQuantity = $("#SelectedQuantity").val();
-            //    //check the values
-            //    if (selectedPricePageId !== "" && selectedQuantity !== "") {
-            //        //create the model to send
-            //        var productModel = {
-            //            SelectedPricePageId: selectedPricePageId,
-            //            SelectedQuantity: parseInt(selectedQuantity)
-            //        };
-
-            //        //create the ajax call
-            //        $.ajax({
-            //            url: "/Umbraco/Api/Shop/AddProductToCart",
-            //            type: "POST",
-            //            cache: false,
-            //            async: false,
-            //            data: JSON.stringify(productModel),
-            //            dataType: "json",
-            //            contentType: "application/json; charset=utf-8",
-            //            success: function(msg) {
-            //                //check if we get a success or an error back
-            //                if (msg.ProductAdded) {
-            //                    iziToast.success({
-            //                        title: "Success",
-            //                        message: msg.ResultMessage,
-            //                        timeout: 10000,
-            //                        position: "topRight"
-            //                    });
-            //                } else {
-            //                    iziToast.error({
-            //                        title: "Error",
-            //                        message: msg.ResultMessage,
-            //                        timeout: 10000,
-            //                        position: "topRight"
-            //                    });
-            //                }
-            //            },
-            //            error: function(xhr, ajaxOptions, thrownError) {
-
-            //                iziToast.error({
-            //                    title: "Error",
-            //                    message: xhr.message,
-            //                    timeout: 10000,
-            //                    position: "topRight"
-            //                });
-            //            }
-            //        });
-            //    }
-            //    //show the default cart adding error message
-            //    else {
-            //        iziToast.error({
-            //            title: "Error",
-            //            message: "Please select the size and enter your quantity",
-            //            timeout: 10000,
-            //            position: "topRight"
-            //        });
-            //    }
-            //});

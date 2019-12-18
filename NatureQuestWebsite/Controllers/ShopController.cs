@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web.Mvc;
 using NatureQuestWebsite.Models;
 using NatureQuestWebsite.Services;
+using PayPalCheckoutSdk.Orders;
 using Stripe;
 using Umbraco.Web;
 using Umbraco.Web.Models;
@@ -483,6 +484,15 @@ namespace NatureQuestWebsite.Controllers
                 CurrentShoppingCart.StripeCartSessionId = _shoppingService.GetCartStripeSessionId(CurrentShoppingCart);
             }
 
+            //check if we have a current paypal checkout order request object, if not then create 1
+            if (CurrentShoppingCart.PayPalOrder == null)
+            {
+                //_shoppingService.GetCartPayPalOrderRequest(CurrentShoppingCart);
+                var getPayPalOrder = _shoppingService.GetCartPayPalOrderRequest(CurrentShoppingCart).
+                    ContinueWith(order => CurrentShoppingCart.PayPalRequestOrder = order.Result);
+                //getPayPalOrder.Wait();
+            }
+
             //we had an error updating the shipping selected
             shippingDetailsResult.ResultSuccess = true;
             shippingDetailsResult.ResultMessage = "Shipping details updated";
@@ -555,6 +565,51 @@ namespace NatureQuestWebsite.Controllers
                 CurrentShoppingCart, 
                 out string paymentResultMessage,
                 out OrderDetails orderDetails);
+            if (orderPlaced)
+            {
+                paymentResult.ResultSuccess = true;
+                paymentResult.ResultMessage = paymentResultMessage;
+                TempData["paymentResult"] = paymentResult;
+            }
+            else
+            {
+                paymentResult.ResultSuccess = false;
+                paymentResult.ResultMessage = paymentResultMessage;
+                TempData["paymentResult"] = paymentResult;
+            }
+            return View("/Views/Partials/Shop/CheckoutProcessedDetails.cshtml", orderDetails);
+        }
+
+        /// <summary>
+        /// Get the pay pal checkout script
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetPayPalCheckoutScript()
+        {
+            //return the view with the model
+            return View("/Views/Partials/Shop/PayPalCheckoutScript.cshtml", CurrentShoppingCart);
+        }
+
+        /// <summary>
+        /// process the pay pal checkout payment
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult ProcessPayPalCheckoutPayment()
+        {
+            //get the token in the submitted form
+            var formData = Request.Form;
+            var paypalOrderId = formData["paypalOrderId"];
+
+            //create the payment result
+            var paymentResult = new AjaxCartResult();
+
+            //use the service to check the order
+            var orderPlaced = _shoppingService.PlacePayPalOrder(
+                paypalOrderId,
+                CurrentShoppingCart,
+                out string paymentResultMessage,
+                out OrderDetails orderDetails);
+
             if (orderPlaced)
             {
                 paymentResult.ResultSuccess = true;

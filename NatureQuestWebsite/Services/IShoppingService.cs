@@ -1,7 +1,11 @@
-﻿using NatureQuestWebsite.Models;
+﻿using System.Threading.Tasks;
+using NatureQuestWebsite.Models;
+using PayPalCheckoutSdk.Orders;
 using Stripe;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Order = PayPalCheckoutSdk.Orders.Order;
+using ShippingOption = NatureQuestWebsite.Models.ShippingOption;
 
 namespace NatureQuestWebsite.Services
 {
@@ -111,12 +115,12 @@ namespace NatureQuestWebsite.Services
         /// <param name="cartMember"></param>
         /// <param name="orderId"></param>
         /// <param name="currentShoppingCart"></param>
+        /// <param name="paymentMethod"></param>
         /// <returns></returns>
-        IPublishedContent CreateMemberOrderPage(
-            IPublishedContent ordersPage,
+        IPublishedContent CreateMemberOrderPage(IPublishedContent ordersPage,
             IMember cartMember,
             string orderId,
-            SiteShoppingCart currentShoppingCart);
+            SiteShoppingCart currentShoppingCart, string paymentMethod);
 
         /// <summary>
         /// Get the carts stripe session
@@ -148,5 +152,26 @@ namespace NatureQuestWebsite.Services
         /// <returns></returns>
         bool PlaceStripeCartOrder(SiteShoppingCart currentShoppingCart,
             out string resultMessage, out OrderDetails stripeOrderDetails);
+
+        /// <summary>
+        /// Get the paypal order request object
+        /// </summary>
+        /// <param name="currentShoppingCart"></param>
+        /// <returns></returns>
+        Task<OrderRequest> GetCartPayPalOrderRequest(SiteShoppingCart currentShoppingCart);
+
+        /// <summary>
+        /// Place a paypal order
+        /// </summary>
+        /// <param name="payPalOrderId"></param>
+        /// <param name="currentShoppingCart"></param>
+        /// <param name="resultMessage"></param>
+        /// <param name="payPalOrderDetails"></param>
+        /// <returns></returns>
+        bool PlacePayPalOrder(
+            string payPalOrderId,
+            SiteShoppingCart currentShoppingCart,
+            out string resultMessage,
+            out OrderDetails payPalOrderDetails);
     }
 }

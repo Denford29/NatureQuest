@@ -1,0 +1,101 @@
+﻿@using NatureQuestWebsite.Models
+@using Newtonsoft.Json
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<SiteShoppingCart>
+@{
+    var currentShoppingCart = Model;
+
+    //get the stripe key from the config
+    var payPalClientId = currentShoppingCart.IsPayPalLiveMode ?
+        currentShoppingCart.PayPalLiveClientId :
+        currentShoppingCart.PayPalTestClientId;
+
+    <script src="https://www.paypal.com/sdk/js?client-id=@payPalClientId&currency=AUD" data-namespace="paypal_sdk">
+    </script>
+
+    //check if the we have the order request
+    //if (!string.IsNullOrWhiteSpace(currentShoppingCart.PayPalOrder?.CheckoutPaymentIntent))
+    if (!string.IsNullOrWhiteSpace(currentShoppingCart.PayPalRequestOrder?.CheckoutPaymentIntent))
+    {
+        var orderRequestJson = Html.Raw(JsonConvert.SerializeObject(currentShoppingCart.PayPalRequestOrder));
+        var cartPurchaseUnit = currentShoppingCart.PayPalPurchaseUnits.FirstOrDefault();
+        //check if the order request string is valid
+        if (cartPurchaseUnit != null)
+        {
+
+            <script>
+                paypal_sdk.Buttons({
+                    createOrder: function(data, actions) {
+                        return actions.order.create({
+                            purchase_units: [
+                                {
+                                    amount: {
+                                        value: '@cartPurchaseUnit.AmountWithBreakdown.Value',
+                                        currency_code: 'AUD',
+                                        description: '@cartPurchaseUnit.Description'
+                                    }
+                                }
+                            ]
+                        });
+                    },
+                    onApprove: function(data, actions) {
+                        return actions.order.capture().then(function(details) {
+                            alert("Transaction completed by " + details.payer.name.given_name);
+                            alert("Order id " + data.orderID);
+                            // get the details from the order captured details
+                            var orderId = data.orderID;
+                            var orderPayerName = details.payer.name.given_name;
+                            //get the form to submit
+                            var paypalForm = document.getElementById("paypalPaymentForm");
+                            if (paypalForm !== undefined && paypalForm !== null) {
+                                // add the order id input on the form
+                                $("#paypalOrderId").val(orderId);
+                                $("#paypalOrderPayerName").val(orderPayerName);
+
+                                paypalForm.submit();
+                            }
+                        });
+                    }
+                }).render("#processPayPalPayment");
+            </script>
+        }
+    }
+}
+
+
+@*purchase_units: [
+        {
+            amount: {
+                value: '@cartPurchaseUnit.AmountWithBreakdown.Value'
+            }
+        }
+    ]*@
+
+@*// This function sets up the details of the transaction, including the amount and line item details.
+    //return actions.order.create(@Html.Raw(orderRequestJson));
+    //@currentShoppingCart.PayPalOrder.Id;*@
+
+@*paypal_sdk.Buttons({
+        createOrder: function (data, actions) {
+            @Html.Raw(orderRequestJson);
+        },
+        onApprove: function (data, actions) {
+
+            return actions.order.capture().then(function (details) {
+                alert('Transaction completed by ' + details.payer.name.given_name);
+                // get the details from the order captured details
+                var orderId = data.orderID;
+                var orderPayerName = details.payer.name.given_name;
+                //get the form to submit
+                var paypalForm = document.getElementById("paypalPaymentForm");
+                if (paypalForm !== undefined && paypalForm !== null) {
+                    // add the order id input on the form
+                    $("#paypalOrderId").val(orderId);
+                    $("#paypalOrderPayerName").val(orderPayerName);
+
+                    paypalForm.submit();
+                }
+
+            });
+        }
+
+    }).render("#processPayPalPayment");*@

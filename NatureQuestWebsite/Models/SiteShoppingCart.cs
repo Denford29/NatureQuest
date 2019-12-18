@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using PayPalCheckoutSdk.Orders;
 using Stripe.Checkout;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -166,6 +167,26 @@ namespace NatureQuestWebsite.Models
         /// get or set the paypal live secret
         /// </summary>
         public string PayPalLiveSecret { get; set; }
+
+        /// <summary>
+        /// get or set the paypal order
+        /// </summary>
+        public Order PayPalOrder { get; set; }
+
+        /// <summary>
+        /// get or set the paypal order id
+        /// </summary>
+        public string PayPalOrderId { get; set; }
+
+        /// <summary>
+        /// get or set paypal request
+        /// </summary>
+        public OrderRequest PayPalRequestOrder { get; set; }
+
+        /// <summary>
+        /// crate the list of purchase units
+        /// </summary>
+        public List<PurchaseUnitRequest> PayPalPurchaseUnits { get; set; } = new List<PurchaseUnitRequest>();
 
     }
 
