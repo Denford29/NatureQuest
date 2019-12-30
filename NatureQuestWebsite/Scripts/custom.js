@@ -58,7 +58,7 @@
         //create the function to clear the cart
         clearCart: function () {
 
-            $("#ClearChoppingCart").click(function (event) {
+            $(".ClearChoppingCart").click(function (event) {
                 event.preventDefault();
                 //load the spinner
                 $.busyLoadFull("show", {

@@ -204,7 +204,7 @@ namespace NatureQuestWebsite.Controllers
                 foreach (var featureProduct in featureProducts)
                 {
                     //get the feature model
-                    var featureProductModel = _productsService.GetProductModel(featureProduct, true);
+                    var featureProductModel = _productsService.GetProductModel(featureProduct);
 
                     //add it to the feature model
                     model.Add(featureProductModel);
@@ -262,11 +262,11 @@ namespace NatureQuestWebsite.Controllers
                     if (categoryProducts.Any())
                     {
                         var r = new Random();
-                        var modelProducts = categoryProducts.OrderBy(x => r.Next()).Take(4).ToList();
+                        var modelProducts = categoryProducts.OrderBy(x => r.Next()).ToList();
                         //get the model for each of the products
                         foreach (var product in modelProducts)
                         {
-                            var productModel = _productsService.GetProductModel(product, true);
+                            var productModel = _productsService.GetProductModel(product);
                             //add it to the category model
                             categoryModel.CategoriesProducts.Add(productModel);
                         }
@@ -633,7 +633,7 @@ namespace NatureQuestWebsite.Controllers
                     // get a model for each of related products
                     foreach (var relatedProduct in relatedProducts)
                     {
-                        var relatedProductModel = _productsService.GetProductModel(relatedProduct, true);
+                        var relatedProductModel = _productsService.GetProductModel(relatedProduct);
                         if (!string.IsNullOrWhiteSpace(relatedProductModel?.ProductTitle))
                         {
                             model.RelatedProducts.Add(relatedProductModel);
@@ -795,7 +795,7 @@ namespace NatureQuestWebsite.Controllers
                 foreach (var product in contentProducts)
                 {
                     //get the model
-                    var productModel = _productsService.GetProductModel(product, true);
+                    var productModel = _productsService.GetProductModel(product);
                     //check if its got prices and add it to the list
                     if (productModel?.ProductPrices.Any() == true)
                     {

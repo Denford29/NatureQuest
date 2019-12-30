@@ -12,7 +12,7 @@
             var thumbCounter = 0;
             <div class="col-md-5">
                 <div class="product-gallery">
-                    @if (featurePrice.SalePercentage > 0)
+                    @if (featurePrice?.SalePercentage > 0)
                     {
                         <span class="product-badge text-danger">
                             @featurePrice.SalePercentage% Off @featurePrice.ProductVariant
@@ -69,20 +69,30 @@
                 </div>
             }
 
-            <h2 class="padding-top-1x text-normal">
-                @Model.ProductTitle @featurePrice.ProductVariant
-            </h2>
-            <span class="h2 d-block">
-                @if (featurePrice.SalePrice > 0)
-                {
-                    <del class="text-danger text-normal">$@featurePrice.ProductPrice</del>
-                    <text>$</text>@featurePrice.SalePrice
-                }
-                else
-                {
-                    <text>$</text>@featurePrice.ProductPrice
-                }
-            </span>
+            @if (featurePrice != null)
+            {
+                <h2 class="padding-top-1x text-normal">
+                    @Model.ProductTitle @featurePrice.ProductVariant
+                </h2>
+                <span class="h2 d-block">
+                    @if (featurePrice.SalePrice > 0)
+                    {
+                        <del class="text-danger text-normal">$@featurePrice.ProductPrice</del>
+                        <text>$</text>@featurePrice.SalePrice
+                    }
+                    else
+                    {
+                        <text>$</text>@featurePrice.ProductPrice
+                    }
+                </span>
+            }
+            else
+            {
+                <h2 class="padding-top-1x text-normal">
+                    @Model.ProductTitle
+                </h2>
+            }
+
             @if (!string.IsNullOrWhiteSpace(Model.ProductDescription))
             {
                 <p>@Model.ProductDescription</p>
@@ -162,27 +172,3 @@
         </div>
     </div>
 }
-
-@*<div class="entry-share mt-2 mb-2">
-        <span class="text-muted">Share:</span>
-            <div class="share-links">
-                <a class="social-button shape-circle sb-facebook"
-                   href="#"
-                   data-toggle="tooltip"
-                   data-placement="top" title="Facebook">
-                    <i class="socicon-facebook"></i>
-                </a>
-                <a class="social-button shape-circle sb-twitter"
-                   href="#"
-                   data-toggle="tooltip"
-                   data-placement="top" title="Twitter">
-                    <i class="socicon-twitter"></i>
-                </a>
-                <a class="social-button shape-circle sb-instagram"
-                   href="#"
-                   data-toggle="tooltip"
-                   data-placement="top" title="Instagram">
-                    <i class="socicon-instagram"></i>
-                </a>
-            </div>
-    </div>*@

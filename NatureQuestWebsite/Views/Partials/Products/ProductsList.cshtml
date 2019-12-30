@@ -72,33 +72,33 @@
                                     if (featurePrice.SalePrice != 0)
                                     {
                                         <h4 class="product-price">
-                                            <del>$@featurePrice.ProductPrice</del>$@featurePrice.SalePrice
+                                            <del>$@featurePrice.ProductPrice</del>$@featurePrice.SalePrice (@featurePrice.ProductVariant)
                                         </h4>
                                     }
                                     else
                                     {
                                         <h4 class="product-price">
-                                            $@featurePrice.ProductPrice
+                                            $@featurePrice.ProductPrice (@featurePrice.ProductVariant)
                                         </h4>
                                     }
                                 }
 
-                            <div class="product-buttons">
-                                @using (Html.BeginUmbracoForm("AddProductToCart", "Shop",
-                                    FormMethod.Post,
-                                    new { role = "form", id = "addToCartForm" }))
-                                {
-                                    <input id="ProductPageId" name="ProductPageId" type="hidden" value="@product.ProductPageId">
-                                    <input id="ProductCode" name="ProductCode" type="hidden" value="@featurePrice.ProductVariantCode">
-                                    <input id="SelectedQuantity" name="SelectedQuantity" type="hidden" value="1">
-                                    <input id="SelectedPricePageId" name="SelectedPricePageId" type="hidden" value="@featurePrice.ProductPricePage.Id">
-                                    <div class="product-buttons">
-                                        <button class="btn btn-outline-primary btn-sm AddToCartBtn">
-                                            <i class="icon-bag"></i> Add to Cart
-                                        </button>
-                                    </div>
-                                }
-                            </div>
+                                <div class="product-buttons">
+                                    @using (Html.BeginUmbracoForm("AddProductToCart", "Shop",
+                                        FormMethod.Post,
+                                        new { role = "form", id = "addToCartForm" }))
+                                    {
+                                        <input id="ProductPageId" name="ProductPageId" type="hidden" value="@product.ProductPageId">
+                                        <input id="ProductCode" name="ProductCode" type="hidden" value="@featurePrice.ProductVariantCode">
+                                        <input id="SelectedQuantity" name="SelectedQuantity" type="hidden" value="1">
+                                        <input id="SelectedPricePageId" name="SelectedPricePageId" type="hidden" value="@featurePrice.ProductPricePage.Id">
+                                        <div class="product-buttons">
+                                            <button class="btn btn-outline-primary btn-sm AddToCartBtn">
+                                                <i class="icon-bag"></i> Add to Cart
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
                             </div>
                         </div>
                     }

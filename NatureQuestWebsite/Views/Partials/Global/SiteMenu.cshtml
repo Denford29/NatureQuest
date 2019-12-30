@@ -52,16 +52,42 @@
     </div>
 
     <div class="offcanvas-container" id="mobile-menu">
-        <a class="account-link" href="@siteMenuModel.AccountDetailsPage.Url">
-            <div class="user-ava">
-                <img src="/Images/account/user-ava-md.jpg" alt="Daniel Adams">
-            </div>
-            <div class="user-info">
-                <h6 class="user-name">Daniel Adams</h6><span class="text-sm text-white opacity-60">290 Reward points</span>
-            </div>
-        </a>
         <nav class="offcanvas-menu">
             <ul class="menu">
+                <!--Add the registration/login or account details page-->
+                @if (siteMenuModel.MemberCurrentLoginStatus.IsLoggedIn)
+                {
+                    if (siteMenuModel.AccountDetailsPage?.Id > 0)
+                    {
+                        var accountLink = siteMenuModel.AccountDetailsPage;
+                        //set the active class if the current page id is the same as the home page
+                        var activeClass = currentPageId == accountLink.Id ? "active" : "";
+                        <li class="@activeClass">
+                            <span>
+                                <a href="@accountLink.Url" title="@accountLink.Name">
+                                    <span>Account Details</span>
+                                </a>
+                            </span>
+                        </li>
+                    }
+                }
+                else
+                {
+                    if (siteMenuModel.RegistrationLoginPage?.Id > 0)
+                    {
+                        var registerLink = siteMenuModel.RegistrationLoginPage;
+                        //set the active class if the current page id is the same as the home page
+                        var activeClass = currentPageId == registerLink.Id ? "active" : "";
+                        <li class="@activeClass">
+                            <span>
+                                <a href="@registerLink.Url" title="@registerLink.Name">
+                                    <span>Login</span>
+                                </a>
+                            </span>
+                        </li>
+                    }
+                }
+
                 <!--Add the home link-->
                 @if (siteMenuModel.HomeLinkItem?.LinkPage?.Id > 0)
                 {
@@ -165,13 +191,13 @@
     <header class="navbar navbar-sticky">
 
         <!-- Search form-->
-        <form class="site-search" method="get">
+        @*<form class="site-search" method="get">
             <input type="text" name="site_search" placeholder="Type to search...">
             <div class="search-tools">
                 <span class="clear-search">Clear</span>
                 <span class="close-search"><i class="icon-cross"></i></span>
             </div>
-        </form>
+        </form>*@
 
         <div class="site-branding">
             <div class="inner">
@@ -185,6 +211,7 @@
                 </a>
             </div>
         </div>
+
         <!-- Main Navigation-->
         <nav class="site-menu">
             <ul>
@@ -354,7 +381,9 @@
         <div class="toolbar">
             <div class="inner">
                 <div class="tools">
-                    <div class="search"><i class="icon-search"></i></div>
+                    @*<div class="search">
+                        <i class="icon-search"></i>
+                    </div>*@
                     <!-- if we have a user logged in show the account and basket link-->
                     @if (siteMenuModel.MemberCurrentLoginStatus.IsLoggedIn)
                     {

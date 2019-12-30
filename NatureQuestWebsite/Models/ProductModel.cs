@@ -134,7 +134,7 @@ namespace NatureQuestWebsite.Models
         /// <summary>
         /// work out the sale percentage
         /// </summary>
-        public int SalePercentage { get; set; }
+        public int SalePercentage { get; set; } = 0;
 
         /// <summary>
         /// get or set the product variant

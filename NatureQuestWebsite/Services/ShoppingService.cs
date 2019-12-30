@@ -176,6 +176,11 @@ namespace NatureQuestWebsite.Services
         public string StripeLiveSecretKey = WebConfigurationManager.AppSettings["stripeLiveSecretKey"];
 
         /// <summary>
+        /// get or set the flag that stripe is in live mode
+        /// </summary>
+        public bool StripeLiveMode = false;
+
+        /// <summary>
         /// get the local paypal test client id
         /// </summary>
         public string PaypalTestClientId = WebConfigurationManager.AppSettings["paypalTestClientId"];
@@ -330,6 +335,12 @@ namespace NatureQuestWebsite.Services
                             StripeLiveSecretKey = storeDetailsPage.Value<string>("liveSecretKey");
                         }
 
+                        //get the stored stripe flag to use live settings
+                        if (storeDetailsPage.HasProperty("stripeLiveMode") && storeDetailsPage.HasValue("stripeLiveMode"))
+                        {
+                            StripeLiveMode = storeDetailsPage.Value<bool>("stripeLiveMode");
+                        }
+
                         //get the stored paypal details
                         if (storeDetailsPage.HasProperty("testClientId") && storeDetailsPage.HasValue("testClientId"))
                         {
@@ -446,6 +457,7 @@ namespace NatureQuestWebsite.Services
             currentCart.StripeTestSecretKey = StripeTestSecretKey;
             currentCart.StripeLivePublishableKey = StripeLivePublishableKey;
             currentCart.StripeLiveSecretKey = StripeLiveSecretKey;
+            currentCart.IsStripeLiveMode = StripeLiveMode;
 
             //set the paypal keys
             currentCart.PayPalTestClientId = PaypalTestClientId;
@@ -1853,7 +1865,7 @@ namespace NatureQuestWebsite.Services
                 //add the shipping
                 var shippingOption = new SessionLineItemOptions
                 {
-                    Name = $"{currentShoppingCart.SelectedShippingOption}",
+                    Name = $"{currentShoppingCart.CartShippingDetails.ShippingOptionDetails}",
                     Description = currentShoppingCart.CartShippingDetails.ShippingOptionDetails,
                     Amount = (int) (currentShoppingCart.ShippingTotal * 100),
                     Currency = "aud",

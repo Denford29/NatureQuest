@@ -89,15 +89,17 @@
                             <h4>Shipping Method</h4>
                             <hr class="padding-bottom-1x">
 
-                            <div class="row shopping-cart cart-list-header">
-                                <div class="col-md-8 text-lg text-medium">
-                                    Shipping method
-                                </div>
-                                <div class="col-md-2 text-center text-lg text-medium">
-                                    Delivery time
-                                </div>
-                                <div class="col-md-2 text-right text-lg text-medium">
-                                    Handling fee
+                            <div class="d-none d-md-block">
+                                <div class="row shopping-cart cart-list-header">
+                                    <div class="col-md-8 text-center text-lg text-medium">
+                                        Shipping method
+                                    </div>
+                                    <div class="col-md-2 text-center text-lg text-medium">
+                                        Delivery time
+                                    </div>
+                                    <div class="col-md-2 text-center text-lg text-medium">
+                                        Handling fee
+                                    </div>
                                 </div>
                             </div>
 
@@ -112,7 +114,7 @@
                                     {
                                         var selectedText = optionSelectList.Selected ? "checked" : "";
                                         <div class="row shopping-cart cart-item">
-                                            <div class="align-middle col-md-1 text-lg text-medium">
+                                            <div class="align-middle col-md-1 text-center text-lg text-medium">
                                                 @using (Html.BeginUmbracoForm("AddShippingToCart", "Shop",
                                                     FormMethod.Post,
                                                     new { role = "form", id = "updateShippingForm" }))
@@ -130,14 +132,14 @@
                                                 }
 
                                             </div>
-                                            <div class="align-middle col-md-7 text-lg text-medium">
+                                            <div class="align-middle col-md-7 text-center text-lg text-medium">
                                                 <h5 class="text-medium">@option.ShippingPricePage.Name</h5>
                                                 <p class="text-sm">@option.ShippingDetails</p>
                                             </div>
                                             <div class="align-middle col-md-2 text-center text-lg text-medium">
                                                 @option.DeliveryTime
                                             </div>
-                                            <div class="align-middle col-md-2 text-right text-lg text-medium">
+                                            <div class="align-middle col-md-2 text-center text-lg text-medium">
                                                 @option.ShippingFee.ToString("c")
                                             </div>
                                         </div>
@@ -193,30 +195,30 @@
                                 </div>
 
                                 @*<div class="card">
-                                    <div class="card-header" role="tab">
-                                        <h6>
-                                            <a class="collapsed" href="#paypal" data-toggle="collapse">
-                                                <i class="socicon-paypal"></i>Pay with PayPal
-                                            </a>
-                                        </h6>
-                                    </div>
-                                    <div class="collapse" id="paypal" data-parent="#accordion" role="tabpanel">
-                                        <div class="card-body">
-                                            <p>PayPal - the safer, easier way to pay</p>
-                                            @using (Html.BeginUmbracoForm("ProcessPayPalCheckoutPayment", "Shop",
-                                                FormMethod.Post,
-                                                new { role = "form", id = "paypalPaymentForm" }))
-                                            {
-                                                <input id="paypalOrderId" name="paypalOrderId" type="hidden" value="">
-                                                <input id="paypalOrderPayerName" name="paypalOrderPayerName" type="hidden" value="">
-
-                                                <div class="offset-md-3 col-md-6">
-                                                    <div id="processPayPalPayment"></div>
-                                                </div>
-                                            }
+                                        <div class="card-header" role="tab">
+                                            <h6>
+                                                <a class="collapsed" href="#paypal" data-toggle="collapse">
+                                                    <i class="socicon-paypal"></i>Pay with PayPal
+                                                </a>
+                                            </h6>
                                         </div>
-                                    </div>
-                                </div>*@
+                                        <div class="collapse" id="paypal" data-parent="#accordion" role="tabpanel">
+                                            <div class="card-body">
+                                                <p>PayPal - the safer, easier way to pay</p>
+                                                @using (Html.BeginUmbracoForm("ProcessPayPalCheckoutPayment", "Shop",
+                                                    FormMethod.Post,
+                                                    new { role = "form", id = "paypalPaymentForm" }))
+                                                {
+                                                    <input id="paypalOrderId" name="paypalOrderId" type="hidden" value="">
+                                                    <input id="paypalOrderPayerName" name="paypalOrderPayerName" type="hidden" value="">
+
+                                                    <div class="offset-md-3 col-md-6">
+                                                        <div id="processPayPalPayment"></div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>*@
 
                             </div>
                         </div>

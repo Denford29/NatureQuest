@@ -6448,7 +6448,7 @@ video {
         display: table-cell
     }
 
-    .site-menu, .offcanvas-toggle.cats-toggle, .toolbar .account, .toolbar-dropdown {
+    .site-menu, .offcanvas-toggle.cats-toggle,  .toolbar-dropdown {
         display: none !important
     }
 
@@ -6464,8 +6464,8 @@ video {
     }
 
     .site-logo {
-        width: 145px;
-        padding-left: 16px
+        width: 120px;
+        padding-left: 10px
     }
 }
 

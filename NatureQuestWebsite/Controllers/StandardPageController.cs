@@ -584,7 +584,7 @@ namespace NatureQuestWebsite.Controllers
                     //create the mega menu items for the feature products
                     foreach (var featureProduct in menuFeatureProducts)
                     {
-                        var featureProductModel = _productsService.GetProductModel(featureProduct, true);
+                        var featureProductModel = _productsService.GetProductModel(featureProduct);
 
                         var productFirstImage = featureProductModel.ProductImages.FirstOrDefault();
                         //if we haven't got a featured price, then just get the 1st normal price
