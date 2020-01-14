@@ -65,6 +65,31 @@ namespace NatureQuestWebsite.Services
         private readonly string _siteName = "Natures Quest";
 
         /// <summary>
+        /// set the home page
+        /// </summary>
+        internal readonly IPublishedContent HomePage;
+
+        /// <summary>
+        /// set the account details page
+        /// </summary>
+        internal readonly IPublishedContent AccountDetailsPage;
+
+        /// <summary>
+        /// set the account orders page
+        /// </summary>
+        internal readonly IPublishedContent AccountOrdersPage;
+
+        /// <summary>
+        /// set the stripe orders page
+        /// </summary>
+        internal readonly IPublishedContent StripeOrdersPage;
+
+        /// <summary>
+        /// set the global carts page
+        /// </summary>
+        private readonly IPublishedContent _globalOrdersPage;
+
+        /// <summary>
         /// initiate the site members service
         /// </summary>
         /// <param name="logger"></param>
@@ -94,7 +119,8 @@ namespace NatureQuestWebsite.Services
             using (var contextReference = contextFactory.EnsureUmbracoContext())
             {
                 IPublishedCache contentCache = contextReference.UmbracoContext.ContentCache;
-                var siteSettingsPage = contentCache.GetAtRoot().FirstOrDefault(x => x.ContentType.Alias == "siteSettings");
+                var siteSettingsPage =
+                    contentCache.GetAtRoot().FirstOrDefault(x => x.ContentType.Alias == "siteSettings");
                 if (siteSettingsPage?.Id > 0)
                 {
                     //get the site details page
@@ -112,7 +138,8 @@ namespace NatureQuestWebsite.Services
                         }
 
                         //get the sites contact emails addresses
-                        if (siteDetailsPage.HasProperty("contactToEmailAddress") && siteDetailsPage.HasValue("contactToEmailAddress"))
+                        if (siteDetailsPage.HasProperty("contactToEmailAddress") &&
+                            siteDetailsPage.HasValue("contactToEmailAddress"))
                         {
                             //set the global site name
                             var adminEmailAddresses = siteDetailsPage.Value<string[]>("contactToEmailAddress");
@@ -135,11 +162,59 @@ namespace NatureQuestWebsite.Services
                         }
 
                         //get the send grid from the backend
-                        if (siteDetailsPage.HasProperty("contactFromEmailAddress") && siteDetailsPage.HasValue("contactFromEmailAddress"))
+                        if (siteDetailsPage.HasProperty("contactFromEmailAddress") &&
+                            siteDetailsPage.HasValue("contactFromEmailAddress"))
                         {
-                            var fromEmailAddress = siteDetailsPage.GetProperty("contactFromEmailAddress").Value().ToString();
+                            var fromEmailAddress = siteDetailsPage.GetProperty("contactFromEmailAddress").Value()
+                                .ToString();
                             _fromEmailAddress = new EmailAddress(fromEmailAddress, _siteName);
                         }
+                    }
+                }
+
+                //get the home page
+                var homePage = contentCache.GetAtRoot().FirstOrDefault(x => x.ContentType.Alias == "home");
+                //check if we have the home page and set it to the global page
+                if (homePage?.Id > 0)
+                {
+                    HomePage = homePage;
+
+                    //get the shopping cart details page
+                    if (homePage.FirstChildOfType("shoppingCartPage")?.Id > 0)
+                    {
+                        //get the account details page
+                        var customerDetails = homePage.FirstChildOfType("customerDetailsPage");
+                        if (customerDetails?.Id > 0)
+                        {
+                            AccountDetailsPage = customerDetails;
+                        }
+
+                        //get the account orders page
+                        var accountOrders = AccountDetailsPage.FirstChildOfType("customerOrders");
+                        if (accountOrders?.Id > 0)
+                        {
+                            AccountOrdersPage = accountOrders;
+                        }
+
+                        //get the admin stripe orders page
+                        var stripeOrders = AccountDetailsPage.FirstChildOfType("stripeOrders");
+                        if (stripeOrders?.Id > 0)
+                        {
+                            StripeOrdersPage = stripeOrders;
+                        }
+                    }
+                }
+
+                //get the carts and orders page
+                var storeDetailsPage = contentCache.GetAtRoot().FirstOrDefault(x => x.ContentType.Alias == "storeDetails");
+                if (storeDetailsPage?.Id > 0)
+                {
+                    //get the site carts page
+                    var cartsPage = storeDetailsPage.ChildrenOfType("ordersFolder").FirstOrDefault();
+                    if (cartsPage?.Id > 0)
+                    {
+                        //save the global carts page to use later
+                        _globalOrdersPage = cartsPage;
                     }
                 }
             }
@@ -175,6 +250,11 @@ namespace NatureQuestWebsite.Services
                         memberModel.GoogleSiteKey = _globalDetailsPage.Value<string>("recaptchaSiteKey");
                     }
                 }
+
+                //set the customer pages
+                memberModel.AccountDetailsPage = AccountDetailsPage;
+                memberModel.AccountOrdersPage = AccountOrdersPage;
+                memberModel.StripeOrdersPage = StripeOrdersPage;
 
                 //check if we have an email address passed in to search the member with
                 if (!string.IsNullOrWhiteSpace(emailAddress))
@@ -227,7 +307,8 @@ namespace NatureQuestWebsite.Services
                         }
 
                         //check which roles the member belongs to
-                        memberModel.MemberRoles = _memberService.GetAllRoles(existingMember.Id).ToList();
+                        var memberRoles = _memberService.GetAllRoles(existingMember.Id).ToList();
+                        memberModel.MemberRoles = memberRoles;
 
                         //check if the model is set to update the newsletter
                         if (memberModel.IsNewsletterMember)
@@ -253,6 +334,20 @@ namespace NatureQuestWebsite.Services
                             memberModel.IsNewsletterMember = memberModel.MemberRoles.FirstOrDefault(role => role == "Newsletter")?.Any() == true;
                             memberModel.IsShopCustomer = memberModel.MemberRoles.FirstOrDefault(role => role == "Customer")?.Any() == true;
                         }
+
+                        //set the members site orders
+                        var memberOrders = _globalOrdersPage.Children.
+                                                                                        Where(page => page.HasProperty("orderMember") &&
+                                                                                        page.HasValue("orderMember") &&
+                                                                                        page.Value<IPublishedContent>("orderMember")?.Name == existingMember.Name)
+                                                                                        .ToList();
+                        if (memberOrders.Any())
+                        {
+                            memberModel.MemberOrdersPage = memberOrders;
+                        }
+
+                        //set a flag if the member is an admin user
+                        memberModel.IsAdminUser = !string.IsNullOrWhiteSpace(_memberRoles.FirstOrDefault(role => role == "Site Admins"));
                     }
                 }
 

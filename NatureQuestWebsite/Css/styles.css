@@ -6448,7 +6448,7 @@ video {
         display: table-cell
     }
 
-    .site-menu, .offcanvas-toggle.cats-toggle,  .toolbar-dropdown {
+    .site-menu, .offcanvas-toggle.cats-toggle, .toolbar-dropdown {
         display: none !important
     }
 

@@ -1,0 +1,78 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+	Response.ContentType = "text/xml";
+	var homePage = Umbraco.ContentAtRoot().FirstOrDefault(x => x.ContentType.Alias == "home");
+}<?xml version="1.0" encoding="UTF-8" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemalocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+	<url>
+		@if (homePage != null)
+		{
+			<loc>@GetUrlWithDomainPrefix(homePage.Url)</loc>
+			<lastmod>@($"{homePage.UpdateDate:s}+00:00")</lastmod>
+			if (homePage.HasValue("sitemapFrequency"))
+			{
+	<changefreq>@homePage.GetProperty("sitemapFrequency").Value().ToString()</changefreq>
+			}
+			if (homePage.HasValue("sitemapPriority"))
+			{
+				<priority>@homePage.GetProperty("sitemapPriority").Value().ToString()</priority>
+			}
+		}
+	</url>
+	@if (homePage != null)
+	{
+		@ListChildNodes(homePage)
+	}
+</urlset>
+
+@helper ListChildNodes(IPublishedContent startNode)
+{
+	const int maxLevelForSiteMap = 100;
+	foreach (var node in startNode.Children(x => x.IsVisible() && !x.Value<bool>("hideFromSitemap")))
+	{
+		if (node.Id > 0)
+		{
+			<url>
+				<loc>@GetUrlWithDomainPrefix(node.Url)</loc>
+				<lastmod>@($"{node.UpdateDate:s}+00:00")</lastmod>
+				@if (node.HasValue("sitemapFrequency"))
+				{
+					<changefreq>@node.GetProperty("sitemapFrequency").Value().ToString()</changefreq>
+				}
+				@if (node.HasValue("sitemapPriority"))
+				{
+					<priority>@node.GetProperty("sitemapPriority").Value().ToString()</priority>
+				}
+			</url>
+		}
+
+		bool any = false;
+		foreach (var child in node.Children())
+		{
+			any = true;
+			break;
+		}
+		if (node.Level <= maxLevelForSiteMap && any)
+		{
+			@ListChildNodes(node)
+		}
+	}
+}
+
+@functions{
+	private static string GetUrlWithDomainPrefix(string url)
+	{
+		if (url.StartsWith("/"))
+			url = url.Substring(1);
+
+		var domainPrefix = $"https://{HttpContext.Current.Request.ServerVariables["HTTP_HOST"]}/";
+
+		if (url.StartsWith(domainPrefix))
+			return url;
+		else
+			return domainPrefix + url;
+	}
+}
+

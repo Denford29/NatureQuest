@@ -44,6 +44,11 @@
                         var productPage = product.ProductPage;
                         var productImage = product.ProductImages.FirstOrDefault();
                         var featurePrice = product.FeaturedPrice;
+                        //check if we have a variant image
+                        if (!string.IsNullOrWhiteSpace(featurePrice.ProductVariantImage?.ImageUrl))
+                        {
+                            productImage = featurePrice.ProductVariantImage;
+                        }
 
                         <div class="grid-item">
                             <div class="product-card">

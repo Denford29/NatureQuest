@@ -91,5 +91,10 @@ namespace NatureQuestWebsite.Models
         /// get or set the page bread crumbs
         /// </summary>
         public List<LinkItemModel> BreadCrumbLinks { get; set; } = new List<LinkItemModel>();
+
+        /// <summary>
+        /// get or set the login status of the current member
+        /// </summary>
+        public LoginStatusModel MemberCurrentLoginStatus { get; set; }
     }
 }

@@ -14,8 +14,9 @@ namespace NatureQuestWebsite.Services
         /// </summary>
         /// <param name="productPage"></param>
         /// <param name="getThumbnail"></param>
+        /// <param name="featurePriceId"></param>
         /// <returns></returns>
-        ProductModel GetProductModel(IPublishedContent productPage, bool getThumbnail = false);
+        ProductModel GetProductModel(IPublishedContent productPage, bool getThumbnail = false, string featurePriceId = "");
 
         /// <summary>
         /// get the list of product categories as links

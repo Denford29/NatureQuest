@@ -301,5 +301,10 @@ namespace NatureQuestWebsite.Models
         /// get or set the shipping option details
         /// </summary>
         public string ShippingOptionDetails { get; set; }
+
+        /// <summary>
+        /// get or set the shipping tracking number
+        /// </summary>
+        public string ShippingTrackingNumber { get; set; }
     }
 }

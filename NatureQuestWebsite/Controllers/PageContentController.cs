@@ -609,6 +609,26 @@ namespace NatureQuestWebsite.Controllers
         }
 
         /// <summary>
+        /// Update the selected feature price from the page
+        /// </summary>
+        /// <param name="selectedFeaturePriceId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult UpdateProductFeaturePrice(string selectedFeaturePriceId)
+        {
+            //check if we have a valid selected price
+            if (!string.IsNullOrWhiteSpace(selectedFeaturePriceId))
+            {
+                //get the product model and preset the selected feature price
+                var model = _productsService.GetProductModel(CurrentPage,featurePriceId: selectedFeaturePriceId);
+                //return the view with the model
+                TempData["updatedModel"] = model;
+            }
+            //check if we have the feature price page
+            return CurrentUmbracoPage();
+        }
+
+        /// <summary>
         /// get the product page's related products
         /// </summary>
         /// <returns></returns>

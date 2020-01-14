@@ -241,7 +241,8 @@ namespace NatureQuestWebsite.Controllers
             //create the default custom model to use
             var viewModel = new StandardPageViewModel(model.Content)
             {
-                CurrentPage = model.Content
+                CurrentPage = model.Content,
+                MemberCurrentLoginStatus = _currentLoginStatus
             };
 
             //set the default page heading

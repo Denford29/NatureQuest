@@ -6,6 +6,7 @@
         onReady: function () {
             this.productSortOptions();
             this.addProductToCart();
+            this.updateDisplayedProductDetails();
             this.clearCart();
             this.submitCart();
             this.removeCartItem();
@@ -52,6 +53,31 @@
                 if (productForm !== undefined && productForm !== null) {
                     productForm.submit();
                 }
+            });
+        },
+
+        //create the function to update displayed product details
+        updateDisplayedProductDetails: function() {
+
+            $('#SelectedPricePageId').change(function() {
+                //load the spinner
+                $.busyLoadFull("show",
+                    {
+                        background: "rgba(0, 0, 0, 0.21)",
+                        spinner: "circles",
+                        animation: "slide",
+                        text: "UPDATING SELECTED PRICE ...",
+                        textPosition: "bottom"
+                    });
+                //get selected option
+                var selectedPriceOption = $('select#SelectedPricePageId option:checked').val();
+                if (selectedPriceOption !== undefined && selectedPriceOption !== null) {
+                    $("#selectedFeaturePriceId").val(selectedPriceOption);
+                    //get the form and submit it
+                    $("#updateFeaturePrice").submit();
+                }
+                //hide the loading
+                $.busyLoadFull("hide");
             });
         },
 

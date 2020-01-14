@@ -515,7 +515,6 @@
     <Content Include="Images\contacts\chicago.jpg" />
     <Content Include="Images\contacts\new-york.jpg" />
     <Content Include="Images\contacts\orlando.jpg" />
-    <Content Include="Images\credit-cards.png" />
     <Content Include="Images\default-skin.png" />
     <Content Include="Images\default-skin.svg" />
     <Content Include="Images\docs\autoprefixer.jpg" />
@@ -580,6 +579,8 @@
     <Content Include="Images\NatureQuest-Logo-square.png" />
     <Content Include="Images\NatureQuest-Logo.png" />
     <Content Include="Images\NatureQuest-Site-Logo.png" />
+    <Content Include="Images\Natures-Quest-credit-cards.png" />
+    <Content Include="Images\Natures-Quest-powered_by_stripe.png" />
     <Content Include="Images\payment_methods-new.png" />
     <Content Include="Images\payment_methods.png" />
     <Content Include="Images\payment_methods_alt.png" />
@@ -883,6 +884,11 @@
     <Content Include="Views\Partials\Shop\CheckoutProcessedDetails.cshtml" />
     <Content Include="Views\checkoutConfirmPage.cshtml" />
     <Content Include="Views\Partials\Shop\PayPalCheckoutScript.cshtml" />
+    <Content Include="Views\sitemap.cshtml" />
+    <Content Include="Views\customerOrdersPage.cshtml" />
+    <Content Include="Views\stripeOrdersPage.cshtml" />
+    <Content Include="Views\Partials\Accounts\AccountsSideBar.cshtml" />
+    <Content Include="Views\Partials\Accounts\MemberOrderDetails.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

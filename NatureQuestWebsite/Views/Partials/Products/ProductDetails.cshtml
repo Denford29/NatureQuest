@@ -1,164 +1,243 @@
 ﻿@using NatureQuestWebsite.Models
 @inherits Umbraco.Web.Mvc.UmbracoViewPage<ProductModel>
 @{
-    var productImages = Model.ProductImages;
-    //var productPrices = Model.ProductPrices;
-    var featurePrice = Model.FeaturedPrice;
+    var productModel = Model;
+    if (TempData.ContainsKey("updatedModel"))
+    {
+        productModel = (ProductModel) TempData["updatedModel"];
+    }
 
-    <div class="row">
-        @if (productImages.Any())
-        {
-            var imageCounter = 0;
-            var thumbCounter = 0;
-            <div class="col-md-5">
-                <div class="product-gallery">
-                    @if (featurePrice?.SalePercentage > 0)
-                    {
-                        <span class="product-badge text-danger">
-                            @featurePrice.SalePercentage% Off @featurePrice.ProductVariant
+    var productImages = productModel.ProductImages;
+        //var productPrices = Model.ProductPrices;
+        var featurePrice = productModel.FeaturedPrice;
+
+        <div class="row">
+            @if (productImages.Any())
+            {
+                var imageCounter = 0;
+                var thumbCounter = 0;
+                <div class="col-md-5">
+                    <div class="product-gallery">
+                        @if (featurePrice?.SalePercentage > 0)
+                        {
+                            <span class="product-badge text-danger">
+                                @featurePrice.SalePercentage% Off @featurePrice.ProductVariant
+                            </span>
+                        }
+                        <div class="product-carousel owl-carousel gallery-wrapper">
+                            @*do the feature price image first*@
+                            @foreach (var productImage in productImages.Where(image => image.IsFeaturedPriceImage))
+                            {
+                                //increase the counter
+                                imageCounter++;
+                                <div class="gallery-item" data-hash="@imageCounter">
+                                    <a href="@productImage.ImageUrl" title="@productImage.ImageAltText" data-size="350x500">
+                                        <img src="@productImage.ImageUrl" alt="@productImage.ImageAltText">
+                                    </a>
+                                    <span class="caption">
+                                        @productImage.ImageAltText
+                                    </span>
+                                </div>
+                            }
+                            @* do the non feature price 1s *@
+                            @foreach (var productImage in productImages.Where(image => !image.IsFeaturedPriceImage))
+                            {
+                                //increase the counter
+                                imageCounter++;
+                                <div class="gallery-item" data-hash="@imageCounter">
+                                    <a href="@productImage.ImageUrl" title="@productImage.ImageAltText" data-size="350x500">
+                                        <img src="@productImage.ImageUrl" alt="@productImage.ImageAltText">
+                                    </a>
+                                    <span class="caption">
+                                        @productImage.ImageAltText
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                        <ul class="product-thumbnails" id="product-gallery-thumbs">
+                            @*do the feature price image first*@
+                            @foreach (var productImage in productImages.Where(image => image.IsFeaturedPriceImage))
+                            {
+                                thumbCounter++;
+                                var thumbClass = thumbCounter == 1 ? "active" : "";
+                                <li class="@thumbClass" id="@productImage.ImageProductId">
+                                    <a href="#@thumbCounter" alt="@productImage.ImageAltText">
+                                        <img src="@productImage.ImageUrl" alt="@productImage.ImageAltText">
+                                    </a>
+                                </li>
+                            }
+                            @* do the non feature price 1s *@
+                            @foreach (var productImage in productImages.Where(image => !image.IsFeaturedPriceImage))
+                            {
+                                thumbCounter++;
+                                var thumbClass = thumbCounter == 1 ? "active" : "";
+                                <li class="@thumbClass" id="@productImage.ImageProductId">
+                                    <a href="#@thumbCounter" alt="@productImage.ImageAltText">
+                                        <img src="@productImage.ImageUrl" alt="@productImage.ImageAltText">
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+
+                using (Html.BeginUmbracoForm("UpdateProductFeaturePrice", "PageContent",
+                    FormMethod.Post,
+                    new { role = "form", id = "updateFeaturePrice" }))
+                {
+                    <input id="selectedFeaturePriceId" name="selectedFeaturePriceId" type="hidden" value="">
+                }
+            }
+
+            <!-- Product Info-->
+            <div class="col-md-7">
+                @if (productModel.ProductStarRating > 0)
+                {
+                    var totalStars = 5;
+                    <div class="rating-stars">
+                        @for (int i = 0; i < productModel.ProductStarRating; i++)
+                        {
+                            totalStars--;
+                            <i class="icon-star filled"></i>
+                        }
+
+                        @for (int i = 0; i < totalStars; i++)
+                        {
+                            totalStars--;
+                            <i class="icon-star"></i>
+                        }
+                    </div>
+                }
+
+                @if (featurePrice != null)
+                {
+                    <h2 class="padding-top-1x text-normal">
+                        @productModel.ProductTitle @featurePrice.ProductVariant
+                    </h2>
+                    <span class="h2 d-block" id="default-price">
+                        @if (featurePrice.SalePrice > 0)
+                        {
+                            <del class="text-danger text-normal">$@featurePrice.ProductPrice</del>
+                            <text>$</text>@featurePrice.SalePrice
+                        }
+                        else
+                        {
+                            <text>$</text>@featurePrice.ProductPrice
+                        }
+                    </span>
+                    <span class="h2 d-block" id="selected-price">
+                    </span>
+                    <div class="margin-bottom-1x h4">
+                        <h4 class="text-normal">
+                            Payment Options:
+                        </h4>
+                        <span>
+                            <a href="https://stripe.com/au/about" target="_blank" title="Stripe Payment">
+                                <img src="/Images/Natures-Quest-powered_by_stripe.png" alt="Natures Quest - Stripe" height="25"><img src="/Images/Natures-Quest-credit-cards.png" alt="Natures Quest - Credit Cards" height="25">
+                            </a>
                         </span>
-                    }
-                    <div class="product-carousel owl-carousel gallery-wrapper">
-                        @foreach (var productImage in productImages)
-                        {
-                            //increase the counter
-                            imageCounter++;
-                            <div class="gallery-item" data-hash="@imageCounter">
-                                <a href="@productImage.ImageUrl" title="@productImage.ImageAltText" data-size="350x500">
-                                    <img src="@productImage.ImageUrl" alt="@productImage.ImageAltText">
-                                </a>
-                                <span class="caption">
-                                    @productImage.ImageAltText
-                                </span>
-                            </div>
-                        }
                     </div>
-                    <ul class="product-thumbnails">
-                        @foreach (var productImage in productImages)
-                        {
-                            thumbCounter++;
-                            var thumbClass = thumbCounter == 1 ? "active" : "";
-                            <li class="@thumbClass">
-                                <a href="#@thumbCounter">
-                                    <img src="@productImage.ImageUrl" alt="@productImage.ImageAltText">
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </div>
-        }
+                }
+                else
+                {
+                    <h2 class="padding-top-1x text-normal">
+                        @productModel.ProductTitle
+                    </h2>
+                }
 
-        <!-- Product Info-->
-        <div class="col-md-7">
-            @if (Model.ProductStarRating > 0)
-            {
-                var totalStars = 5;
-                <div class="rating-stars">
-                    @for (int i = 0; i < Model.ProductStarRating; i++)
-                    {
-                        totalStars--;
-                        <i class="icon-star filled"></i>
-                    }
+                @if (!string.IsNullOrWhiteSpace(productModel.ProductDescription))
+                {
+                    <hr />
+                    <p class="padding-top-1x">@productModel.ProductDescription</p>
+                }
 
-                    @for (int i = 0; i < totalStars; i++)
-                    {
-                        totalStars--;
-                        <i class="icon-star"></i>
-                    }
-                </div>
-            }
+                @using (Html.BeginUmbracoForm("AddProductToCart", "Shop",
+                    FormMethod.Post,
+                    new { role = "form", id = "addToCartForm" }))
+                {
+                    @Html.HiddenFor(model => model.ProductPageId)
+                    @Html.HiddenFor(model => model.ProductCode)
 
-            @if (featurePrice != null)
-            {
-                <h2 class="padding-top-1x text-normal">
-                    @Model.ProductTitle @featurePrice.ProductVariant
-                </h2>
-                <span class="h2 d-block">
-                    @if (featurePrice.SalePrice > 0)
-                    {
-                        <del class="text-danger text-normal">$@featurePrice.ProductPrice</del>
-                        <text>$</text>@featurePrice.SalePrice
-                    }
-                    else
-                    {
-                        <text>$</text>@featurePrice.ProductPrice
-                    }
-                </span>
-            }
-            else
-            {
-                <h2 class="padding-top-1x text-normal">
-                    @Model.ProductTitle
-                </h2>
-            }
-
-            @if (!string.IsNullOrWhiteSpace(Model.ProductDescription))
-            {
-                <p>@Model.ProductDescription</p>
-            }
-
-            @using (Html.BeginUmbracoForm("AddProductToCart", "Shop",
-                FormMethod.Post,
-                new { role = "form", id = "addToCartForm" }))
-            {
-                @Html.HiddenFor(model => model.ProductPageId)
-                @Html.HiddenFor(model => model.ProductCode)
-
-                <div class="row margin-top-1x margin-bottom-1x">
-                    <div class="col-md-8">
-                        @Html.LabelFor(model => Model.SelectedPricePageId)
-                        @Html.DropDownListFor(model => Model.SelectedPricePageId, Model.ProductDisplayPrices, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => Model.SelectedPricePageId, "", new { @class = "help-block text-danger" })
+                    <div class="row margin-top-1x margin-bottom-1x">
+                        <div class="col-md-8">
+                            @Html.LabelFor(model => model.SelectedPricePageId)
+                            @Html.DropDownListFor(model => model.SelectedPricePageId, productModel.ProductDisplayPrices, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.SelectedPricePageId, "", new { @class = "help-block text-danger" })
+                        </div>
+                        <div class="col-md-4">
+                            @Html.LabelFor(model => model.SelectedQuantity)
+                            @Html.TextBoxFor(model => model.SelectedQuantity, new { @class = "form-control", required = "", placeholder = "Required quantity" })
+                            @Html.ValidationMessageFor(model => model.SelectedQuantity, "", new { @class = "help-block text-danger" })
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        @Html.LabelFor(m => Model.SelectedQuantity)
-                        @Html.TextBoxFor(model => Model.SelectedQuantity, new { @class = "form-control", required = "", placeholder = "Required quantity" })
-                        @Html.ValidationMessageFor(model => Model.SelectedQuantity, "", new { @class = "help-block text-danger" })
-                    </div>
-                </div>
 
-                <div class="d-flex flex-wrap justify-content-between mt-2 mb-2">
-                    <div class="sp-buttons mt-2 mb-2">
-                        @if (Model.CanBeOrdered)
-                        {
-                            <button class="btn btn-primary AddToCartBtn">
-                                <i class="icon-bag"></i> Add to Cart
-                            </button>
-                        }
+                    <div class="d-flex flex-wrap justify-content-between mt-2 mb-2">
+                        <div class="sp-buttons mt-2 mb-2">
+                            @if (productModel.CanBeOrdered)
+                            {
+                                <button class="btn btn-primary AddToCartBtn">
+                                    <i class="icon-bag"></i> Add to Cart
+                                </button>
+                            }
+                        </div>
                     </div>
-                </div>
-            }
+                }
 
-            @if (!string.IsNullOrWhiteSpace(Model.PageContentText))
-            {
                 <div class="row padding-top-1x mb-1">
                     <div class="col-lg-12">
                         <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#description" data-toggle="tab" role="tab">
-                                    Description
-                                </a>
-                            </li>
-                            @if (Model.ProductIngredients.Any())
+                            @* if we have the content text set that as the active tab *@
+                            @if (!string.IsNullOrWhiteSpace(productModel.PageContentText))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" href="#ingredients" data-toggle="tab" role="tab">
+                                    <a class="nav-link active" href="#description" data-toggle="tab" role="tab">
+                                        Description
+                                    </a>
+                                </li>
+                                if (productModel.ProductIngredients.Any())
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#ingredients" data-toggle="tab" role="tab">
+                                            Ingredients
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            @* if we don't have the content set the ingredients  *@
+                            @if (string.IsNullOrWhiteSpace(productModel.PageContentText) && productModel.ProductIngredients.Any())
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="#ingredients" data-toggle="tab" role="tab">
                                         Ingredients
                                     </a>
                                 </li>
                             }
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane fade show active" id="description" role="tabpanel">
-                                @Html.Raw(Model.PageContentText)
-                            </div>
-
-                            @if (Model.ProductIngredients.Any())
+                            @* if we have the content text set that as the active tab *@
+                            @if (!string.IsNullOrWhiteSpace(productModel.PageContentText))
                             {
-                                <div class="tab-pane fade show" id="ingredients" role="tabpanel">
+                                <div class="tab-pane fade show active" id="description" role="tabpanel">
+                                    @Html.Raw(productModel.PageContentText)
+                                </div>
+                                if (productModel.ProductIngredients.Any())
+                                {
+                                    <div class="tab-pane fade show" id="ingredients" role="tabpanel">
+                                        <ul>
+                                            @foreach (var ingredient in productModel.ProductIngredients)
+                                            {
+                                                <li>@ingredient</li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+                            }
+                            @* if we don't have the content set the ingredients  *@
+                            @if (string.IsNullOrWhiteSpace(productModel.PageContentText) && productModel.ProductIngredients.Any())
+                            {
+                                <div class="tab-pane fade show active" id="ingredients" role="tabpanel">
                                     <ul>
-                                        @foreach (var ingredient in Model.ProductIngredients)
+                                        @foreach (var ingredient in productModel.ProductIngredients)
                                         {
                                             <li>@ingredient</li>
                                         }
@@ -168,7 +247,6 @@
                         </div>
                     </div>
                 </div>
-            }
+            </div>
         </div>
-    </div>
-}
+    }

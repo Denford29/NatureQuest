@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using NatureQuestWebsite.Models;
 using PayPalCheckoutSdk.Orders;
 using Stripe;
@@ -154,6 +155,13 @@ namespace NatureQuestWebsite.Services
             out string resultMessage, out OrderDetails stripeOrderDetails);
 
         /// <summary>
+        /// Get the stripe list of paid payment intents, with optional customer emails
+        /// </summary>
+        /// <param name="emailAddress"></param>
+        /// <returns></returns>
+        List<PaymentIntent> GetStripePaidIntents(string emailAddress = null);
+
+        /// <summary>
         /// Get the paypal order request object
         /// </summary>
         /// <param name="currentShoppingCart"></param>
@@ -173,5 +181,12 @@ namespace NatureQuestWebsite.Services
             SiteShoppingCart currentShoppingCart,
             out string resultMessage,
             out OrderDetails payPalOrderDetails);
+
+        /// <summary>
+        /// get the member model orders
+        /// </summary>
+        /// <param name="membersModel"></param>
+        /// <returns></returns>
+        MembersModel GetMemberOrderDetails(MembersModel membersModel);
     }
 }

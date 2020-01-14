@@ -109,6 +109,13 @@ namespace NatureQuestWebsite.Models
         /// get or set the product image alt text
         /// </summary>
         public string ImageAltText { get; set; }
+
+        /// <summary>
+        /// get or set the product image id e.g. variant id
+        /// </summary>
+        public string ImageProductId { get; set; }
+
+        public bool IsFeaturedPriceImage { get; set; }
     }
 
     /// <summary>
@@ -150,5 +157,10 @@ namespace NatureQuestWebsite.Models
         /// get or set the product variant code
         /// </summary>
         public string ProductVariantCode { get; set; }
+
+        /// <summary>
+        /// get or set the product variant image
+        /// </summary>
+        public ProductImageModel ProductVariantImage { get; set; }
     }
 }

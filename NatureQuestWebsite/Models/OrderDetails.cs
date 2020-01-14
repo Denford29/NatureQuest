@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection.PortableExecutable;
+using Stripe;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace NatureQuestWebsite.Models
 {
@@ -26,5 +31,35 @@ namespace NatureQuestWebsite.Models
         /// get or set the list of order items from shopping cart
         /// </summary>
         public List<CartItem> OrderItems { get; set; } = new List<CartItem>();
+
+        /// <summary>
+        /// get or set the payment intent for the order
+        /// </summary>
+        public PaymentIntent OrderPaymentIntent { get; set; } = new PaymentIntent();
+
+        /// <summary>
+        /// get or set the site order member
+        /// </summary>
+        public IMember LoggedInMember { get; set; }
+
+        /// <summary>
+        /// get or set the order shipping details
+        /// </summary>
+        public ShippingDetails OrderShippingDetails { get; set; } = new ShippingDetails();
+
+        /// <summary>
+        /// get or set the site order page
+        /// </summary>
+        public IPublishedContent SiteOrderPage { get; set; }
+
+        /// <summary>
+        /// get or set the order total
+        /// </summary>
+        public decimal OrderTotal { get; set; }
+
+        /// <summary>
+        /// get or set the order created date
+        /// </summary>
+        public DateTime OrderCreatedDate { get; set; }
     }
 }

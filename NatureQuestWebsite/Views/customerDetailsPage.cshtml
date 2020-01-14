@@ -6,14 +6,16 @@
 
     @Html.Partial("/Views/Partials/PageContent/PageHeader.cshtml", Model)
 
-<div class="container padding-bottom-3x mb-2">
-    <div class="row">
-        @if (!string.IsNullOrWhiteSpace(currentModel.PageContentText))
-        {
-            @Html.Raw(currentModel.PageContentText)
-        }
-    </div>
+    <div class="container padding-bottom-3x mb-2">
+        <div class="row">
+            @if (!string.IsNullOrWhiteSpace(currentModel.PageContentText))
+            {
+                @Html.Raw(currentModel.PageContentText)
+            }
+        </div>
 
-    @Html.Action("GetMembersAccountDetailsView", "Accounts")
-</div>
+        <div class="row">
+            @Html.Action("GetMembersAccountDetailsView", "Accounts")
+        </div>
+    </div>
 }

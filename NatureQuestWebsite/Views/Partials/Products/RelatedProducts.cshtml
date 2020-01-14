@@ -15,6 +15,11 @@
                 var productPage = product.ProductPage;
                 var productImage = product.ProductImages.FirstOrDefault();
                 var featurePrice = product.FeaturedPrice;
+                //check if we have a variant image
+                if (!string.IsNullOrWhiteSpace(featurePrice.ProductVariantImage?.ImageUrl))
+                {
+                    productImage = featurePrice.ProductVariantImage;
+                }
 
                 <div class="grid-item">
                     <div class="product-card">
@@ -55,16 +60,20 @@
 
                         @if (product.CanBeOrdered)
                         {
-                            <div class="product-buttons">
-                                <button class="btn btn-outline-primary btn-sm"
-                                        data-toast data-toast-type="success"
-                                        data-toast-position="topRight"
-                                        data-toast-icon="icon-circle-check"
-                                        data-toast-title="Product"
-                                        data-toast-message="successful added to cart!">
-                                    Add to Cart
-                                </button>
-                            </div>
+                            using (Html.BeginUmbracoForm("AddProductToCart", "Shop",
+                                FormMethod.Post,
+                                new { role = "form", id = "addToCartForm" }))
+                            {
+                                <input id="ProductPageId" name="ProductPageId" type="hidden" value="@product.ProductPageId">
+                                <input id="ProductCode" name="ProductCode" type="hidden" value="@featurePrice.ProductVariantCode">
+                                <input id="SelectedQuantity" name="SelectedQuantity" type="hidden" value="1">
+                                <input id="SelectedPricePageId" name="SelectedPricePageId" type="hidden" value="@featurePrice.ProductPricePage.Id">
+                                <div class="product-buttons">
+                                    <button class="btn btn-outline-primary btn-sm AddToCartBtn">
+                                        <i class="icon-bag"></i> Add to Cart
+                                    </button>
+                                </div>
+                            }
                         }
                     </div>
                 </div>

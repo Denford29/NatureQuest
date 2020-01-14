@@ -1,0 +1,53 @@
+﻿@using NatureQuestWebsite.Models
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<MembersModel>
+@{
+   var currentPage = UmbracoContext.PublishedRequest.PublishedContent;
+    if (Model.LoggedInMember != null)
+    {
+        var currentUser = Model.LoggedInMember;
+        <div class="col-lg-4">
+            <aside class="user-info-wrapper">
+                <div class="user-cover" style="background-image: url(/images/account/user-cover-img.jpg);">
+                    <div class="user-info">
+                        <div class="user-data">
+                            <h4>@Model.FullName</h4>
+                            <span>Joined @currentUser.CreateDate.ToLongDateString()</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <nav class="list-group">
+
+                @if (Model.AccountDetailsPage?.Id > 0)
+                {
+                    //set the active class
+                    var activeClass = currentPage.Id == Model.AccountDetailsPage.Id ? "active" : "";
+                    <a class="list-group-item @activeClass" href="@Model.AccountDetailsPage.Url" title="@Model.FullName Details">
+                        <i class="icon-head"></i>Profile
+                    </a>
+                }
+
+                @if (Model.AccountOrdersPage?.Id > 0 && Model.MemberOrderDetailsList.Any())
+                {
+                    //set the active class
+                    var activeClass = currentPage.Id == Model.AccountOrdersPage.Id ? "active" : "";
+                    <a class="list-group-item with-badge @activeClass" href="@Model.AccountOrdersPage.Url" title="@Model.FullName Orders">
+                        <i class="icon-bag"></i>Orders
+                        <span class="badge badge-primary badge-pill">@Model.MemberOrderDetailsList.Count</span>
+                    </a>
+                }
+
+                @if (Model.StripeOrdersPage?.Id > 0 && Model.IsAdminUser)
+                {
+                    //set the active class
+                    var activeClass = currentPage.Id == Model.StripeOrdersPage.Id ? "active" : "";
+                    <a class="list-group-item @activeClass" href="@Model.StripeOrdersPage.Url" title="Stripe Orders">
+                        <i class="icon-bag"></i>Stripe Orders
+                    </a>
+                }
+
+            </nav>
+        </div>
+    }
+}

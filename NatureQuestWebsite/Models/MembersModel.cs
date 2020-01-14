@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Models;
 using DataType = System.ComponentModel.DataAnnotations.DataType;
 
@@ -142,5 +143,35 @@ namespace NatureQuestWebsite.Models
         /// get or set the members model current cart
         /// </summary>
         public SiteShoppingCart MemberCart { get; set; }
+
+        /// <summary>
+        /// set a flag if the user is an admin user
+        /// </summary>
+        public bool IsAdminUser { get; set; }
+
+        /// <summary>
+        /// get or set the account details page
+        /// </summary>
+        public IPublishedContent AccountDetailsPage { get; set; }
+
+        /// <summary>
+        /// get or set the account orders page
+        /// </summary>
+        public IPublishedContent AccountOrdersPage { get; set; }
+
+        /// <summary>
+        /// get or set the stripe orders page
+        /// </summary>
+        public IPublishedContent StripeOrdersPage { get; set; }
+
+        /// <summary>
+        /// get or set the list member orders page
+        /// </summary>
+        public List<IPublishedContent> MemberOrdersPage { get; set; } = new List<IPublishedContent>();
+
+        /// <summary>
+        /// get or set the members orders list
+        /// </summary>
+        public List<OrderDetails> MemberOrderDetailsList { get; set; } = new List<OrderDetails>();
     }
 }

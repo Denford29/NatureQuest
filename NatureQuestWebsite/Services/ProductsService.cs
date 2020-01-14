@@ -60,8 +60,9 @@ namespace NatureQuestWebsite.Services
         /// </summary>
         /// <param name="productPage"></param>
         /// <param name="getThumbnail"></param>
+        /// <param name="featurePriceId"></param>
         /// <returns></returns>
-        public ProductModel GetProductModel(IPublishedContent productPage, bool getThumbnail = false)
+        public ProductModel GetProductModel(IPublishedContent productPage, bool getThumbnail = false, string featurePriceId = "")
         {
             try
             {
@@ -122,62 +123,17 @@ namespace NatureQuestWebsite.Services
                         model.PageContentText = productPage.GetProperty("pageText").Value().ToString();
                     }
 
-                    //set feature product image
-                    var productImages = productPage.Value<IEnumerable<IPublishedContent>>("productImages").ToList();
-                    if (productImages.Any())
-                    {
-                        //go through each of the images and add them
-                        foreach (var productImage in productImages)
-                        {
-                            if (productImage != null && productImage.Id > 0)
-                            {
-                                //get the image url
-                                var imageLink = "/Images/Nature-Quest-Product-Default.png";
-                                var defaultCropSize = getThumbnail ? productImage.GetCropUrl("thumbNail") : productImage.GetCropUrl("product");
-                                var productImagelink = !string.IsNullOrEmpty(defaultCropSize)
-                                    ? defaultCropSize
-                                    : getThumbnail ? productImage.GetCropUrl(250, 250) : productImage.GetCropUrl(350, 500);
-                                if (!string.IsNullOrWhiteSpace(productImagelink))
-                                {
-                                    imageLink = productImagelink;
-                                }
-
-                                //create the product model
-                                var imageModel = new ProductImageModel
-                                {
-                                    ImageUrl = imageLink,
-                                    ImageAltText = productImage.Name
-                                };
-                                //add the image model to the model
-                                model.ProductImages.Add(imageModel);
-                            }
-                        }
-                    }
-                    //add a default image model 
-                    else
-                    {
-                        var imageLink = getThumbnail ? "/Images/Nature-Quest-Product-Default-thumb.png" : "/Images/Nature-Quest-Product-Default.png";
-                        //create the product model
-                        var imageModel = new ProductImageModel
-                        {
-                            ImageUrl = imageLink,
-                            ImageAltText = productTitle
-                        };
-                        //add the image model to the model
-                        model.ProductImages.Add(imageModel);
-                    }
-
                     //add the default price
                     var defaultPrice = new SelectListItem
                     {
                         Text = "Select size require.",
                         Value = "",
-                        Selected = true
+                        Selected = string.IsNullOrWhiteSpace(featurePriceId)
                     };
                     model.ProductDisplayPrices.Add(defaultPrice);
 
                     //get the price child items
-                    var productPrices = productPage.Children().Where(page => 
+                    var productPrices = productPage.Children().Where(page =>
                                                             page.ContentType.Alias == "productPrice"
                                                             && page.IsPublished()).
                                                             ToList();
@@ -215,11 +171,20 @@ namespace NatureQuestWebsite.Services
 
                             // get the flag to indicate its a featured price
                             var isFeaturedPrice = false;
-                            if (productPrice.HasProperty("featuredPrice") && productPrice.HasValue("featuredPrice"))
+                            //if there is a feature price id passed in use that to set the price marked as feature price
+                            if (!string.IsNullOrWhiteSpace(featurePriceId))
                             {
-                                // set the page flag from the value
-                                isFeaturedPrice = productPrice.Value<bool>("featuredPrice");
+                                isFeaturedPrice = productPrice.Id.ToString() == featurePriceId;
                             }
+                            else
+                            {
+                                if (productPrice.HasProperty("featuredPrice") && productPrice.HasValue("featuredPrice"))
+                                {
+                                    // set the page flag from the value
+                                    isFeaturedPrice = productPrice.Value<bool>("featuredPrice");
+                                }
+                            }
+                            
 
                             var productCode = string.Empty;
                             //check if we have the product code set on the current product
@@ -242,9 +207,11 @@ namespace NatureQuestWebsite.Services
                             var productDisplayPrice = new SelectListItem
                             {
                                 Text = priceDisplayed,
-                                Value = productPrice.Id.ToString()
+                                Value = productPrice.Id.ToString(),
+                                Selected = !string.IsNullOrWhiteSpace(featurePriceId) && productPrice.Id.ToString() == featurePriceId
                             };
                             model.ProductDisplayPrices.Add(productDisplayPrice);
+
 
                             //create the new price model
                             var priceModel = new ProductPriceModel
@@ -258,14 +225,75 @@ namespace NatureQuestWebsite.Services
                                 ProductVariantCode = productCode
                             };
 
+                            //get the variant image if there is an image set
+                            if (productPrice.HasProperty("variantImage") && productPrice.HasValue("variantImage"))
+                            {
+                                //set feature product image
+                                var productVariantImage = productPrice.Value<IPublishedContent>("variantImage");
+                                if (productVariantImage?.Id > 0)
+                                {
+                                    //get the image url
+                                    var imageLink = "/Images/Nature-Quest-Product-Default.png";
+                                    var defaultCropSize = getThumbnail
+                                        ? productVariantImage.GetCropUrl("thumbNail")
+                                        : productVariantImage.GetCropUrl("product");
+                                    var productImagelink = !string.IsNullOrEmpty(defaultCropSize)
+                                        ? defaultCropSize
+                                        : getThumbnail
+                                            ? productVariantImage.GetCropUrl(250, 250)
+                                            : productVariantImage.GetCropUrl(350, 500);
+                                    if (!string.IsNullOrWhiteSpace(productImagelink))
+                                    {
+                                        imageLink = productImagelink;
+                                    }
+
+                                    //create the product model
+                                    var variantImageModel = new ProductImageModel
+                                    {
+                                        ImageUrl = imageLink,
+                                        ImageAltText = productVariantImage.Name,
+                                        ImageProductId = productPrice.Id.ToString(),
+                                        IsFeaturedPriceImage = isFeaturedPrice
+                                    };
+                                    //add the image model to the product images
+                                    model.ProductImages.Add(variantImageModel);
+                                    //add the image to the variant image
+                                    priceModel.ProductVariantImage = variantImageModel;
+                                }
+                            }
+                            //add a default image model 
+                            else
+                            {
+                                var imageLink = getThumbnail ? "/Images/Nature-Quest-Product-Default-thumb.png" : "/Images/Nature-Quest-Product-Default.png";
+                                //create the product model
+                                var variantImageModel = new ProductImageModel
+                                {
+                                    ImageUrl = imageLink,
+                                    ImageAltText = productTitle,
+                                    ImageProductId = productPrice.Id.ToString()
+                                };
+                                //add the default image to the variant image
+                                priceModel.ProductVariantImage = variantImageModel;
+                            }
+
                             // add the price to the model
                             model.ProductPrices.Add(priceModel);
                         }
                     }
 
-                    //from the prices get the featured price to show
-                    model.FeaturedPrice = model.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice) ??
-                                                            model.ProductPrices.FirstOrDefault();
+                    //if we have a feature price id, use that
+                    if (!string.IsNullOrWhiteSpace(featurePriceId))
+                    {
+                        //from the prices get the featured price to show
+                        model.FeaturedPrice = model.ProductPrices.FirstOrDefault(price => price.ProductPricePage.Id.ToString() == featurePriceId) ??
+                                              model.ProductPrices.FirstOrDefault();
+                    }
+                    else
+                    {
+                        //from the prices get the featured price to show
+                        model.FeaturedPrice = model.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice) ??
+                                              model.ProductPrices.FirstOrDefault();
+                    }
 
                     //check if this product i valid for ordering
                     model.CanBeOrdered = model.FeaturedPrice != null;

@@ -3,6 +3,7 @@
 @{
     Layout = "siteMaster.cshtml";
     var currentModel = Model;
+    var registrationPage = Model.SiteMenu.RegistrationLoginPage;
 
     @Html.Partial("/Views/Partials/PageContent/PageHeader.cshtml", Model)
 
@@ -12,6 +13,17 @@
                 @if (!string.IsNullOrWhiteSpace(currentModel.PageContentText))
                 {
                     @Html.Raw(currentModel.PageContentText)
+                }
+
+                @*check if the user is logged in and display the login message*@
+                @if (!Model.MemberCurrentLoginStatus.IsLoggedIn && registrationPage?.Id > 0)
+                {
+                    <p>
+                        For quicker and easier ordering
+                        <a href="@registrationPage.Url" title="Registration and Login">login/register</a> for a user account from the login page in the main menu.
+                        From your customer account you can have an automatically saved shopping cart, track the progress of your orders and update your
+                        saved shipping detail.
+                    </p>
                 }
             </div>
         </div>

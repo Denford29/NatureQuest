@@ -29,6 +29,12 @@
                                 //if we haven't got a featured price, then just get the 1st normal price
                                 var productFeaturedPrice = product.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice) ??
                                                            product.ProductPrices.FirstOrDefault();
+                                //check if we have a variant image
+                                if (!string.IsNullOrWhiteSpace(productFeaturedPrice?.ProductVariantImage?.ImageUrl))
+                                {
+                                    productFirstImage = productFeaturedPrice.ProductVariantImage;
+                                }
+
                                 if (!string.IsNullOrWhiteSpace(productFirstImage?.ImageUrl))
                                 {
                                     <div class="entry">

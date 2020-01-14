@@ -69,6 +69,7 @@ namespace NatureQuestWebsite.Controllers
         /// </summary>
         /// <param name="siteMembersService"></param>
         /// <param name="memberTypeService"></param>
+        /// <param name="shoppingService"></param>
         public AccountsController(
             ISiteMembersService siteMembersService,
             IMemberTypeService memberTypeService,
@@ -536,8 +537,38 @@ namespace NatureQuestWebsite.Controllers
             // create the default model
             var model = GetMembersModel(new MembersModel(), _currentLoginStatus);
 
+            //get the customer paid orders
+            model = _shoppingService.GetMemberOrderDetails(model);
+
             // return the view with the model
             return View("/Views/Partials/Accounts/MemberAcountDetails.cshtml", model);
+        }
+
+        /// <summary>
+        /// Get the registration and login form
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetMembersOrderDetailsView()
+        {
+            //check if the user is logged in, if not redirect to the login page
+            if (!_currentLoginStatus.IsLoggedIn)
+            {
+                //if we have the registration page redirect there
+                if (_registrationLoginPage?.Id > 0)
+                {
+                    return RedirectToUmbracoPage(_registrationLoginPage);
+                }
+                //otherwise redirect to the home page
+                return RedirectToUmbracoPage(_homePage);
+            }
+            // create the default model
+            var model = GetMembersModel(new MembersModel(), _currentLoginStatus);
+
+            //get the customer paid orders
+            model = _shoppingService.GetMemberOrderDetails(model);
+
+            // return the view with the model
+            return View("/Views/Partials/Accounts/MemberOrderDetails.cshtml", model);
         }
 
         /// <summary>
