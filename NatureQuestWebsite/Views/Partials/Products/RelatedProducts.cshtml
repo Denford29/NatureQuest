@@ -8,13 +8,14 @@
             Related Products
         </h3>
 
-        <div class="owl-carousel d-none d-md-block" 
+        <div class="owl-carousel d-none d-md-block"
              data-owl-carousel="{ &quot;nav&quot;: true, &quot;dots&quot;: true, &quot;margin&quot;: 20, &quot;responsive&quot;: {&quot;0&quot;:{&quot;items&quot;:1},&quot;576&quot;:{&quot;items&quot;:2},&quot;768&quot;:{&quot;items&quot;:3},&quot;991&quot;:{&quot;items&quot;:4},&quot;1200&quot;:{&quot;items&quot;:4}} }">
             @foreach (var product in currentProductSiblings.Where(productSibling => productSibling.FeaturedPrice != null))
             {
                 var productPage = product.ProductPage;
                 var productImage = product.ProductImages.FirstOrDefault();
                 var featurePrice = product.FeaturedPrice;
+                var salePrice = product.SalePrice;
                 //check if we have a variant image
                 if (!string.IsNullOrWhiteSpace(featurePrice.ProductVariantImage?.ImageUrl))
                 {
@@ -23,10 +24,10 @@
 
                 <div class="grid-item">
                     <div class="product-card">
-                        @if (featurePrice.SalePercentage > 0)
+                        @if (salePrice != null && salePrice.SalePercentage > 0)
                         {
                             <div class="product-badge text-danger">
-                                @featurePrice.SalePercentage% Off @featurePrice.ProductVariant
+                                @salePrice.SalePercentage% Off @salePrice.ProductVariant
                             </div>
                         }
                         @if (productImage != null)
@@ -47,13 +48,13 @@
                             if (featurePrice.SalePrice != 0)
                             {
                                 <h4 class="product-price">
-                                    <del>$@featurePrice.ProductPrice</del>$@featurePrice.SalePrice (@featurePrice.ProductVariant)
+                                    <del>@featurePrice.ProductPrice.ToString("c")</del>@featurePrice.SalePrice.ToString("c")
                                 </h4>
                             }
                             else
                             {
                                 <h4 class="product-price">
-                                    $@featurePrice.ProductPrice (@featurePrice.ProductVariant)
+                                    From @featurePrice.ProductPrice.ToString("c")
                                 </h4>
                             }
                         }

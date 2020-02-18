@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
+using System.Web.Security;
 using NatureQuestWebsite.Models;
 using Newtonsoft.Json;
 using PayPalCheckoutSdk.Core;
@@ -201,6 +202,11 @@ namespace NatureQuestWebsite.Services
         public string PaypalLiveSecret = WebConfigurationManager.AppSettings["paypalLiveSecret"];
 
         /// <summary>
+        /// get the local site member service
+        /// </summary>
+        private readonly ISiteMembersService _siteMembersService;
+
+        /// <summary>
         /// initialise the shopping service
         /// </summary>
         /// <param name="logger"></param>
@@ -209,13 +215,15 @@ namespace NatureQuestWebsite.Services
         /// <param name="contentService"></param>
         /// <param name="umbracoHelper"></param>
         /// <param name="productsService"></param>
+        /// <param name="siteMembersService"></param>
         public ShoppingService(
             ILogger logger,
             IUmbracoContextFactory contextFactory,
             IMemberService memberService,
             IContentService contentService,
             UmbracoHelper umbracoHelper,
-            IProductsService productsService
+            IProductsService productsService,
+            ISiteMembersService siteMembersService
         )
         {
             //set the local logger to use
@@ -228,6 +236,8 @@ namespace NatureQuestWebsite.Services
             _umbracoHelper = umbracoHelper;
             //get the product service
             _productsService = productsService;
+            //get the site member service
+            _siteMembersService = siteMembersService;
 
             //add the default address to the admin list
             _siteToEmailAddresses.Add(new EmailAddress("denfordmutseriwa@yahoo.com", "Admin"));
@@ -657,7 +667,7 @@ namespace NatureQuestWebsite.Services
                                         && cartProduct.HasValue("variantImage"))
                                     {
                                         var variantImage = cartProduct.Value<IPublishedContent>("variantImage");
-                                        if (variantImage?.Id != 0)
+                                        if (variantImage != null && variantImage?.Id != 0)
                                         {
                                             //get the image url
                                             var defaultCropSize = variantImage.GetCropUrl("product");
@@ -705,7 +715,7 @@ namespace NatureQuestWebsite.Services
                         {
                             //save the cart member and member cart page to the current cart
                             currentCart.CartMember = cartMember;
-                            currentCart.MemberCartPage = cartPage;
+                            currentCart.MemberCartPage = newCartPage;
                         }
                     }
                 }
@@ -1047,7 +1057,7 @@ namespace NatureQuestWebsite.Services
             if (currentShoppingCart == null || !currentShoppingCart.CartItems.Any())
             {
                 resultMessage = "The shopping cart is empty";
-                return false;
+                return true;
             }
 
             // try and clear the cart
@@ -1074,6 +1084,8 @@ namespace NatureQuestWebsite.Services
                 //also clear the cart session if there is one
                 currentShoppingCart.StripeCartSession = null;
                 currentShoppingCart.StripeCartSessionId = string.Empty;
+                //reset the session cart
+                HttpContext.Current.Session["Cart"] = null;
                 //set the result message
                 resultMessage = "The shopping cart has been cleared";
                 return true;
@@ -1420,6 +1432,8 @@ namespace NatureQuestWebsite.Services
                 if (memberShoppingCart?.MemberCartPage != null && productCartItem != null)
                 {
                     var memberCartPage = memberShoppingCart.MemberCartPage;
+                    //get the parent cart item page
+                    var cartItemPage = _contentService.GetById(memberCartPage.Id);
                     IContent cartItemContentPage = null;
 
                     //check if we are creating a new cart item or update
@@ -1428,8 +1442,7 @@ namespace NatureQuestWebsite.Services
                         //generate the cart item name
                         var newCartItemName = $"{priceProductPage.Parent.Name.Trim().Replace(" ", "-")}" +
                                               $"-{priceProductPage.Name.Trim().Replace(" ", "-")}";
-                        //get the parent cart item page
-                        var cartItemPage = _contentService.GetById(memberCartPage.Id);
+                        
                         //use the content service to create the cart item page
                         cartItemContentPage =
                             _contentService.CreateAndSave(newCartItemName, cartItemPage, CartPageItemAlias);
@@ -1444,7 +1457,6 @@ namespace NatureQuestWebsite.Services
                         {
                             cartItemContentPage = _contentService.GetById(memberExistingCartPage.Id);
                         }
-
                     }
 
                     //check if the new cart item page has been created
@@ -1472,9 +1484,19 @@ namespace NatureQuestWebsite.Services
 
                         if (saveResult.Success)
                         {
-                            _logger.Info(Type.GetType("ShoppingService"),
-                                $"The cart item: {cartItemContentPage.Name}  for user {memberShoppingCart.CartMember.Email} has been added/updated");
-                            return true;
+                            //publish the parent page
+                            var cartPageUpdated = _contentService.SaveAndPublish(cartItemPage);
+                            if(cartPageUpdated.Success)
+                            {
+                                var updatedCartPage = _umbracoHelper.Content(cartPageUpdated.Content.Id);
+                                if (updatedCartPage?.Id > 0)
+                                {
+                                    memberShoppingCart.MemberCartPage = updatedCartPage;
+                                }
+                                _logger.Info(Type.GetType("ShoppingService"),
+                                    $"The cart item: {cartItemContentPage.Name}  for user {memberShoppingCart.CartMember.Email} has been added/updated");
+                                return true;
+                            }
                         }
 
                         //there was an error saving the content item
@@ -1645,8 +1667,21 @@ namespace NatureQuestWebsite.Services
                         memberName = (string)memberNameProperty.GetValue();
                     }
 
-                    //generate the cart name
-                    var memberOrderName = $"{paymentMethod}-{orderId}-{memberName.Trim().Replace(" ", "-")}-Order";
+                    //generate the order summary
+                    var orderSummary = $"<p>Order id: {orderId} has been created with details.<br /> <br />" +
+                                       $"Shipping details: {currentShoppingCart.CartShippingDetails.ShippingOptionDetails} </p>";
+                    //get the summary order items
+                    foreach (var cartItem in currentShoppingCart.CartItems)
+                    {
+                        var cartItemSummary = $"<p>Product details: {cartItem.Description}</p>";
+                        orderSummary += cartItemSummary;
+                    }
+                    //add the order total
+                    orderSummary +=
+                        $"<p><strong>Order total: {currentShoppingCart.ComputeTotalWithShippingValue():c}</strong> </p>";
+
+                                    //generate the cart name
+                                    var memberOrderName = $"{memberName.Trim().Replace(" ", "-")}-{paymentMethod}-{orderId}-Order";
                     //get the parent carts page
                     var ordersParentPage = _contentService.GetById(ordersPage.Id);
                     //use the content service to create the cart page
@@ -1664,6 +1699,8 @@ namespace NatureQuestWebsite.Services
                         newMemberOrderPage.SetValue("isOrder", true);
                         newMemberOrderPage.SetValue("orderId", orderId);
                         newMemberOrderPage.SetValue("paymentMethod", paymentMethodValue);
+                        //save the order summary
+                        newMemberOrderPage.SetValue("orderSummary", orderSummary);
 
                         //set the shipping on the order
                         if (!string.IsNullOrWhiteSpace(currentShoppingCart.SelectedShippingOption) &&
@@ -1714,8 +1751,12 @@ namespace NatureQuestWebsite.Services
                                 $"Payment id: {orderId} <br />" +
                                 $"Shipping name: {shippingDetails.ShippingFullname} <br />" +
                                 $"Shipping email: {shippingDetails.ShippingEmail} <br />" +
-                                $"Shipping address: {shippingDetails.ShippingAddress} <br />" +
                                 $"Shipping details: {currentShoppingCart.CartShippingDetails.ShippingOptionDetails} <br />" +
+                                $"Shipping phone: {shippingDetails.ShippingMobileNumber} <br />" +
+                                $"Shipping address: {shippingDetails.ShippingAddress} <br />" +
+                                $"Shipping suburb: {shippingDetails.ShippingSuburb} <br />" +
+                                $"Shipping post code: {shippingDetails.ShippingPostCode} <br />" +
+                                $"Shipping state: {shippingDetails.ShippingState} <br />" +
                                 $"<strong>Order total: {currentShoppingCart.ComputeTotalWithShippingValue():c}</strong> <br />" +
                                 "<br /> <br />Regards, <br /> Website Team</p>";
                             //create the admin email
@@ -1846,7 +1887,10 @@ namespace NatureQuestWebsite.Services
                             Address = new AddressOptions
                             {
                                 Line1 = cartShippingDetails.ShippingAddress,
-                                Line2 = cartShippingDetails.ShippingMobileNumber
+                                Line2 = cartShippingDetails.ShippingMobileNumber,
+                                City = cartShippingDetails.ShippingSuburb,
+                                PostalCode = cartShippingDetails.ShippingPostCode,
+                                State = cartShippingDetails.ShippingState
                             }
                         }
                     },
@@ -1942,7 +1986,10 @@ namespace NatureQuestWebsite.Services
                         Phone = cartShippingDetails.ShippingMobileNumber,
                         Address = new AddressOptions
                         {
-                            Line1 = cartShippingDetails.ShippingAddress
+                            Line1 = cartShippingDetails.ShippingAddress,
+                            City = cartShippingDetails.ShippingSuburb,
+                            PostalCode = cartShippingDetails.ShippingPostCode,
+                            State = cartShippingDetails.ShippingState
                         }
                     }
                 };
@@ -2000,6 +2047,7 @@ namespace NatureQuestWebsite.Services
                                 paymentIntent.Id,
                                 currentShoppingCart,
                                 "Stripe");
+
                             //create the member order page first
                             if (memberOrder?.Id > 0)
                             {
@@ -2053,76 +2101,134 @@ namespace NatureQuestWebsite.Services
                         //its an anonymous cart
                         else
                         {
+                            //get the default values to use
                             var cartTotal = currentShoppingCart.ComputeTotalWithShippingValue().ToString("c");
                             var shippingDetails = currentShoppingCart.CartShippingDetails;
 
-                            //create the user email body
-                            var customerEmailBody = CustomerEmailBody(currentShoppingCart, paymentIntent.Id,
-                                shippingDetails.ShippingFullname);
-
-                            //if we have the body then send the customer email
-                            if (!string.IsNullOrWhiteSpace(customerEmailBody?.ToString()))
+                            //check if we already have a registered member from the cart shipping email used
+                            var anonymousMember = _siteMembersService.GetMemberByEmail(shippingDetails.ShippingEmail);
+                            //if we don't have an existing one then create a new one
+                            if (anonymousMember == null)
                             {
-                                //create the customer email
-                                var customerEmailAddress = new EmailAddress(shippingDetails.ShippingEmail, shippingDetails.ShippingFullname);
+                                //update the anonymous member model to use
+                                var anonymousMemberModel = currentShoppingCart.CartMembersModel;
+                                anonymousMemberModel.Email = shippingDetails.ShippingEmail;
+                                anonymousMemberModel.FullName = shippingDetails.ShippingFullname;
+                                anonymousMemberModel.MobileNumber = shippingDetails.ShippingMobileNumber;
+                                anonymousMemberModel.HouseAddress = shippingDetails.ShippingAddress;
+                                anonymousMemberModel.Suburb = shippingDetails.ShippingSuburb;
+                                anonymousMemberModel.PostCode = shippingDetails.ShippingPostCode;
+                                anonymousMemberModel.State = shippingDetails.ShippingState;
 
-                                var customerSubject = "Your Order on Natures Quest.";
-
-                                //create the global emails
-                                var customerMessage = MailHelper.CreateSingleEmail(
-                                    _fromEmailAddress,
-                                    customerEmailAddress,
-                                    customerSubject,
-                                    "",
-                                    customerEmailBody.ToString());
-                                //send the global email
-                                var unused3 = SendGridEmail(customerMessage);
+                                //create a default member account here for the anonymous user
+                                var newMember = _siteMembersService.RegisterSiteMember(anonymousMemberModel,
+                                    out MembershipCreateStatus createStatus);
+                                if (newMember != null)
+                                {
+                                    anonymousMember = newMember.LoggedInMember;
+                                }
                             }
 
-                            //send the customer email to global admins
-                            if (!string.IsNullOrWhiteSpace(customerEmailBody?.ToString()))
+                            //we should have a new anonymous member by now
+                            if (anonymousMember != null)
                             {
-                                var customerAdminSubject = "New customer Order on Natures Quest.";
-                                //create the global emails
-                                var globalNewCartMessage = MailHelper.CreateSingleEmailToMultipleRecipients(
-                                    _fromEmailAddress,
-                                    _siteToEmailAddresses,
-                                    customerAdminSubject,
-                                    "",
-                                    customerEmailBody.ToString());
-                                //send the global email
-                                var unused = SendGridEmail(globalNewCartMessage);
-                            }
+                                //create the cart page for the user
+                                var newCartPage = CreateMemberCartPage(_globalCartsPage, anonymousMember);
 
-                            //clear the cart
-                            var cartCleared = ClearShoppingCart(currentShoppingCart, out _);
-                            //if the cart is cleared, then set the result message
-                            if (cartCleared)
-                            {
-                                //create the admin email to notify of a new order page
-                                var newCartSubject = "A new order has been paid using Stripe.";
-                                var newCartBody =
-                                    $"<p>A none site member name: {shippingDetails.ShippingFullname} has paid for an order on Stripe.<br /> <br />" +
-                                    "Payment Method: Stripe<br />" +
-                                    $"Payment id: {paymentIntent.Id} <br />" +
-                                    $"Shipping name: {shippingDetails.ShippingFullname} <br />" +
-                                    $"Shipping email: {shippingDetails.ShippingEmail} <br />" +
-                                    $"Shipping address: {shippingDetails.ShippingAddress} <br />" +
-                                    $"Shipping details: {currentShoppingCart.CartShippingDetails.ShippingOptionDetails} <br />" +
-                                    $"<strong>Order total: {cartTotal}</strong> <br />" +
-                                    "<br /> <br />Regards, <br /> Website Team</p>";
-                                //create the admin email
-                                var adminNewCartMessage = MailHelper.CreateSingleEmail(
-                                    _fromEmailAddress,
-                                    _systemEmailAddress,
-                                    newCartSubject,
-                                    "",
-                                    newCartBody);
-                                //send the admin email
-                                var unused1 = SendGridEmail(adminNewCartMessage);
+                                // if the new cart page is not null create the session with that and return it
+                                if (newCartPage != null && newCartPage.Id != 0)
+                                {
+                                    //save the cart member and member cart page to the current cart
+                                    currentShoppingCart.CartMember = anonymousMember;
+                                    currentShoppingCart.MemberCartPage = newCartPage;
+                                }
 
-                                orderPlaced = true;
-                                resultMessage = "Your Order has been placed";
+                                //update the saved cart
+                                var cartUpdated = false;
+                                //update the saved cart
+                                if (currentShoppingCart.CartItems.Any())
+                                {
+                                    foreach (var cartItem in currentShoppingCart.CartItems)
+                                    {
+                                        //get the price product page
+                                        var priceProduct =_umbracoHelper.Content(cartItem.CartItemPageId);
+                                        if(priceProduct != null)
+                                        {
+                                            cartUpdated = UpdateMemberSavedCart(
+                                                currentShoppingCart,
+                                                priceProduct,
+                                                true,
+                                                out int cartItemPageId);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    cartUpdated = true;
+                                }
+
+                                //check if the cart has been updated
+                                if(cartUpdated)
+                                {
+                                    var anonymousMemberOrder = CreateMemberOrderPage(
+                                        _globalOrdersPage,
+                                        anonymousMember,
+                                        paymentIntent.Id,
+                                        currentShoppingCart,
+                                        "Stripe");
+
+                                    //create the member order page first
+                                    if (anonymousMemberOrder?.Id > 0)
+                                    {
+
+                                        //create the user email
+                                        var customerEmailBody = CustomerEmailBody(currentShoppingCart, paymentIntent.Id,
+                                            shippingDetails.ShippingFullname);
+
+                                        if (!string.IsNullOrWhiteSpace(customerEmailBody?.ToString()))
+                                        {
+                                            //create the customer email
+                                            var customerEmailAddress = new EmailAddress(
+                                                shippingDetails.ShippingEmail,
+                                                shippingDetails.ShippingFullname);
+
+                                            var customerSubject = "Your Order on Natures Quest.";
+
+                                            //create the global emails
+                                            var customerMessage = MailHelper.CreateSingleEmail(
+                                                _fromEmailAddress,
+                                                customerEmailAddress,
+                                                customerSubject,
+                                                "",
+                                                customerEmailBody.ToString());
+                                            //send the global email
+                                            var unused3 = SendGridEmail(customerMessage);
+                                        }
+
+                                        //send the customer email to global admins
+                                        if (!string.IsNullOrWhiteSpace(customerEmailBody?.ToString()))
+                                        {
+                                            var customerAdminSubject = "New customer Order on Natures Quest.";
+                                            //create the global emails
+                                            var globalNewCartMessage = MailHelper.CreateSingleEmailToMultipleRecipients(
+                                                _fromEmailAddress,
+                                                _siteToEmailAddresses,
+                                                customerAdminSubject,
+                                                "",
+                                                customerEmailBody.ToString());
+                                            //send the global email
+                                            var unused = SendGridEmail(globalNewCartMessage);
+                                        }
+
+                                        //clear the cart once we have the member order
+                                        var cartCleared = ClearShoppingCart(currentShoppingCart, out _);
+                                        if (cartCleared)
+                                        {
+                                            orderPlaced = true;
+                                            resultMessage = "Your Order has been placed and saved in your account";
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -2156,7 +2262,7 @@ namespace NatureQuestWebsite.Services
                 var siteOrders = membersModel.MemberOrdersPage;
 
                 //create the order models from the stripe payments list and site orders list
-                if(siteOrders.Any() && memberStripePayments.Any())
+                if (siteOrders.Any() && memberStripePayments.Any())
                 {
                     //go through each of the site orders 
                     foreach (var siteOrder in siteOrders)
@@ -2176,9 +2282,23 @@ namespace NatureQuestWebsite.Services
                             var modelOrderDetails = new OrderDetails
                             {
                                 OrderId = orderPaymentIntentId,
-                                OrderPaidSuccess = true,
-                                OrderPaymentIntent = siteOrderIntent
+                                OrderPaymentIntent = siteOrderIntent,
+                                LoggedInMember = modelMember
                             };
+
+                            //get the saved order payment status
+                            if (siteOrder.HasProperty("isOrder") && siteOrder.HasValue("isOrder"))
+                            {
+                                // set the page title to override the default
+                                modelOrderDetails.OrderPaidSuccess = siteOrder.Value<bool>("isOrder");
+                            }
+
+                            //get the saved order shipment status
+                            if (siteOrder.HasProperty("isOrderShipped") && siteOrder.HasValue("isOrderShipped"))
+                            {
+                                // set the page title to override the default
+                                modelOrderDetails.OrderShipped = siteOrder.Value<bool>("isOrderShipped");
+                            }
 
                             //get the payment intent shipping details
                             var stripeShippingDetails = siteOrderIntent.Shipping;
@@ -2189,7 +2309,10 @@ namespace NatureQuestWebsite.Services
                                     ShippingTrackingNumber = stripeShippingDetails.TrackingNumber,
                                     ShippingMobileNumber = stripeShippingDetails.Address.Line2,
                                     ShippingFullname = stripeShippingDetails.Name,
-                                    ShippingAddress = stripeShippingDetails.Address.Line1
+                                    ShippingAddress = stripeShippingDetails.Address.Line1,
+                                    ShippingSuburb = stripeShippingDetails.Address.City,
+                                    ShippingPostCode = stripeShippingDetails.Address.PostalCode,
+                                    ShippingState = stripeShippingDetails.Address.State
                                 };
                                 //add it to the model
                                 modelOrderDetails.OrderShippingDetails = modelShipping;
@@ -2204,10 +2327,81 @@ namespace NatureQuestWebsite.Services
                             {
                                 modelOrderDetails.OrderTotal = Convert.ToDecimal(siteOrderIntent.Amount) / Convert.ToDecimal(100);
                             }
-  
+
                             //finally add the order details to the model list
                             membersModel.MemberOrderDetailsList.Add(modelOrderDetails);
                         }
+                    }
+                }
+            }
+            //return the model
+            return membersModel;
+        }
+
+        /// <summary>
+        /// get the admin model orders
+        /// </summary>
+        /// <param name="membersModel"></param>
+        /// <returns></returns>
+        public MembersModel GetAdminOrderDetails(MembersModel membersModel)
+        {
+            //check if we have a member email to use and if they are an admin user
+            if (!string.IsNullOrWhiteSpace(membersModel.LoggedInMember?.Email) && membersModel.IsAdminUser)
+            {
+                //get the model member
+                var modelMember = membersModel.LoggedInMember;
+                //add the current cart for use later
+                membersModel.MemberCart = GetCurrentCart(modelMember.Email);
+                //get the user's stripe payment intents for the orders
+                var memberStripePayments = GetStripePaidIntents();
+
+                //create the order models from the stripe payments list
+                if (memberStripePayments.Any())
+                {
+                    //go through each of the site orders 
+                    foreach (var stripePaymentIntent in memberStripePayments)
+                    {
+                        var orderPaymentIntentId = stripePaymentIntent.Id;
+
+                        var modelOrderDetails = new OrderDetails
+                        {
+                            OrderId = orderPaymentIntentId,
+                            OrderPaidSuccess = true,
+                            OrderPaymentIntent = stripePaymentIntent
+                        };
+
+                        //get the payment intent shipping details
+                        var stripeShippingDetails = stripePaymentIntent.Shipping;
+                        if (!string.IsNullOrWhiteSpace(stripeShippingDetails?.TrackingNumber))
+                        {
+                            var modelShipping = new ShippingDetails
+                            {
+                                ShippingTrackingNumber = stripeShippingDetails.TrackingNumber,
+                                ShippingMobileNumber = stripeShippingDetails.Address.Line2,
+                                ShippingFullname = stripeShippingDetails.Name,
+                                ShippingAddress = stripeShippingDetails.Address.Line1,
+                                ShippingSuburb = stripeShippingDetails.Address.City,
+                                ShippingPostCode = stripeShippingDetails.Address.PostalCode,
+                                ShippingState = stripeShippingDetails.Address.State
+                            };
+                            //add it to the model
+                            modelOrderDetails.OrderShippingDetails = modelShipping;
+                        }
+
+                        //get the stripe payment date
+                        if (stripePaymentIntent.Created.HasValue)
+                        {
+                            modelOrderDetails.OrderCreatedDate = stripePaymentIntent.Created.Value;
+                        }
+
+                        //get the order total
+                        if (stripePaymentIntent.Amount != null)
+                        {
+                            modelOrderDetails.OrderTotal = Convert.ToDecimal(stripePaymentIntent.Amount) / Convert.ToDecimal(100);
+                        }
+
+                        //finally add the order details to the model list
+                        membersModel.AdminOrderDetailsList.Add(modelOrderDetails);
                     }
                 }
             }
@@ -2222,7 +2416,6 @@ namespace NatureQuestWebsite.Services
         /// <returns></returns>
         public List<PaymentIntent> GetStripePaidIntents(string emailAddress = null)
         {
-
             //get the stripe api key to use
             StripeConfiguration.ApiKey = StripeLiveMode
                 ? StripeLiveSecretKey
@@ -2232,7 +2425,10 @@ namespace NatureQuestWebsite.Services
             var paidStripePayments = new List<PaymentIntent>();
 
             //create the payment options
-            var paymentOptions = new PaymentIntentListOptions();
+            var paymentOptions = new PaymentIntentListOptions
+            {
+                Limit = 100
+            };
 
             //create the default payment service
             var paymentIntentService = new PaymentIntentService();
@@ -2533,7 +2729,11 @@ namespace NatureQuestWebsite.Services
                                     $"Payment id: {cartOrder.Id} <br />" +
                                     $"Shipping name: {shippingDetails.ShippingFullname} <br />" +
                                     $"Shipping email: {shippingDetails.ShippingEmail} <br />" +
+                                    $"Shipping phone: {shippingDetails.ShippingMobileNumber} <br />" +
                                     $"Shipping address: {shippingDetails.ShippingAddress} <br />" +
+                                    $"Shipping suburb: {shippingDetails.ShippingSuburb} <br />" +
+                                    $"Shipping post code: {shippingDetails.ShippingPostCode} <br />" +
+                                    $"Shipping state: {shippingDetails.ShippingState} <br />" +
                                     $"Shipping details: {currentShoppingCart.CartShippingDetails.ShippingOptionDetails} <br />" +
                                     $"<strong>Order total: {cartTotal}</strong> <br />" +
                                     "<br /> <br />Regards, <br /> Website Team</p>";
@@ -2796,7 +2996,11 @@ namespace NatureQuestWebsite.Services
                 emailBodyString.Append("<h2>Shipping Details.</h2>");
                 emailBodyString.Append($"<p>Shipping name: {shippingDetails.ShippingFullname} <br />" +
                                        $"Shipping email: {shippingDetails.ShippingEmail} <br />" +
-                                       $"Shipping address: {shippingDetails.ShippingAddress}<p/>");
+                                       $"Shipping phone: {shippingDetails.ShippingMobileNumber} <br />" +
+                                       $"Shipping address: {shippingDetails.ShippingAddress} <br />" +
+                                       $"Shipping suburb: {shippingDetails.ShippingSuburb} <br />" +
+                                       $"Shipping post code: {shippingDetails.ShippingPostCode} <br />" +
+                                       $"Shipping state: {shippingDetails.ShippingState}<p/>");
             }
 
             //add the email body footer

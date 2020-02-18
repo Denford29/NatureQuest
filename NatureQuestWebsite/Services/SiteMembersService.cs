@@ -273,7 +273,10 @@ namespace NatureQuestWebsite.Services
                         var editableProperties = existingMember.Properties.Where(property =>
                                                                                     property.Alias == "fullName" ||
                                                                                     property.Alias == "mobileNumber" ||
-                                                                                    property.Alias == "houseAddress").ToList();
+                                                                                    property.Alias == "houseAddress" ||
+                                                                                    property.Alias == "suburb" ||
+                                                                                    property.Alias == "postCode" ||
+                                                                                    property.Alias == "state").ToList();
 
 
                         //get the values from the properties to set them on the model
@@ -300,6 +303,24 @@ namespace NatureQuestWebsite.Services
                                         if (memberProperty.GetValue() != null && !string.IsNullOrWhiteSpace((string)memberProperty.GetValue()))
                                         {
                                             memberModel.HouseAddress = (string)memberProperty.GetValue();
+                                        }
+                                        break;
+                                    case "suburb":
+                                        if (memberProperty.GetValue() != null && !string.IsNullOrWhiteSpace((string)memberProperty.GetValue()))
+                                        {
+                                            memberModel.Suburb = (string)memberProperty.GetValue();
+                                        }
+                                        break;
+                                    case "postcode":
+                                        if (memberProperty.GetValue() != null && !string.IsNullOrWhiteSpace((string)memberProperty.GetValue()))
+                                        {
+                                            memberModel.PostCode = (string)memberProperty.GetValue();
+                                        }
+                                        break;
+                                    case "state":
+                                        if (memberProperty.GetValue() != null && !string.IsNullOrWhiteSpace((string)memberProperty.GetValue()))
+                                        {
+                                            memberModel.State = (string)memberProperty.GetValue();
                                         }
                                         break;
                                 }
@@ -347,8 +368,13 @@ namespace NatureQuestWebsite.Services
                         }
 
                         //set a flag if the member is an admin user
-                        memberModel.IsAdminUser = !string.IsNullOrWhiteSpace(_memberRoles.FirstOrDefault(role => role == "Site Admins"));
+                        memberModel.IsAdminUser = !string.IsNullOrWhiteSpace(memberModel.MemberRoles.FirstOrDefault(role => role == "Site Admins"));
                     }
+                }
+                else
+                {
+                    //set the default values for the model
+                    memberModel.IsNewsletterMember = true;
                 }
 
             }
@@ -362,7 +388,7 @@ namespace NatureQuestWebsite.Services
 
                 //system email
                 var systemMessage = MailHelper.CreateSingleEmail(_fromEmailAddress, _systemEmailAddress, errorSubject, "", errorMessage);
-                SendGridEmail(systemMessage);
+                _ = SendGridEmail(systemMessage);
             }
 
             //return the model 
@@ -464,6 +490,24 @@ namespace NatureQuestWebsite.Services
                                         memberProperty.SetValue(memberModel.HouseAddress);
                                     }
                                     break;
+                                case "suburb":
+                                    if (!string.IsNullOrWhiteSpace(memberModel.Suburb))
+                                    {
+                                        memberProperty.SetValue(memberModel.Suburb);
+                                    }
+                                    break;
+                                case "postcode":
+                                    if (!string.IsNullOrWhiteSpace(memberModel.PostCode))
+                                    {
+                                        memberProperty.SetValue(memberModel.PostCode);
+                                    }
+                                    break;
+                                case "state":
+                                    if (!string.IsNullOrWhiteSpace(memberModel.State))
+                                    {
+                                        memberProperty.SetValue(memberModel.State);
+                                    }
+                                    break;
                             }
                         }
 
@@ -553,7 +597,7 @@ namespace NatureQuestWebsite.Services
 
                 //system email
                 var systemMessage = MailHelper.CreateSingleEmail(_fromEmailAddress, _systemEmailAddress, errorSubject, "", errorMessage);
-                SendGridEmail(systemMessage);
+                _ = SendGridEmail(systemMessage);
             }
 
             //return the model after registration
@@ -735,8 +779,11 @@ namespace NatureQuestWebsite.Services
                 var adminRegisterBody = "<p>A customer has created a new shop account on the website, with the details below.<br /> <br />" +
                                                     $"Email address: {registerModel.Email} <br />" +
                                                     $"Full name: {registerModel.FullName} <br />" +
-                                                    $"Home address: {registerModel.HouseAddress} <br />" +
                                                     $"Mobile number: {registerModel.MobileNumber} <br />" +
+                                                    $"Home address: {registerModel.HouseAddress} <br />" +
+                                                    $"Address suburb: {registerModel.Suburb} <br />" +
+                                                    $"Address post code: {registerModel.PostCode} <br />" +
+                                                    $"Address state: {registerModel.State} <br />" +
                                                     $"Password: {registerModel.Password} <br />" +
                                                 "<br /> <br />Regards, <br /> Website Team</p>";
                 //create the admin email

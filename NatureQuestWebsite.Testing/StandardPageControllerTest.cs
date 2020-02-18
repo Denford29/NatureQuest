@@ -30,6 +30,7 @@ namespace NatureQuestWebsite.Testing
         private IShoppingService _shoppingService;
         private IContentService _contentService;
         private UmbracoHelper _umbracoHelper;
+        private ISiteMembersService _siteMembersService;
         /// <summary>
         /// set up the test
         /// </summary>
@@ -49,13 +50,16 @@ namespace NatureQuestWebsite.Testing
             _umbracoHelper = Mock.Of<UmbracoHelper>();
 
             _memberService = Mock.Of<MemberService>();
+            //create the mock content service
+            _siteMembersService = Mock.Of<ISiteMembersService>();
             _shoppingService = new ShoppingService(
                                                     _logger, 
                                                     _contextFactory, 
                                                     _memberService,
                                                     _contentService,
                                                     _umbracoHelper,
-                                                    _productService);
+                                                    _productService, 
+                                                    _siteMembersService);
             //pass this to the standard page mock controller
             _controller = new StandardPageController(_productService, _shoppingService);
         }

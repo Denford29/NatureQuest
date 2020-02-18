@@ -355,7 +355,10 @@ namespace NatureQuestWebsite.Controllers
             if (string.IsNullOrWhiteSpace(model.Email) ||
                 string.IsNullOrWhiteSpace(model.FullName) ||
                 string.IsNullOrWhiteSpace(model.HouseAddress)||
-                string.IsNullOrWhiteSpace(model.MobileNumber))
+                string.IsNullOrWhiteSpace(model.MobileNumber) ||
+                string.IsNullOrWhiteSpace(model.Suburb) ||
+                string.IsNullOrWhiteSpace(model.PostCode) ||
+                string.IsNullOrWhiteSpace(model.State))
             {
                 // set the error message and return the current page
                 var errorMessage = "Ops... Registration Error, Please fill in all the details and try again.";
@@ -539,13 +542,15 @@ namespace NatureQuestWebsite.Controllers
 
             //get the customer paid orders
             model = _shoppingService.GetMemberOrderDetails(model);
+            //get the admin paid orders
+            model = _shoppingService.GetAdminOrderDetails(model);
 
             // return the view with the model
             return View("/Views/Partials/Accounts/MemberAcountDetails.cshtml", model);
         }
 
         /// <summary>
-        /// Get the registration and login form
+        /// Get the members orders view
         /// </summary>
         /// <returns></returns>
         public ActionResult GetMembersOrderDetailsView()
@@ -566,9 +571,52 @@ namespace NatureQuestWebsite.Controllers
 
             //get the customer paid orders
             model = _shoppingService.GetMemberOrderDetails(model);
+            //get the admin paid orders
+            model = _shoppingService.GetAdminOrderDetails(model);
 
             // return the view with the model
             return View("/Views/Partials/Accounts/MemberOrderDetails.cshtml", model);
+        }
+
+        /// <summary>
+        /// Get the admin stripe orders view
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult GetAdminStripeOrderDetailsView()
+        {
+            //check if the user is logged in, if not redirect to the login page
+            if (!_currentLoginStatus.IsLoggedIn)
+            {
+                //if we have the registration page redirect there
+                if (_registrationLoginPage?.Id > 0)
+                {
+                    return RedirectToUmbracoPage(_registrationLoginPage);
+                }
+                //otherwise redirect to the home page
+                return RedirectToUmbracoPage(_homePage);
+            }
+            // create the default model
+            var model = GetMembersModel(new MembersModel(), _currentLoginStatus);
+
+            //check if the user is an admin user
+            if (!model.IsAdminUser)
+            {
+                //if we have the account details page redirect there
+                if (_accountDetailsPage?.Id > 0)
+                {
+                    return RedirectToUmbracoPage(_accountDetailsPage);
+                }
+                //otherwise redirect to the home page
+                return RedirectToUmbracoPage(_homePage);
+            }
+
+            //get the customer paid orders
+            model = _shoppingService.GetMemberOrderDetails(model);
+            //get the admin paid orders
+            model = _shoppingService.GetAdminOrderDetails(model);
+
+            // return the view with the model
+            return View("/Views/Partials/Accounts/AdminsStripeOrderDetails.cshtml", model);
         }
 
         /// <summary>
@@ -609,8 +657,11 @@ namespace NatureQuestWebsite.Controllers
 
             //check if we have the email address to subscribe
             if (string.IsNullOrWhiteSpace(model.FullName) ||
+                string.IsNullOrWhiteSpace(model.MobileNumber) ||
                 string.IsNullOrWhiteSpace(model.HouseAddress) ||
-                string.IsNullOrWhiteSpace(model.MobileNumber))
+                string.IsNullOrWhiteSpace(model.Suburb) ||
+                string.IsNullOrWhiteSpace(model.PostCode) ||
+                string.IsNullOrWhiteSpace(model.State))
             {
                 // set the error message and return the current page
                 var errorMessage = "Ops... Update Error, Your name, address and mobile number must be filled in.'";

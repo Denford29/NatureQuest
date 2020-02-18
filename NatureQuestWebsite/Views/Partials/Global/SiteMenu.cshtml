@@ -189,16 +189,6 @@
     </div>
     <!-- Navbar-->
     <header class="navbar navbar-sticky">
-
-        <!-- Search form-->
-        @*<form class="site-search" method="get">
-            <input type="text" name="site_search" placeholder="Type to search...">
-            <div class="search-tools">
-                <span class="clear-search">Clear</span>
-                <span class="close-search"><i class="icon-cross"></i></span>
-            </div>
-        </form>*@
-
         <div class="site-branding">
             <div class="inner">
                 <!-- Off-Canvas Toggle (#shop-categories)-->
@@ -330,7 +320,8 @@
                             </span>
                         </a>
                         <ul class="mega-menu">
-                            @foreach (var featuredLink in siteMenuModel.FeaturedProductsLinks.Take(4).ToList())
+                            @foreach (var featuredLink in siteMenuModel.FeaturedProductsLinks.
+                                Where(featureLink => !string.IsNullOrWhiteSpace(featureLink.LinkImage)).Take(5).ToList())
                             {
                                 <li>
                                     <a class="d-block img-thumbnail text-center navi-link" href="@featuredLink.LinkUrl" title="@featuredLink.LinkTitle">
@@ -382,8 +373,8 @@
             <div class="inner">
                 <div class="tools">
                     @*<div class="search">
-                        <i class="icon-search"></i>
-                    </div>*@
+                            <i class="icon-search"></i>
+                        </div>*@
                     <!-- if we have a user logged in show the account and basket link-->
                     @if (siteMenuModel.MemberCurrentLoginStatus.IsLoggedIn)
                     {
@@ -394,9 +385,6 @@
                             }
                             <ul class="toolbar-dropdown">
                                 <li class="sub-menu-user">
-                                    <div class="user-ava">
-                                        <img src="/Images/account/user-ava-sm.jpg" alt="Daniel Adams">
-                                    </div>
                                     <div class="user-info">
                                         <h6 class="user-name">
                                             @siteMenuModel.MemberCurrentLoginStatus.Name
@@ -453,7 +441,7 @@
                             </ul>
                         </div>
                     }
-                    
+
                     @*get the shopping cart*@
                     @Html.Action("GetMiniCart", "Shop")
                 </div>

@@ -569,13 +569,12 @@ namespace NatureQuestWebsite.Controllers
                 }
 
                 //get the feature products to display
-                var featureProducts = _homePage.Descendants().Where(page => page.ContentType.Alias == "productPage"
-                                                                            && !page.Value<bool>("hideFromMenu")
-                                                                            && page.Value<bool>("featureProduct")
-                                                                            && page.HasProperty("productImages")
-                                                                            && page.HasValue("productImages")
-                                                                            && page.IsPublished())
-                                                                            .ToList();
+                var featureProducts = _homePage.Descendants().Where(page =>
+                        page.ContentType.Alias == "productPage"
+                        && !page.Value<bool>("hideFromMenu")
+                        && page.Value<bool>("featureProduct"))
+                    .ToList();
+
                 //check if we have any feature products
                 if (featureProducts.Any())
                 {
@@ -597,9 +596,9 @@ namespace NatureQuestWebsite.Controllers
                             LinkTitle = featureProductModel.ProductTitle,
                             LinkUrl = featureProductModel.ProductPage.Url,
                             LinkPage = featureProductModel.ProductPage,
-                            LinkImage = productFirstImage != null ? productFirstImage.ImageUrl: "",
-                            ThumbLinkImage = productFirstImage != null ? productFirstImage.ImageUrl : "",
-                            ProductPrice = productFeaturedPrice != null ? productFeaturedPrice: null
+                            LinkImage = !string.IsNullOrWhiteSpace(productFirstImage?.ImageUrl) ? productFirstImage.ImageUrl: "",
+                            ThumbLinkImage = !string.IsNullOrWhiteSpace(productFirstImage?.ImageUrl) ? productFirstImage.ImageUrl : "",
+                            ProductPrice = productFeaturedPrice
                         };
 
                         //add the feature link to the model

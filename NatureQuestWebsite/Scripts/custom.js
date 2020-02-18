@@ -160,7 +160,7 @@
             });
         },
 
-        //create the function to do the sorting
+        //create the function to do the shipping options
         shippingOptions: function () {
             //set the event to listen to the change event
             $('input:radio[name="ShippingOption"]').change(function () {
@@ -184,6 +184,7 @@
             });
         },
 
+        //create the function to do the cart review
         cartReview: function() {
             $(".cart-review").on('click', function (event) {
                 event.stopPropagation();
@@ -213,13 +214,20 @@
                 //check the shipping details
                 var shippingFullname = $("#cartMember_FullName").val();
                 var shippingEmail = $("#cartMember_Email").val();
-                var shippingAddress = $("#cartMember_HouseAddress").val();
                 var shippingMobileNumber = $("#cartMember_MobileNumber").val();
+                var shippingAddress = $("#cartMember_HouseAddress").val();
+                var shippingSuburb = $("#cartMember_Suburb").val();
+                var shippingState = $("#cartMember_State").val();
+                var shippingPostCode = $("#cartMember_PostCode").val();
+
                 //if we don''t have shipping selected, show an error message
                 if (shippingFullname === "" ||
                     shippingEmail === "" ||
                     shippingAddress === "" ||
-                    shippingMobileNumber === "") {
+                    shippingMobileNumber === "" ||
+                    shippingSuburb === "" ||
+                    shippingState === "" ||
+                    shippingPostCode === "") {
                     $.busyLoadFull("hide");
                     iziToast.error({
                         title: "Error",
@@ -233,6 +241,9 @@
                     $("#shippingEmail").val(shippingEmail);
                     $("#shippingAddress").val(shippingAddress);
                     $("#shippingMobileNumber").val(shippingMobileNumber);
+                    $("#shippingSuburb").val(shippingSuburb);
+                    $("#shippingPostCode").val(shippingState);
+                    $("#shippingState").val(shippingPostCode);
                     //get the form and submit it
                     $("#shippingDetailsForm").submit();
                     //$.busyLoadFull("hide");

@@ -113,10 +113,28 @@ namespace NatureQuestWebsite.Models
         public string MobileNumber { get; set; }
 
         /// <summary>
-        /// /get or set the member home address
+        /// /get or set the member street address
         /// </summary>
-        [Display(Name = "Home Address")]
+        [Display(Name = "Street Address")]
         public string HouseAddress { get; set; }
+
+        /// <summary>
+        /// /get or set the member suburb
+        /// </summary>
+        [Display(Name = "Suburb")]
+        public string Suburb { get; set; }
+
+        /// <summary>
+        /// /get or set the member post code
+        /// </summary>
+        [Display(Name = "Post Code")]
+        public string PostCode { get; set; }
+
+        /// <summary>
+        /// /get or set the member address state
+        /// </summary>
+        [Display(Name = "State")]
+        public string State { get; set; }
 
         /// <summary>
         /// /get or set the inquiry details
@@ -173,5 +191,7 @@ namespace NatureQuestWebsite.Models
         /// get or set the members orders list
         /// </summary>
         public List<OrderDetails> MemberOrderDetailsList { get; set; } = new List<OrderDetails>();
+
+        public List<OrderDetails> AdminOrderDetailsList { get; set; } = new List<OrderDetails>();
     }
 }

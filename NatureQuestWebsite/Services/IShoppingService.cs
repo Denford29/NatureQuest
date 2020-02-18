@@ -188,5 +188,12 @@ namespace NatureQuestWebsite.Services
         /// <param name="membersModel"></param>
         /// <returns></returns>
         MembersModel GetMemberOrderDetails(MembersModel membersModel);
+
+        /// <summary>
+        /// get the admin model orders
+        /// </summary>
+        /// <param name="membersModel"></param>
+        /// <returns></returns>
+        MembersModel GetAdminOrderDetails(MembersModel membersModel);
     }
 }

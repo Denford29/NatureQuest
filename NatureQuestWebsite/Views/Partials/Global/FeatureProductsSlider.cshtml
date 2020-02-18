@@ -16,6 +16,7 @@
                     var productFirstImage = productModel.ProductImages.FirstOrDefault();
                     //if we haven't got a featured price, then just get the 1st normal price
                     var productFeaturedPrice = productModel.FeaturedPrice;
+                    var salePrice = productModel.SalePrice;
 
                     //check if we have the image, product page and price
                     if (productPage?.Id > 0 &&
@@ -25,10 +26,10 @@
                         <!-- Product-->
                         <div class="grid-item">
                             <div class="product-card">
-                                @if (productFeaturedPrice.SalePercentage > 0)
+                                @if (salePrice != null && salePrice.SalePercentage > 0)
                                 {
                                     <div class="product-badge text-danger">
-                                        @productFeaturedPrice.SalePercentage% Off
+                                        @salePrice.SalePercentage% Off @salePrice.ProductVariant
                                     </div>
                                 }
 
@@ -43,14 +44,14 @@
                                 @if (productFeaturedPrice.SalePrice > 0)
                                 {
                                     <h4 class="product-price">
-                                        <del>$@productFeaturedPrice.ProductPrice</del>
-                                        $@productFeaturedPrice.SalePrice (@productFeaturedPrice.ProductVariant)
+                                        <del>@productFeaturedPrice.ProductPrice.ToString("c")</del>
+                                        @productFeaturedPrice.SalePrice.ToString("c")
                                     </h4>
                                 }
                                 else
                                 {
                                     <h4 class="product-price">
-                                        $@productFeaturedPrice.ProductPrice (@productFeaturedPrice.ProductVariant)
+                                        From @productFeaturedPrice.ProductPrice.ToString("c")
                                     </h4>
                                 }
 

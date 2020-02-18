@@ -288,6 +288,16 @@ namespace NatureQuestWebsite.Models
         public string ShippingEmail { get; set; }
 
         /// <summary>
+        /// get or set the shipping option details
+        /// </summary>
+        public string ShippingOptionDetails { get; set; }
+
+        /// <summary>
+        /// get or set the shipping tracking number
+        /// </summary>
+        public string ShippingTrackingNumber { get; set; }
+
+        /// <summary>
         /// get or set the shipping address
         /// </summary>
         public string ShippingAddress { get; set; }
@@ -298,13 +308,18 @@ namespace NatureQuestWebsite.Models
         public string ShippingMobileNumber { get; set; }
 
         /// <summary>
-        /// get or set the shipping option details
+        /// /get or set the member suburb
         /// </summary>
-        public string ShippingOptionDetails { get; set; }
+        public string ShippingSuburb { get; set; }
 
         /// <summary>
-        /// get or set the shipping tracking number
+        /// /get or set the member post code
         /// </summary>
-        public string ShippingTrackingNumber { get; set; }
+        public string ShippingPostCode { get; set; }
+
+        /// <summary>
+        /// /get or set the member address state
+        /// </summary>
+        public string ShippingState { get; set; }
     }
 }

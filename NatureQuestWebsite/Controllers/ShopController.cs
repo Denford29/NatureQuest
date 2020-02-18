@@ -5,6 +5,8 @@ using NatureQuestWebsite.Models;
 using NatureQuestWebsite.Services;
 using PayPalCheckoutSdk.Orders;
 using Stripe;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
@@ -40,15 +42,27 @@ namespace NatureQuestWebsite.Controllers
         private readonly ISiteMembersService _siteMemberService;
 
         /// <summary>
+        /// get the member type service
+        /// </summary>
+        private readonly IMemberTypeService _memberTypeService;
+
+        /// <summary>
+        /// get the member type
+        /// </summary>
+        private readonly IMemberType _memberType;
+
+        /// <summary>
         /// initialise the shop controller
         /// </summary>
         /// <param name="shoppingService"></param>
         /// <param name="umbracoHelper"></param>
         /// <param name="siteMembersService"></param>
+        /// <param name="memberTypeService"></param>
         public ShopController(
             IShoppingService shoppingService,
             UmbracoHelper umbracoHelper,
-            ISiteMembersService siteMembersService
+            ISiteMembersService siteMembersService,
+            IMemberTypeService memberTypeService
         )
         {
             //set the shopping cart service to use
@@ -78,6 +92,12 @@ namespace NatureQuestWebsite.Controllers
             if (homePage?.Id > 0)
             {
             }
+
+            //set the member type service to use
+            _memberTypeService = memberTypeService;
+
+            //get the member type
+            _memberType = _memberTypeService.Get("Member");
         }
 
         /// <summary>
@@ -432,20 +452,29 @@ namespace NatureQuestWebsite.Controllers
         /// <param name="shippingEmail"></param>
         /// <param name="shippingAddress"></param>
         /// <param name="shippingMobileNumber"></param>
+        /// <param name="shippingSuburb"></param>
+        /// <param name="shippingPostCode"></param>
+        /// <param name="shippingState"></param>
         /// <returns></returns>
         [HttpPost]
         public ActionResult UpdateShippingDetails(
             string shippingFullname,
             string shippingEmail,
             string shippingAddress,
-            string shippingMobileNumber)
+            string shippingMobileNumber,
+            string shippingSuburb,
+            string shippingPostCode,
+            string shippingState)
         {
             var shippingDetailsResult = new AjaxCartResult();
             //check if we have the page id set
             if (string.IsNullOrWhiteSpace(shippingFullname) ||
                 string.IsNullOrWhiteSpace(shippingEmail) ||
                 string.IsNullOrWhiteSpace(shippingAddress) ||
-                string.IsNullOrWhiteSpace(shippingMobileNumber))
+                string.IsNullOrWhiteSpace(shippingMobileNumber) ||
+                string.IsNullOrWhiteSpace(shippingSuburb) ||
+                string.IsNullOrWhiteSpace(shippingPostCode) ||
+                string.IsNullOrWhiteSpace(shippingState))
             {
                 shippingDetailsResult.ResultSuccess = false;
                 shippingDetailsResult.ResultMessage = "Please add all the shipping details";
@@ -472,9 +501,12 @@ namespace NatureQuestWebsite.Controllers
             {
                 ShippingFullname = shippingFullname,
                 ShippingEmail = shippingEmail,
-                ShippingAddress = shippingAddress,
                 ShippingMobileNumber = shippingMobileNumber,
-                ShippingOptionDetails = shippingCartDetails
+                ShippingOptionDetails = shippingCartDetails,
+                ShippingAddress = shippingAddress,
+                ShippingSuburb = shippingSuburb,
+                ShippingPostCode = shippingPostCode,
+                ShippingState = shippingState
             };
             CurrentShoppingCart.CartShippingDetails = newShippingDetails;
 
@@ -559,6 +591,9 @@ namespace NatureQuestWebsite.Controllers
         {
             //create the payment result
             var paymentResult = new AjaxCartResult();
+
+            //set the member type on the cart
+            CurrentShoppingCart.CartMembersModel.ModelMemberType = _memberType;
 
             //use the service to check the order
             var orderPlaced = _shoppingService.PlaceStripeCartOrder(

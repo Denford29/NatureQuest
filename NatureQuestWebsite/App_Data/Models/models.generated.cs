@@ -19,7 +19,7 @@ using Umbraco.ModelsBuilder;
 using Umbraco.ModelsBuilder.Umbraco;
 
 [assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "60895f34c53fe30e")]
+[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "8c4f2c951e2865ba")]
 [assembly:System.Reflection.AssemblyVersion("0.0.0.1")]
 
 namespace Umbraco.Web.PublishedModels
@@ -1809,6 +1809,13 @@ namespace Umbraco.Web.PublishedModels
 		public bool IsOrder => this.Value<bool>("isOrder");
 
 		///<summary>
+		/// Is Order Complete: Set if the order has been completed
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("isOrderComplete")]
+		public bool IsOrderComplete => this.Value<bool>("isOrderComplete");
+
+		///<summary>
 		/// Is Order Shipped: Indicates if the order has been shipped.
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
@@ -1835,6 +1842,20 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("orderShipping")]
 		public IPublishedContent OrderShipping => this.Value<IPublishedContent>("orderShipping");
+
+		///<summary>
+		/// Order Summary: This is the order summary sent with auto updates, please do not edit
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("orderSummary")]
+		public string OrderSummary => this.Value<string>("orderSummary");
+
+		///<summary>
+		/// Order Tracking Id
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("orderTrackingId")]
+		public string OrderTrackingId => this.Value<string>("orderTrackingId");
 
 		///<summary>
 		/// Payment Method: The payment method used to pay the order
@@ -2479,6 +2500,27 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("mobileNumber")]
 		public string MobileNumber => this.Value<string>("mobileNumber");
+
+		///<summary>
+		/// Post Code: The address post code
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("postCode")]
+		public string PostCode => this.Value<string>("postCode");
+
+		///<summary>
+		/// State: The address state
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("state")]
+		public string State => this.Value<string>("state");
+
+		///<summary>
+		/// Suburb: The address surburb
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("suburb")]
+		public string Suburb => this.Value<string>("suburb");
 
 		///<summary>
 		/// Is Approved

@@ -60,17 +60,43 @@
                             <div class="row padding-bottom-1x">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        @Html.LabelFor(model => cartMember.HouseAddress)
-                                        @Html.TextBoxFor(model => cartMember.HouseAddress, new { @class = "form-control", required = "", type = "text" })
-                                        @Html.ValidationMessageFor(model => cartMember.HouseAddress, "", new { @class = "help-block text-danger" })
+                                        @Html.LabelFor(model => cartMember.MobileNumber)
+                                        @Html.TextBoxFor(model => cartMember.MobileNumber, new { @class = "form-control", required = "" })
+                                        @Html.ValidationMessageFor(model => cartMember.MobileNumber, "", new { @class = "help-block text-danger" })
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        @Html.LabelFor(model => cartMember.MobileNumber)
-                                        @Html.TextBoxFor(model => cartMember.MobileNumber, new { @class = "form-control", required = "" })
-                                        @Html.ValidationMessageFor(model => cartMember.MobileNumber, "", new { @class = "help-block text-danger" })
+                                        @Html.LabelFor(model => cartMember.HouseAddress)
+                                        @Html.TextBoxFor(model => cartMember.HouseAddress, new { @class = "form-control", required = "", type = "text" })
+                                        @Html.ValidationMessageFor(model => cartMember.HouseAddress, "", new { @class = "help-block text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row padding-bottom-1x">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => cartMember.Suburb)
+                                        @Html.TextBoxFor(model => cartMember.Suburb, new { @class = "form-control", required = "", type = "text" })
+                                        @Html.ValidationMessageFor(model => cartMember.Suburb, "", new { @class = "help-block text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => cartMember.State)
+                                        @Html.TextBoxFor(model => cartMember.State, new { @class = "form-control", required = "", type = "text" })
+                                        @Html.ValidationMessageFor(model => cartMember.State, "", new { @class = "help-block text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => cartMember.PostCode)
+                                        @Html.TextBoxFor(model => cartMember.PostCode, new { @class = "form-control", required = "", type = "text" })
+                                        @Html.ValidationMessageFor(model => cartMember.PostCode, "", new { @class = "help-block text-danger" })
                                     </div>
                                 </div>
                             </div>
@@ -82,8 +108,11 @@
                                 var shippingDetails = currentCart.CartShippingDetails;
                                 <input id="shippingFullname" name="shippingFullname" type="hidden" value="@shippingDetails.ShippingFullname">
                                 <input id="shippingEmail" name="shippingEmail" type="hidden" value="@shippingDetails.ShippingEmail">
-                                <input id="shippingAddress" name="shippingAddress" type="hidden" value="@shippingDetails.ShippingAddress">
                                 <input id="shippingMobileNumber" name="shippingMobileNumber" type="hidden" value="@shippingDetails.ShippingMobileNumber">
+                                <input id="shippingAddress" name="shippingAddress" type="hidden" value="@shippingDetails.ShippingAddress">
+                                <input id="shippingSuburb" name="shippingSuburb" type="hidden" value="@shippingDetails.ShippingSuburb">
+                                <input id="shippingPostCode" name="shippingPostCode" type="hidden" value="@shippingDetails.ShippingPostCode">
+                                <input id="shippingState" name="shippingState" type="hidden" value="@shippingDetails.ShippingState">
                             }
 
                             <h4>Shipping Method</h4>

@@ -2,7 +2,7 @@
 @inherits Umbraco.Web.Mvc.UmbracoViewPage<MembersModel>
 @{
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-md-4">
             @using (Html.BeginUmbracoForm("ProcessLoginForm", "Accounts",
                 FormMethod.Post,
                 new { role = "form", id = "loginForm", @class = "login-box form-horizontal", novalidate = "novalidate" }))
@@ -43,22 +43,10 @@
                 </div>
 
                 <div class="form-group input-group">
-                    @Html.TextBoxFor(model => model.Password, new { @class = "form-control", required = "", type = "password" , placeholder = "Your Password" })
+                    @Html.TextBoxFor(model => model.Password, new { @class = "form-control", required = "", type = "password", placeholder = "Your Password" })
                     <span class="input-group-addon"><i class="icon-lock"></i></span>
                     @Html.ValidationMessageFor(model => Model.Password, "", new { @class = "help-block text-danger" })
                 </div>
-
-                if (!Model.IsNewsletterMember)
-                {
-                    <div class="row">
-                        <div class="form-group col-sm-12">
-                            <div class="custom-control custom-checkbox">
-                                @Html.CheckBoxFor(model => model.IsNewsletterMember, new { @class = "custom-control-input" })
-                                <label class="custom-control-label" for="IsNewsletterMember">@Model.SubscribeText</label>
-                            </div>
-                        </div>
-                    </div>
-                }
 
                 <div class="text-center text-sm-right">
                     <button class="btn btn-primary margin-bottom-none" id="submitLoginForm">
@@ -68,7 +56,7 @@
             }
         </div>
 
-        <div class="col-md-7">
+        <div class="col-md-8">
             <div class="padding-top-3x hidden-md-up"></div>
             <h3 class="margin-bottom-1x">No Account? Register Below.</h3>
             @if (TempData.ContainsKey("registrationSuccess") || !string.IsNullOrWhiteSpace(Model.RegistrationMessage))
@@ -109,7 +97,7 @@
 
                 using (Html.BeginUmbracoForm("ProcessRegistrationForm", "Accounts",
                 FormMethod.Post,
-                new { role = "form", id = "registrationForm", @class = "row", novalidate = "novalidate" }))
+                new { role = "form", id = "registrationForm", novalidate = "novalidate" }))
                 {
 
                     //add the anti forgery token and the hidden fields
@@ -121,62 +109,103 @@
                     @Html.HiddenFor(m => Model.GoogleSiteKey)
                     @Html.HiddenFor(m => Model.MemberTypeAlias)
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.FullName)
-                            @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", required = "", type = "text", placeholder = "Your Full Name" })
-                            @Html.ValidationMessageFor(model => Model.FullName, "", new { @class = "help-block text-danger" })
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.FullName)
+                                @Html.TextBoxFor(model => model.FullName, new { @class = "form-control", required = "", type = "text", placeholder = "Your Full Name" })
+                                @Html.ValidationMessageFor(model => Model.FullName, "", new { @class = "help-block text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Email)
+                                @Html.TextBoxFor(model => model.Email, new { @class = "form-control", required = "", placeholder = "Your Email Address" })
+                                @Html.ValidationMessageFor(model => Model.Email, "", new { @class = "help-block text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.MobileNumber)
+                                @Html.TextBoxFor(model => model.MobileNumber, new { @class = "form-control", required = "", placeholder = "Your Mobile Number" })
+                                @Html.ValidationMessageFor(model => Model.MobileNumber, "", new { @class = "help-block text-danger" })
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.Email)
-                            @Html.TextBoxFor(model => model.Email, new { @class = "form-control", required = "", placeholder = "Your Email Address" })
-                            @Html.ValidationMessageFor(model => Model.Email, "", new { @class = "help-block text-danger" })
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Password)
+                                @Html.TextBoxFor(model => model.Password, new { @class = "form-control", required = "", type = "password" })
+                                @Html.ValidationMessageFor(model => Model.Password, "", new { @class = "help-block text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.PasswordConfirm)
+                                @Html.TextBoxFor(model => model.PasswordConfirm, new { @class = "form-control", required = "", type = "password" })
+                                @Html.ValidationMessageFor(model => Model.PasswordConfirm, "", new { @class = "help-block text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.HouseAddress)
+                                @Html.TextBoxFor(model => model.HouseAddress, new { @class = "form-control", required = "", type = "text", placeholder = "Your Home Address" })
+                                @Html.ValidationMessageFor(model => Model.HouseAddress, "", new { @class = "help-block text-danger" })
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.HouseAddress)
-                            @Html.TextBoxFor(model => model.HouseAddress, new { @class = "form-control", required = "", type = "text", placeholder = "Your Home Address" })
-                            @Html.ValidationMessageFor(model => Model.HouseAddress, "", new { @class = "help-block text-danger" })
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Suburb)
+                                @Html.TextBoxFor(model => model.Suburb, new { @class = "form-control", required = "", type = "text" })
+                                @Html.ValidationMessageFor(model => model.Suburb, "", new { @class = "help-block text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.State)
+                                @Html.TextBoxFor(model => model.State, new { @class = "form-control", required = "", type = "text" })
+                                @Html.ValidationMessageFor(model => model.State, "", new { @class = "help-block text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.PostCode)
+                                @Html.TextBoxFor(model => model.PostCode, new { @class = "form-control", required = "", type = "text" })
+                                @Html.ValidationMessageFor(model => model.PostCode, "", new { @class = "help-block text-danger" })
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.MobileNumber)
-                            @Html.TextBoxFor(model => model.MobileNumber, new { @class = "form-control", required = "", placeholder = "Your Mobile Number" })
-                            @Html.ValidationMessageFor(model => Model.MobileNumber, "", new { @class = "help-block text-danger" })
+                    <div class="row">
+                        <div class="form-group col-sm-12">
+                            <div class="custom-control custom-checkbox">
+                                @Html.CheckBoxFor(model => model.IsNewsletterMember, new { @class = "custom-control-input" })
+                                <label class="custom-control-label" for="IsNewsletterMember">@Model.SubscribeText</label>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.Password)
-                            @Html.TextBoxFor(model => model.Password, new { @class = "form-control", required = "", type = "password" })
-                            @Html.ValidationMessageFor(model => Model.Password, "", new { @class = "help-block text-danger" })
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="g-recaptcha" data-sitekey="@Model.GoogleSiteKey"></div>
                         </div>
-                    </div>
 
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            @Html.LabelFor(model => model.PasswordConfirm)
-                            @Html.TextBoxFor(model => model.PasswordConfirm, new { @class = "form-control", required = "", type = "password" })
-                            @Html.ValidationMessageFor(model => Model.PasswordConfirm, "", new { @class = "help-block text-danger" })
+                        <div class="col-md-6 text-center text-sm-right">
+                            <button class="btn btn-primary margin-bottom-none" id="submitRegisterButton">
+                                Register
+                            </button>
                         </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="g-recaptcha" data-sitekey="@Model.GoogleSiteKey"></div>
-                    </div>
-
-                    <div class="col-md-6 text-center text-sm-right">
-                        <button class="btn btn-primary margin-bottom-none" id="submitRegisterButton">
-                            Register
-                        </button>
                     </div>
                 }
             }

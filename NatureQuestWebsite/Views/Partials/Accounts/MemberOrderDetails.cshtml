@@ -3,125 +3,134 @@
 @{
     if (Model.LoggedInMember != null)
     {
-
         @Html.Partial("/Views/Partials/Accounts/AccountsSideBar.cshtml", Model)
 
-    <div class="col-lg-8">
-        <div class="padding-top-2x mt-2 hidden-lg-up"></div>
-        @if (Model.MemberOrderDetailsList.Any())
-        {
-            <div class="table-responsive">
-                <table class="table table-hover margin-bottom-none">
-                    <thead>
-                        <tr>
-                            <th>Order #</th>
-                            <th>Date Purchased</th>
-                            <th>Status</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var orderDetail in Model.MemberOrderDetailsList)
-                        {
-                            var orderDisplayedStatus = orderDetail.OrderPaidSuccess ? "Paid" : "Processing";
+        <div class="col-lg-9">
+            <div class="padding-top-2x mt-2 hidden-lg-up"></div>
+            @if (Model.MemberOrderDetailsList.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover margin-bottom-none">
+                        <thead>
                             <tr>
-                                <td>
-                                    @*<a class="text-medium navi-link" href="#" data-toggle="modal" data-target="#orderDetails">78A643CD409</a>*@
-                                    <a class="text-medium navi-link">@orderDetail.OrderId</a>
-                                </td>
-                                <td>@orderDetail.OrderCreatedDate.ToLongDateString()</td>
-                                <td>
-                                    <span class="text-success">@orderDisplayedStatus</span>
-                                </td>
-                                <td>
-                                    <span class="text-medium">@orderDetail.OrderTotal.ToString("c")</span>
-                                </td>
+                                <th>Order #</th>
+                                <th>Date Purchased</th>
+                                <th>Status</th>
+                                <th>Total</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-        else
-        {
-            <div class="alert alert-danger alert-dismissible fade show text-center margin-bottom-1x">
-                <span class="alert-close" data-dismiss="alert">
-                </span>
-                <i class="icon-ban"></i>&nbsp;&nbsp;<strong>You currently haven't placed any orders from your account.</strong>
-            </div>
-        }
+                        </thead>
+                        <tbody>
+                            @foreach (var orderDetail in Model.MemberOrderDetailsList)
+                            {
+                                var orderDisplayedStatus = "Pending";
+                                if (orderDetail.OrderPaidSuccess && !orderDetail.OrderShipped)
+                                {
+                                    orderDisplayedStatus = "Processing";
+                                }
+                                else if (orderDetail.OrderPaidSuccess && orderDetail.OrderShipped)
+                                {
+                                    orderDisplayedStatus = "Shipped";
+                                }
 
-        <hr>
-    </div>
+                                <tr>
+                                    <td>
+                                        <a class="text-medium navi-link">@orderDetail.OrderId</a>
+                                        @*<a class="text-medium navi-link" href="#" data-toggle="modal" data-target="#orderDetails">78A643CD409</a>*@
 
-         @*Open Ticket Modal
-        <div class="modal fade" id="orderDetails" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Order No  - 34VB5540K83</h4>
-                        <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="table-responsive shopping-cart mb-0">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Product Name</th>
-                                        <th class="text-center">Subtotal</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div class="product-item">
-                                                <a class="product-thumb" href="shop-single.html">
-                                                    <img src="/Images/shop/cart/01.jpg" alt="Product">
-                                                </a>
-                                                <div class="product-info">
-                                                    <h4 class="product-title">
-                                                        <a href="shop-single.html">Unionbay Park<small>x 1</small></a>
-                                                    </h4><span><em>Size:</em> 10.5</span><span><em>Color:</em> Dark Blue</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="text-center text-lg text-medium">$43.90</td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="product-item">
-                                                <a class="product-thumb" href="shop-single.html"><img src="/Images/shop/cart/02.jpg" alt="Product"></a>
-                                                <div class="product-info">
-                                                    <h4 class="product-title"><a href="shop-single.html">Daily Fabric Cap<small>x 2</small></a></h4><span><em>Size:</em> XL</span><span><em>Color:</em> Black</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="text-center text-lg text-medium">$24.89</td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="product-item">
-                                                <a class="product-thumb" href="shop-single.html"><img src="/Images/shop/cart/03.jpg" alt="Product"></a>
-                                                <div class="product-info">
-                                                    <h4 class="product-title"><a href="shop-single.html">Cole Haan Crossbody<small>x 1</small></a></h4><span><em>Size:</em> -</span><span><em>Color:</em> Turquoise</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="text-center text-lg text-medium">$200.00</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                    </td>
+                                    <td>@orderDetail.OrderCreatedDate.ToShortDateString()</td>
+                                    <td>
+                                        <span class="text-success">@orderDisplayedStatus</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-medium">@orderDetail.OrderTotal.ToString("c")</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger alert-dismissible fade show text-center margin-bottom-1x">
+                    <span class="alert-close" data-dismiss="alert">
+                    </span>
+                    <i class="icon-ban"></i>&nbsp;&nbsp;<strong>You currently haven't placed any orders from your account.</strong>
+                </div>
+            }
+
+            <hr>
+        </div>
+
+        @*Open Ticket Modal
+            <div class="modal fade" id="orderDetails" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Order No  - 34VB5540K83</h4>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         </div>
-                        <hr class="mb-3">
-                        <div class="d-flex flex-wrap justify-content-between align-items-center pb-2">
-                            <div class="px-2 py-1">Subtotal: <span class='text-medium'>$289.68</span></div>
-                            <div class="px-2 py-1">Shipping: <span class='text-medium'>$22.50</span></div>
-                            <div class="px-2 py-1">Tax: <span class='text-medium'>$3.42</span></div>
-                            <div class="text-lg px-2 py-1">Total: <span class='text-medium'>$315.60</span></div>
+                        <div class="modal-body">
+                            <div class="table-responsive shopping-cart mb-0">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th class="text-center">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="product-item">
+                                                    <a class="product-thumb" href="shop-single.html">
+                                                        <img src="/Images/shop/cart/01.jpg" alt="Product">
+                                                    </a>
+                                                    <div class="product-info">
+                                                        <h4 class="product-title">
+                                                            <a href="shop-single.html">Unionbay Park<small>x 1</small></a>
+                                                        </h4><span><em>Size:</em> 10.5</span><span><em>Color:</em> Dark Blue</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center text-lg text-medium">$43.90</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="product-item">
+                                                    <a class="product-thumb" href="shop-single.html"><img src="/Images/shop/cart/02.jpg" alt="Product"></a>
+                                                    <div class="product-info">
+                                                        <h4 class="product-title"><a href="shop-single.html">Daily Fabric Cap<small>x 2</small></a></h4><span><em>Size:</em> XL</span><span><em>Color:</em> Black</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center text-lg text-medium">$24.89</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="product-item">
+                                                    <a class="product-thumb" href="shop-single.html"><img src="/Images/shop/cart/03.jpg" alt="Product"></a>
+                                                    <div class="product-info">
+                                                        <h4 class="product-title"><a href="shop-single.html">Cole Haan Crossbody<small>x 1</small></a></h4><span><em>Size:</em> -</span><span><em>Color:</em> Turquoise</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center text-lg text-medium">$200.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <hr class="mb-3">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center pb-2">
+                                <div class="px-2 py-1">Subtotal: <span class='text-medium'>$289.68</span></div>
+                                <div class="px-2 py-1">Shipping: <span class='text-medium'>$22.50</span></div>
+                                <div class="px-2 py-1">Tax: <span class='text-medium'>$3.42</span></div>
+                                <div class="text-lg px-2 py-1">Total: <span class='text-medium'>$315.60</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>*@
+            </div>*@
     }
 }

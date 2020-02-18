@@ -153,11 +153,17 @@ namespace NatureQuestWebsite.Services
 
                             //set the default sale price
                             decimal productSalePrice = 0;
+                            // set a flag for the sale price
+                            var isSalePrice = false;
                             //check if we have a sale price
                             if (productPrice.HasProperty("salePrice") && productPrice.HasValue("salePrice"))
                             {
                                 // set the sale price
                                 productSalePrice = productPrice.Value<decimal>("salePrice");
+                                if(productSalePrice >0)
+                                {
+                                    isSalePrice = true;
+                                }
                             }
 
                             //set the variant name
@@ -222,7 +228,8 @@ namespace NatureQuestWebsite.Services
                                 ProductVariant = priceVariant,
                                 IsFeaturedPrice = isFeaturedPrice,
                                 SalePercentage = salePercentage,
-                                ProductVariantCode = productCode
+                                ProductVariantCode = productCode,
+                                IsSalePrice = isSalePrice
                             };
 
                             //get the variant image if there is an image set
@@ -291,8 +298,17 @@ namespace NatureQuestWebsite.Services
                     else
                     {
                         //from the prices get the featured price to show
-                        model.FeaturedPrice = model.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice) ??
-                                              model.ProductPrices.FirstOrDefault();
+                        //model.FeaturedPrice = model.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice) ??
+                        //                      model.ProductPrices.FirstOrDefault();
+                        //set the feature price as the 1st product
+                        model.FeaturedPrice = model.ProductPrices.FirstOrDefault();
+                    }
+
+                    //get the 1st sale price
+                    var setSalePrice = model.ProductPrices.FirstOrDefault(price => price.IsSalePrice);
+                    if (setSalePrice != null)
+                    {
+                        model.SalePrice = setSalePrice;
                     }
 
                     //check if this product i valid for ordering

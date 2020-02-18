@@ -5,7 +5,7 @@
     if (Model.LoggedInMember != null)
     {
         var currentUser = Model.LoggedInMember;
-        <div class="col-lg-4">
+        <div class="col-lg-3">
             <aside class="user-info-wrapper">
                 <div class="user-cover" style="background-image: url(/images/account/user-cover-img.jpg);">
                     <div class="user-info">
@@ -28,7 +28,7 @@
                     </a>
                 }
 
-                @if (Model.AccountOrdersPage?.Id > 0 && Model.MemberOrderDetailsList.Any())
+                @if (Model.MemberOrderDetailsList.Any() && Model.AccountOrdersPage?.Id > 0)
                 {
                     //set the active class
                     var activeClass = currentPage.Id == Model.AccountOrdersPage.Id ? "active" : "";
@@ -38,13 +38,14 @@
                     </a>
                 }
 
-                @if (Model.StripeOrdersPage?.Id > 0 && Model.IsAdminUser)
+                @if (Model.IsAdminUser && Model.AdminOrderDetailsList.Any() && Model.StripeOrdersPage?.Id > 0)
                 {
                     //set the active class
                     var activeClass = currentPage.Id == Model.StripeOrdersPage.Id ? "active" : "";
-                    <a class="list-group-item @activeClass" href="@Model.StripeOrdersPage.Url" title="Stripe Orders">
-                        <i class="icon-bag"></i>Stripe Orders
-                    </a>
+            <a class="list-group-item @activeClass" href="@Model.StripeOrdersPage.Url" title="Stripe Orders">
+                <i class="icon-bag"></i>Stripe Orders
+                <span class="badge badge-primary badge-pill">@Model.AdminOrderDetailsList.Count</span>
+            </a>
                 }
 
             </nav>

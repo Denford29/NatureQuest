@@ -190,13 +190,12 @@ namespace NatureQuestWebsite.Controllers
             var model = new List<ProductModel>();
 
             //get the feature products to display
-            var featureProducts = _homePage.Descendants().Where(page => page.ContentType.Alias == "productPage"
-                                                                        && !page.Value<bool>("hideFromMenu")
-                                                                        && page.Value<bool>("featureProduct")
-                                                                        && page.HasProperty("productImages")
-                                                                        && page.HasValue("productImages")
-                                                                        && page.IsPublished())
-                                                                    .ToList();
+            var featureProducts = _homePage.Descendants().Where(page => 
+                                                                              page.ContentType.Alias == "productPage"
+                                                                            && !page.Value<bool>("hideFromMenu")
+                                                                            && page.Value<bool>("featureProduct"))
+                                                                        .ToList();
+
             //check if we have any feature products
             if (featureProducts.Any())
             {
@@ -261,8 +260,10 @@ namespace NatureQuestWebsite.Controllers
                     //if we have some products, take 4 random ones
                     if (categoryProducts.Any())
                     {
-                        var r = new Random();
-                        var modelProducts = categoryProducts.OrderBy(x => r.Next()).ToList();
+                        //var r = new Random();
+                        //var modelProducts = categoryProducts.OrderBy(x => r.Next()).ToList();
+                        var modelProducts = categoryProducts.ToList();
+
                         //get the model for each of the products
                         foreach (var product in modelProducts)
                         {
@@ -328,10 +329,10 @@ namespace NatureQuestWebsite.Controllers
                     //create the stockist page item
                     var stockistLink = new LinkItemModel
                     {
-                        LinkTitle = stockistName,
+                        LinkTitle = $"{stockistName} - {stockist.Parent.Name}",
                         LinkUrl = stockist.Url,
                         LinkPage = stockist,
-                        ThumbLinkImage = "/Images/NatureQuest-Logo-square.png"
+                        ThumbLinkImage = ""
                     };
 
                     //set feature product image

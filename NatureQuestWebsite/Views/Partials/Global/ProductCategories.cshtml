@@ -7,13 +7,13 @@
         <section class="container padding-top-1x padding-bottom-1x">
             <h3 class="text-center mb-30 text-primary text-uppercase">
                 Product Categories
-                </h3>
+            </h3>
             <div class="row">
                 @foreach (var category in Model.ProductCategories)
                 {
                     //get 4 random products to list
-                    var r = new Random();
-                    var categoryProducts = category.CategoriesProducts;
+                    //var r = new Random();
+                    var categoryProducts = category.CategoriesProducts.Take(3);
                     <div class="col-md-4 col-sm-6">
                         <div class="widget widget-featured-products">
                             <h3 class="widget-title">
@@ -27,8 +27,10 @@
                                 var productPage = product.ProductPage;
                                 var productFirstImage = product.ProductImages.FirstOrDefault();
                                 //if we haven't got a featured price, then just get the 1st normal price
-                                var productFeaturedPrice = product.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice) ??
-                                                           product.ProductPrices.FirstOrDefault();
+                                //var productFeaturedPrice = product.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice) ??
+                                //                           product.ProductPrices.FirstOrDefault();
+                                var productFeaturedPrice = product.ProductPrices.FirstOrDefault();
+                                var salePrice = product.SalePrice;
                                 //check if we have a variant image
                                 if (!string.IsNullOrWhiteSpace(productFeaturedPrice?.ProductVariantImage?.ImageUrl))
                                 {
@@ -49,27 +51,28 @@
                                                     @product.ProductTitle
                                                 </a>
                                             </h4>
-                                            @if (productFeaturedPrice != null)
+                                            @if (salePrice != null && salePrice.SalePrice > 0)
                                             {
-                                                if (productFeaturedPrice.SalePrice > 0)
-                                                {
-                                                    <span class="entry-meta">
-                                                        <del>$@productFeaturedPrice.ProductPrice</del>
-                                                        $@productFeaturedPrice.SalePrice
-                                                    </span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="entry-meta">
-                                                        $@productFeaturedPrice.ProductPrice
-                                                    </span>
-                                                }
+                                                <span class="entry-meta">
+                                                    <del>@salePrice.ProductPrice.ToString("c")</del>
+                                                    @salePrice.SalePrice.ToString("c")
+                                                </span>
                                             }
+                                            else if (productFeaturedPrice != null)
+                                            {
+                                                <span class="entry-meta">
+                                                    From @productFeaturedPrice.ProductPrice.ToString("c")
+                                                </span>
+                                            }
+
 
                                         </div>
                                     </div>
                                 }
                             }
+                            <a class="btn btn-outline-primary btn-sm" href="@category.CategoryLinkUrl" title="@category.CategoryLinkTitle">
+                                View All
+                            </a>
                         </div>
                     </div>
                 }

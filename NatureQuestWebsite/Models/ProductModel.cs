@@ -31,6 +31,11 @@ namespace NatureQuestWebsite.Models
         public ProductPriceModel FeaturedPrice { get; set; }
 
         /// <summary>
+        /// get or set the sale price to display
+        /// </summary>
+        public ProductPriceModel SalePrice { get; set; }
+
+        /// <summary>
         /// get the product title
         /// </summary>
         public string ProductTitle { get; set; }
@@ -152,6 +157,11 @@ namespace NatureQuestWebsite.Models
         /// get or set the flag if the product is set as a featured product
         /// </summary>
         public bool IsFeaturedPrice { get; set; }
+
+        /// <summary>
+        /// get or set the flag if the product is set as a sale product
+        /// </summary>
+        public bool IsSalePrice { get; set; }
 
         /// <summary>
         /// get or set the product variant code
