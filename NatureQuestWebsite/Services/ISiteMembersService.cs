@@ -1,5 +1,7 @@
-﻿using NatureQuestWebsite.Models;
+﻿using System.Threading.Tasks;
+using NatureQuestWebsite.Models;
 using System.Web.Security;
+using SendGrid.Helpers.Mail;
 using Umbraco.Core.Models;
 
 namespace NatureQuestWebsite.Services
@@ -34,5 +36,15 @@ namespace NatureQuestWebsite.Services
         /// <param name="email"></param>
         /// <returns></returns>
         IMember GetMemberByEmail(string email);
+
+        /// <summary>
+        /// send the send grid message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="autoAddBcc"></param>
+        /// <param name="autoAddAdminBcc"></param>
+        /// <returns></returns>
+        Task<bool> SendGridEmail(SendGridMessage message, bool autoAddBcc = false,
+            bool autoAddAdminBcc = false);
     }
 }

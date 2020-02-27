@@ -396,5 +396,113 @@ namespace NatureQuestWebsite.Services
             //return the list
             return categoriesList;
         }
+
+        /// <summary>
+        /// get the product categories
+        /// </summary>
+        /// <returns></returns>
+        public List<ProductCategory> ProductCategories()
+        {
+            //create the default list to return
+            var productCategories = new List<ProductCategory>();
+
+            //get the feature products to display
+            var productCategoriesList = _homePage.Descendants().Where(page => page.ContentType.Alias == "productCategoryPage"
+                                                                        && !page.Value<bool>("hideFromMenu")
+                                                                        && page.IsPublished())
+                .ToList();
+
+            //add each category to the model
+            if (productCategoriesList.Any())
+            {
+                foreach (var productCategory in productCategoriesList)
+                {
+                    //set the default category page title
+                    var categoryTitle = productCategory.Name;
+                    //check if we have the page title set on the current page
+                    if (productCategory.HasProperty("pageTitle") && productCategory.HasValue("pageTitle"))
+                    {
+                        // set the page title to override the default
+                        categoryTitle = productCategory.GetProperty("pageTitle").Value().ToString();
+                    }
+
+                    //create the default category model
+                    var categoryModel = new ProductCategory
+                    {
+                        CategoryLinkTitle = categoryTitle,
+                        CategoryLinkUrl = productCategory.Url,
+                        ProductCategoryPage = productCategory
+                    };
+
+                    //get the products for each category to add to the model
+                    var categoryProducts = productCategory.Children().Where(page => page.ContentType.Alias == "productPage"
+                                                                                && !page.Value<bool>("hideFromMenu")
+                                                                                && page.IsPublished())
+                        .ToList();
+
+                    //if we have some products, take 4 random ones
+                    if (categoryProducts.Any())
+                    {
+                        // get the products list
+                        var modelProducts = categoryProducts.ToList();
+
+                        //get the model for each of the products
+                        foreach (var product in modelProducts)
+                        {
+                            var productModel = GetProductModel(product);
+                            //add it to the category model
+                            categoryModel.CategoriesProducts.Add(productModel);
+                        }
+                    }
+
+                    //get the category image
+                    if (productCategory.HasProperty("bannerImage") && productCategory.HasValue("bannerImage"))
+                    {
+                        //set feature product image
+                        var productVariantImage = productCategory.Value<IPublishedContent>("bannerImage");
+                        if (productVariantImage?.Id > 0)
+                        {
+                            //get the image url
+                            var imageLink = "/Images/Nature-Quest-Product-Default.png";
+                            var defaultCropSize = productVariantImage.GetCropUrl("product");
+                            var productImagelink = !string.IsNullOrEmpty(defaultCropSize)
+                                ? defaultCropSize
+                                : productVariantImage.GetCropUrl(350, 500);
+                            if (!string.IsNullOrWhiteSpace(productImagelink))
+                            {
+                                imageLink = productImagelink;
+                            }
+
+                            //create the product model
+                            var variantImageModel = new ProductImageModel
+                            {
+                                ImageUrl = imageLink,
+                                ImageAltText = productVariantImage.Name,
+                                ImageProductId = productCategory.Id.ToString(),
+                                IsFeaturedPriceImage = false
+                            };
+                            //add the image model to the product images
+                            categoryModel.CategoryImageModel = variantImageModel;
+                        }
+                    }
+                    //if we don't have a image set on the category then get the first one from the products
+                    else if(categoryModel.CategoriesProducts.Any())
+                    {
+                        var productFirstImage =
+                            categoryModel.CategoriesProducts.FirstOrDefault(productModel => productModel.ProductImages.Any());
+                        if (productFirstImage != null)
+                        {
+                            categoryModel.CategoryImageModel = productFirstImage.ProductImages.FirstOrDefault();
+                        }
+                    }
+
+                    //add the category model to the view model
+                    productCategories.Add(categoryModel);
+                }
+            }
+
+            //return the list of categories
+            return productCategories;
+        }
     }
 }

@@ -8,7 +8,7 @@ using  Umbraco.Web;
 using  Umbraco.ModelsBuilder;
 using  Umbraco.ModelsBuilder.Umbraco;
 [assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "8c4f2c951e2865ba")]
+[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "e36c2e90b1133bf8")]
 [assembly:System.Reflection.AssemblyVersion("0.0.0.1")]
 
 
@@ -659,6 +659,34 @@ namespace Umbraco.Web.PublishedModels
 		{ }
 
 		// properties
+
+		///<summary>
+		/// Best Sellers Heading: Set the heading text used when listing best sellers
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("bestSellersHeading")]
+		public string BestSellersHeading => this.Value<string>("bestSellersHeading");
+
+		///<summary>
+		/// Best Sellers Image: Set the image used when listing best sellers
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("bestSellersImage")]
+		public Image BestSellersImage => this.Value<Image>("bestSellersImage");
+
+		///<summary>
+		/// Specials Heading: Set the heading text used when listing specials
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("specialsHeading")]
+		public string SpecialsHeading => this.Value<string>("specialsHeading");
+
+		///<summary>
+		/// Specials Image: Set the image used when listing specials
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("specialsImage")]
+		public Image SpecialsImage => this.Value<Image>("specialsImage");
 	}
 
 	/// <summary>Product Category Page</summary>
@@ -711,6 +739,13 @@ namespace Umbraco.Web.PublishedModels
 		{ }
 
 		// properties
+
+		///<summary>
+		/// Best Seller Product: Set this option to selected to set this product as a best seller product
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("bestSellerProduct")]
+		public bool BestSellerProduct => this.Value<bool>("bestSellerProduct");
 
 		///<summary>
 		/// Feature Product: Set this option to selected to set this product as a featured product
@@ -1785,6 +1820,13 @@ namespace Umbraco.Web.PublishedModels
 		public IPublishedContent CartMember => this.Value<IPublishedContent>("cartMember");
 
 		///<summary>
+		/// Cart Notes: Cart tracking notes
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("cartNotes")]
+		public string CartNotes => this.Value<string>("cartNotes");
+
+		///<summary>
 		/// Cart Shipping: This is the shipping set on the cart
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
@@ -1879,6 +1921,13 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("paymentMethod")]
 		public string PaymentMethod => this.Value<string>("paymentMethod");
+
+		///<summary>
+		/// Send Shipment Email: Will be set once the shipment email is sent.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("sendShipmentEmail")]
+		public string SendShipmentEmail => this.Value<string>("sendShipmentEmail");
 	}
 
 	/// <summary>Cart Item</summary>
@@ -2149,6 +2198,13 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("shippingFee")]
 		public decimal ShippingFee => this.Value<decimal>("shippingFee");
+
+		///<summary>
+		/// Website Tracking Link: Enter the shipping options website tracking url
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("websiteTrackingLink")]
+		public string WebsiteTrackingLink => this.Value<string>("websiteTrackingLink");
 	}
 
 	/// <summary>Payment Option</summary>

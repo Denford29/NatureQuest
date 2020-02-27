@@ -1,0 +1,84 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<NatureQuestWebsite.Models.ProductCategoriesModel>
+@{
+    var productCategoriesLinks = Model.ProductCategoriesLinks;
+    var productCategories = Model.ProductCategories;
+
+    <div class="row">
+        <div class="col-xl-9 col-lg-8">
+            @if (productCategories.Any())
+            {
+                foreach (var groupedProducts in productCategories.InGroupsOf(3))
+                {
+                    <div class="card-deck">
+                        @foreach (var productCategory in groupedProducts)
+                        {
+                            var categoryImage = productCategory.CategoryImageModel;
+                            <div class="card margin-bottom-1x">
+                                <a href="@productCategory.CategoryLinkUrl" title="@productCategory.CategoryLinkTitle">
+                                    <img class="card-img-top" src="@categoryImage.ImageUrl" alt="@categoryImage.ImageAltText">
+                                </a>
+                                <div class="card-body">
+                                    <h4 class="card-title text-center">
+                                        @productCategory.CategoryLinkTitle
+                                    </h4>
+                                </div>
+                                <div class="card-footer text-muted text-center">
+                                    <a class="btn btn-outline-primary btn-sm" href="@productCategory.CategoryLinkUrl" title="@productCategory.CategoryLinkTitle">
+                                        @productCategory.CategoryLinkTitle Products
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+
+            }
+        </div>
+
+        <div class="col-xl-3 col-lg-4">
+            <button class="sidebar-toggle position-left" data-toggle="modal" data-target="#modalShopFilters">
+                <i class="icon-layout"></i>
+            </button>
+            <aside class="sidebar sidebar-offcanvas">
+                @if (productCategoriesLinks.Any())
+                {
+                    <section class="widget widget-categories">
+                        <h3 class="widget-title">
+                            Product Categories
+                        </h3>
+                        <ul>
+                            @foreach (var category in productCategoriesLinks)
+                            {
+                                //set the class for the category items
+                                var childrenClass = category.ChildLinkItems.Any() ? "has-children expanded" : "";
+                                <li class="@childrenClass">
+                                    <a href="@category.LinkUrl" title="@category.LinkTitle">
+                                        @category.LinkTitle
+                                        @if (category.ChildLinkItems.Any())
+                                        {
+                                            <span>(@category.ChildLinkItems.Count)</span>
+                                        }
+                                    </a>
+                                    @if (category.ChildLinkItems.Any())
+                                    {
+                                        <ul>
+                                            @foreach (var childLink in category.ChildLinkItems)
+                                            {
+                                                <li>
+                                                    <a href="@childLink.LinkUrl" title="@childLink.LinkTitle">
+                                                        @childLink.LinkTitle
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    </section>
+                }
+            </aside>
+        </div>
+    </div>
+
+}

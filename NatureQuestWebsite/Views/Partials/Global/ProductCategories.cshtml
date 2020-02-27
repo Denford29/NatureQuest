@@ -11,8 +11,7 @@
             <div class="row">
                 @foreach (var category in Model.ProductCategories)
                 {
-                    //get 4 random products to list
-                    //var r = new Random();
+                    //get 3 products to list
                     var categoryProducts = category.CategoriesProducts.Take(3);
                     <div class="col-md-4 col-sm-6">
                         <div class="widget widget-featured-products">
@@ -26,9 +25,7 @@
                             {
                                 var productPage = product.ProductPage;
                                 var productFirstImage = product.ProductImages.FirstOrDefault();
-                                //if we haven't got a featured price, then just get the 1st normal price
-                                //var productFeaturedPrice = product.ProductPrices.FirstOrDefault(price => price.IsFeaturedPrice) ??
-                                //                           product.ProductPrices.FirstOrDefault();
+                                //get the 1st normal price
                                 var productFeaturedPrice = product.ProductPrices.FirstOrDefault();
                                 var salePrice = product.SalePrice;
                                 //check if we have a variant image
@@ -64,8 +61,6 @@
                                                     From @productFeaturedPrice.ProductPrice.ToString("c")
                                                 </span>
                                             }
-
-
                                         </div>
                                     </div>
                                 }

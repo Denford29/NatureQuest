@@ -764,6 +764,12 @@ namespace NatureQuestWebsite.Services
                         //set the properties
                         newMemberCartPage.SetValue("cartMember", cartMember.Id);
                         newMemberCartPage.SetValue("activeCart", true);
+
+                        //add some notes on the cart item
+                        var currentComments = $"{newMemberCartPage.GetValue("cartNotes")} {System.Environment.NewLine} " +
+                                              $"- {DateTime.Now.ToShortDateString()} - New cart created for: {cartMember.Name}";
+
+                        newMemberCartPage.SetValue("cartNotes", currentComments);
                         //save the content item
                         var saveResult = _contentService.SaveAndPublish(newMemberCartPage);
 
@@ -1442,7 +1448,7 @@ namespace NatureQuestWebsite.Services
                         //generate the cart item name
                         var newCartItemName = $"{priceProductPage.Parent.Name.Trim().Replace(" ", "-")}" +
                                               $"-{priceProductPage.Name.Trim().Replace(" ", "-")}";
-                        
+
                         //use the content service to create the cart item page
                         cartItemContentPage =
                             _contentService.CreateAndSave(newCartItemName, cartItemPage, CartPageItemAlias);
@@ -1479,14 +1485,20 @@ namespace NatureQuestWebsite.Services
                         cartItemContentPage.SetValue("itemDescription", productCartItem.Description);
                         cartItemContentPage.SetValue("productId", productCartItem.ProductLinePage.Id);
                         cartItemContentPage.SetValue("productCode", productCartItem.ProductVariantCode);
+
                         //save the content item
                         var saveResult = _contentService.SaveAndPublish(cartItemContentPage);
 
                         if (saveResult.Success)
                         {
+                            //add some notes on the cart item
+                            var currentComments = $"{cartItemPage.GetValue("cartNotes")} {System.Environment.NewLine} " +
+                                                  $"- {DateTime.Now.ToShortDateString()} - {productCartItem.Description}";
+
+                            cartItemPage.SetValue("cartNotes", currentComments);
                             //publish the parent page
                             var cartPageUpdated = _contentService.SaveAndPublish(cartItemPage);
-                            if(cartPageUpdated.Success)
+                            if (cartPageUpdated.Success)
                             {
                                 var updatedCartPage = _umbracoHelper.Content(cartPageUpdated.Content.Id);
                                 if (updatedCartPage?.Id > 0)
@@ -1677,11 +1689,10 @@ namespace NatureQuestWebsite.Services
                         orderSummary += cartItemSummary;
                     }
                     //add the order total
-                    orderSummary +=
-                        $"<p><strong>Order total: {currentShoppingCart.ComputeTotalWithShippingValue():c}</strong> </p>";
+                    orderSummary += $"<p><strong>Order total: {currentShoppingCart.ComputeTotalWithShippingValue():c}</strong> </p>";
 
-                                    //generate the cart name
-                                    var memberOrderName = $"{memberName.Trim().Replace(" ", "-")}-{paymentMethod}-{orderId}-Order";
+                    //generate the cart name
+                    var memberOrderName = $"{memberName.Trim().Replace(" ", "-")}-{paymentMethod}-{orderId}-Order";
                     //get the parent carts page
                     var ordersParentPage = _contentService.GetById(ordersPage.Id);
                     //use the content service to create the cart page
@@ -2151,8 +2162,8 @@ namespace NatureQuestWebsite.Services
                                     foreach (var cartItem in currentShoppingCart.CartItems)
                                     {
                                         //get the price product page
-                                        var priceProduct =_umbracoHelper.Content(cartItem.CartItemPageId);
-                                        if(priceProduct != null)
+                                        var priceProduct = _umbracoHelper.Content(cartItem.CartItemPageId);
+                                        if (priceProduct != null)
                                         {
                                             cartUpdated = UpdateMemberSavedCart(
                                                 currentShoppingCart,
@@ -2168,7 +2179,7 @@ namespace NatureQuestWebsite.Services
                                 }
 
                                 //check if the cart has been updated
-                                if(cartUpdated)
+                                if (cartUpdated)
                                 {
                                     var anonymousMemberOrder = CreateMemberOrderPage(
                                         _globalOrdersPage,
@@ -3004,7 +3015,7 @@ namespace NatureQuestWebsite.Services
             }
 
             //add the email body footer
-            emailBodyString.Append("<p>Thanks you for shopping in Natures Quest.<p/>");
+            emailBodyString.Append("<p>Thank you for shopping in Natures Quest.<p/>");
             //add the logo and website
             emailBodyString.Append($"<p><a href='{HomePage.UrlAbsolute()}' tittle='Natures Quest'>" +
                                    $"<img src='{HomePage.UrlAbsolute()}Images/NatureQuest-Site-Logo.png' alt='Natures Quest' width='185' />" +

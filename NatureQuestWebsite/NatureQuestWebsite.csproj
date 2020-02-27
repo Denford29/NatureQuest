@@ -891,6 +891,7 @@
     <Content Include="Views\Partials\Accounts\AccountsSideBar.cshtml" />
     <Content Include="Views\Partials\Accounts\MemberOrderDetails.cshtml" />
     <Content Include="Views\Partials\Accounts\AdminsStripeOrderDetails.cshtml" />
+    <Content Include="Views\Partials\Products\ProductCategoriesList.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

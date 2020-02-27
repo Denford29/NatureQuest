@@ -107,7 +107,8 @@ namespace NatureQuestWebsite.Services
             _memberRoles = _memberService.GetAllRoles().ToList();
 
             //add the default address to the admin list
-            _siteToEmailAddresses.Add(new EmailAddress("denfordmutseriwa@yahoo.com", "Admin"));
+            //_siteToEmailAddresses.Add(new EmailAddress("denfordmutseriwa@yahoo.com", "Admin"));
+
             //create the default system email address
             _systemEmailAddress = new EmailAddress("denfordmutseriwa@yahoo.com", "Admin");
             _fromEmailAddress = new EmailAddress("support@naturesquest.com.au", _siteName);
@@ -629,21 +630,12 @@ namespace NatureQuestWebsite.Services
                                                                                 "",
                                                                                 userNewsletterBody);
                 //send the user email
-                var userNewsletterSent = SendGridEmail(userNewsletterMessage);
+                _ = SendGridEmail(userNewsletterMessage, true);
 
                 //create the admin email to notify of a new news letter user
                 var newsletterSubject = "A new newsletter member has been created.";
                 var newsletterBody = $"<p>A new user with the email address: {newsletterModel.Email} has signed up for the newsletter." +
                                                 "<br /> <br />Regards, <br /> Website Team</p>";
-                //create the admin email
-                var adminNewsletterMessage = MailHelper.CreateSingleEmail(
-                                                                                _fromEmailAddress,
-                                                                                _systemEmailAddress,
-                                                                                newsletterSubject,
-                                                                                "",
-                                                                                newsletterBody);
-                //send the admin email
-                var adminNewsletterSent = SendGridEmail(adminNewsletterMessage);
 
                 //create the global emails
                 var globalNewsletterMessage = MailHelper.CreateSingleEmailToMultipleRecipients(
@@ -653,7 +645,7 @@ namespace NatureQuestWebsite.Services
                                                                                 "",
                                                                                 newsletterBody);
                 //send the global email
-                var globalNewsletterSent = SendGridEmail(globalNewsletterMessage);
+               _ = SendGridEmail(globalNewsletterMessage, true);
 
                 signupEmailSent = true;
             }
@@ -667,7 +659,7 @@ namespace NatureQuestWebsite.Services
 
                 //system email
                 var systemMessage = MailHelper.CreateSingleEmail(_fromEmailAddress, _systemEmailAddress, errorSubject, "", errorMessage);
-                var systemMessageSent = SendGridEmail(systemMessage);
+                _ = SendGridEmail(systemMessage);
             }
 
             //return the flag after sending the email
@@ -699,7 +691,7 @@ namespace NatureQuestWebsite.Services
                                                                                 "",
                                                                                 userContactBody);
                 //send the user email
-                var userContactSent = SendGridEmail(userContactMessage);
+               _ = SendGridEmail(userContactMessage, true);
 
                 //create the admin email to notify of a contact inquiry
                 var adminContactSubject = $"A new contact inquiry has been submitted on {_siteName}.";
@@ -708,15 +700,6 @@ namespace NatureQuestWebsite.Services
                                                     $"Full name: {contactModel.FullName} <br />" +
                                                     $"Inquiry details: {contactModel.ContactDetails} <br />" +
                                                 "<br /> <br />Regards, <br /> Website Team</p>";
-                //create the admin email
-                var adminContactMessage = MailHelper.CreateSingleEmail(
-                                                                                _fromEmailAddress,
-                                                                                _systemEmailAddress,
-                                                                                adminContactSubject,
-                                                                                "",
-                                                                                adminContactBody);
-                //send the admin email
-                var adminContactSent = SendGridEmail(adminContactMessage);
 
                 //create the global emails
                 var globalContactMessage = MailHelper.CreateSingleEmailToMultipleRecipients(
@@ -726,7 +709,7 @@ namespace NatureQuestWebsite.Services
                                                                                 "",
                                                                                 adminContactBody);
                 //send the global email
-                var globalContactSent = SendGridEmail(globalContactMessage);
+                _ = SendGridEmail(globalContactMessage, true);
 
                 contactEmailSent = true;
             }
@@ -740,7 +723,7 @@ namespace NatureQuestWebsite.Services
 
                 //system email
                 var systemMessage = MailHelper.CreateSingleEmail(_fromEmailAddress, _systemEmailAddress, errorSubject, "", errorMessage);
-                var systemMessageSent = SendGridEmail(systemMessage);
+                _ = SendGridEmail(systemMessage);
             }
 
             //return the flag after sending the email
@@ -772,7 +755,7 @@ namespace NatureQuestWebsite.Services
                                                                                 "",
                                                                                 userRegisterBody);
                 //send the user email
-                var userRegisterSent = SendGridEmail(userRegisterMessage);
+               _ = SendGridEmail(userRegisterMessage, true);
 
                 //create the admin email to notify of a registration account
                 var adminRegisterSubject = $"A new shop account has been created on {_siteName}.";
@@ -786,15 +769,6 @@ namespace NatureQuestWebsite.Services
                                                     $"Address state: {registerModel.State} <br />" +
                                                     $"Password: {registerModel.Password} <br />" +
                                                 "<br /> <br />Regards, <br /> Website Team</p>";
-                //create the admin email
-                var adminRegisterMessage = MailHelper.CreateSingleEmail(
-                                                                                _fromEmailAddress,
-                                                                                _systemEmailAddress,
-                                                                                adminRegisterSubject,
-                                                                                "",
-                                                                                adminRegisterBody);
-                //send the admin email
-                var adminRegisterSent = SendGridEmail(adminRegisterMessage);
 
                 //create the global emails
                 var globalRegisterMessage = MailHelper.CreateSingleEmailToMultipleRecipients(
@@ -804,7 +778,7 @@ namespace NatureQuestWebsite.Services
                                                                                 "",
                                                                                 adminRegisterBody);
                 //send the global email
-                var globalRegisterSent = SendGridEmail(globalRegisterMessage);
+              _ = SendGridEmail(globalRegisterMessage,true);
 
                 registerEmailSent = true;
             }
@@ -818,7 +792,7 @@ namespace NatureQuestWebsite.Services
 
                 //system email
                 var systemMessage = MailHelper.CreateSingleEmail(_fromEmailAddress, _systemEmailAddress, errorSubject, "", errorMessage);
-                var systemMessageSent = SendGridEmail(systemMessage);
+                _ = SendGridEmail(systemMessage);
             }
 
             //return the flag after sending the email
@@ -829,8 +803,10 @@ namespace NatureQuestWebsite.Services
         /// send the send grid message
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="autoAddBcc"></param>
+        /// <param name="autoAddAdminBcc"></param>
         /// <returns></returns>
-        public async Task<bool> SendGridEmail(SendGridMessage message)
+        public async Task<bool> SendGridEmail(SendGridMessage message, bool autoAddBcc = false, bool autoAddAdminBcc = false)
         {
             //set the flag for a message sent
             var messageSent = false;
@@ -840,6 +816,22 @@ namespace NatureQuestWebsite.Services
             {
                 //get the client to use
                 var client = new SendGridClient(_sendGridKey);
+
+                //check if we need to add the auto bcc
+                if (autoAddBcc)
+                {
+                    message.AddBcc(_systemEmailAddress);
+                }
+
+                //check if we need to add the admin auto bcc as well
+                if (autoAddAdminBcc && _siteToEmailAddresses.Any())
+                {
+                    foreach (var emailAddress in _siteToEmailAddresses)
+                    {
+                        message.AddBcc(emailAddress);
+                    }
+                }
+
                 //send the email and get the response
                 var response = await client.SendEmailAsync(message);
 
@@ -848,6 +840,7 @@ namespace NatureQuestWebsite.Services
                 {
                     messageSent = true;
                 }
+
             }
             //return the flag
             return messageSent;

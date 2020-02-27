@@ -190,7 +190,7 @@ namespace NatureQuestWebsite.Controllers
             var model = new List<ProductModel>();
 
             //get the feature products to display
-            var featureProducts = _homePage.Descendants().Where(page => 
+            var featureProducts = _homePage.Descendants().Where(page =>
                                                                               page.ContentType.Alias == "productPage"
                                                                             && !page.Value<bool>("hideFromMenu")
                                                                             && page.Value<bool>("featureProduct"))
@@ -221,62 +221,10 @@ namespace NatureQuestWebsite.Controllers
         public ActionResult GetProductCategories()
         {
             // create the default model
-            var model = new ProductCategoriesModel();
-
-            //get the feature products to display
-            var productCategories = _homePage.Descendants().Where(page => page.ContentType.Alias == "productCategoryPage"
-                                                                        && !page.Value<bool>("hideFromMenu")
-                                                                        && page.IsPublished())
-                .ToList();
-
-            //add each category to the model
-            if (productCategories.Any())
+            var model = new ProductCategoriesModel
             {
-                foreach (var productCategory in productCategories)
-                {
-                    //set the default category page title
-                    var categoryTitle = productCategory.Name;
-                    //check if we have the page title set on the current page
-                    if (productCategory.HasProperty("pageTitle") && productCategory.HasValue("pageTitle"))
-                    {
-                        // set the page title to override the default
-                        categoryTitle = productCategory.GetProperty("pageTitle").Value().ToString();
-                    }
-
-                    //create the default category model
-                    var categoryModel = new ProductCategory
-                    {
-                        CategoryLinkTitle = categoryTitle,
-                        CategoryLinkUrl = productCategory.Url,
-                        ProductCategoryPage = productCategory
-                    };
-
-                    //get the products for each category to add to the model
-                    var categoryProducts = productCategory.Children().Where(page => page.ContentType.Alias == "productPage"
-                                                                                && !page.Value<bool>("hideFromMenu")
-                                                                                && page.IsPublished())
-                        .ToList();
-
-                    //if we have some products, take 4 random ones
-                    if (categoryProducts.Any())
-                    {
-                        //var r = new Random();
-                        //var modelProducts = categoryProducts.OrderBy(x => r.Next()).ToList();
-                        var modelProducts = categoryProducts.ToList();
-
-                        //get the model for each of the products
-                        foreach (var product in modelProducts)
-                        {
-                            var productModel = _productsService.GetProductModel(product);
-                            //add it to the category model
-                            categoryModel.CategoriesProducts.Add(productModel);
-                        }
-                    }
-
-                    //add the category model to the view model
-                    model.ProductCategories.Add(categoryModel);
-                }
-            }
+                ProductCategories = _productsService.ProductCategories()
+            };
 
             //return the view with the model
             return View("/Views/Partials/Global/ProductCategories.cshtml", model);
@@ -621,7 +569,7 @@ namespace NatureQuestWebsite.Controllers
             if (!string.IsNullOrWhiteSpace(selectedFeaturePriceId))
             {
                 //get the product model and preset the selected feature price
-                var model = _productsService.GetProductModel(CurrentPage,featurePriceId: selectedFeaturePriceId);
+                var model = _productsService.GetProductModel(CurrentPage, featurePriceId: selectedFeaturePriceId);
                 //return the view with the model
                 TempData["updatedModel"] = model;
             }
@@ -676,8 +624,7 @@ namespace NatureQuestWebsite.Controllers
         public ActionResult GetProductsList(string sortOption, int page = 1)
         {
             //check if the current page is a product
-            if ((CurrentPage.ContentType.Alias == "productLandingPage"
-                 || CurrentPage.ContentType.Alias == "productCategoryPage")
+            if (CurrentPage.ContentType.Alias == "productCategoryPage"
                 && !CurrentPage.Value<bool>("hideFromMenu"))
             {
                 //create the default model, and set a flag if its a category page
@@ -797,7 +744,7 @@ namespace NatureQuestWebsite.Controllers
                 //return the view with the model
                 return View("/Views/Partials/Products/ProductsList.cshtml", model);
             }
-            //if the request is not from a visible product landing or category page return a 404
+            //if the request is not from a visible category page return a 404
             return HttpNotFound();
         }
 
@@ -827,6 +774,29 @@ namespace NatureQuestWebsite.Controllers
 
             //return the list
             return productModels;
+        }
+
+        /// <summary>
+        /// get the product landing page categories
+        /// </summary>
+        public ActionResult GetCategoryProductsList()
+        {
+            //check if the current page is a product
+            if (CurrentPage.ContentType.Alias == "productLandingPage"
+                 && !CurrentPage.Value<bool>("hideFromMenu"))
+            {
+                //create the default model, and set a flag if its a category page
+                var model = new ProductCategoriesModel
+                {
+                    ProductCategoriesLinks = _productsService.ProductCategoryLinks(),
+                    ProductCategories = _productsService.ProductCategories()
+                };
+
+                //return the view with the model
+                return View("/Views/Partials/Products/ProductCategoriesList.cshtml", model);
+            }
+            //if the request is not from a visible product landing return a 404
+            return HttpNotFound();
         }
 
     }

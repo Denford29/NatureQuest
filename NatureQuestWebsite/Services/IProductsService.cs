@@ -23,5 +23,11 @@ namespace NatureQuestWebsite.Services
         /// </summary>
         /// <returns></returns>
         List<LinkItemModel> ProductCategoryLinks();
+
+        /// <summary>
+        /// get the product categories
+        /// </summary>
+        /// <returns></returns>
+        List<ProductCategory> ProductCategories();
     }
 }
