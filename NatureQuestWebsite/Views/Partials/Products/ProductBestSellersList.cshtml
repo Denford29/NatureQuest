@@ -1,0 +1,172 @@
+﻿@using NatureQuestWebsite.Models
+@using NatureQuestWebsite.Services
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<ProductsListModel>
+@{
+    var productsList = Model.ProductsList;
+    var listPaging = Model.ProductsPaging;
+    var productCategories = Model.ProductCategoriesLinks;
+    var currentPage = Model.CurrentPage;
+    if (productsList.Any())
+    {
+        <div class="row">
+            <div class="col-lg-9">
+                <div class="shop-toolbar padding-bottom-1x mb-2">
+                    <div class="column">
+                        <div class="shop-sorting">
+                            @using (Html.BeginUmbracoForm("GetProductsList", "PageContent",
+                                new { productsType = "bestSellers" },
+                                new { role = "productListSorting", id = "productListSortingForm" }))
+                            {
+                                @Html.HiddenFor(model => listPaging.CurrentPage)
+                                @Html.HiddenFor(model => currentPage.Url)
+
+                                @Html.LabelFor(m => Model.SortOption)
+                                @Html.DropDownListFor(m => Model.SortOption, Model.SortOptions, new { @class = "form-control" })
+                            }
+                        </div>
+                    </div>
+                    <div class="column">
+                        @if (listPaging.TotalPages > 1)
+                        {
+                            <span class="text-muted">
+                                Showing:&nbsp;
+                            </span>
+                            <span>page @listPaging.CurrentPage of @listPaging.TotalPages pages</span>
+                        }
+                    </div>
+                </div>
+                <!-- Products Grid-->
+                <div class="isotope-grid cols-3 mb-2">
+                    <div class="gutter-sizer"></div>
+                    <div class="grid-sizer"></div>
+                    @foreach (var product in productsList)
+                    {
+                        var productPage = product.ProductPage;
+                        var productImage = product.ProductImages.FirstOrDefault();
+                        var featurePrice = product.FeaturedPrice;
+                        var salePrice = product.SalePrice;
+
+                        //check if we have a variant image
+                        if (!string.IsNullOrWhiteSpace(featurePrice.ProductVariantImage?.ImageUrl))
+                        {
+                            productImage = featurePrice.ProductVariantImage;
+                        }
+
+                        <div class="grid-item">
+                            <div class="product-card">
+                                @if (salePrice != null && salePrice.SalePercentage > 0)
+                                {
+                                    <div class="product-badge text-danger">
+                                        @salePrice.SalePercentage% Off @salePrice.ProductVariant
+                                    </div>
+                                }
+
+                                @if (productImage != null)
+                                {
+                                    <a class="product-thumb" href="@productPage.Url" tittle="@product.ProductTitle">
+                                        <img src="@productImage.ImageUrl" alt="@productImage.ImageAltText">
+                                    </a>
+                                }
+
+                                <h3 class="product-title">
+                                    <a href="@productPage.Url" tittle="@product.ProductTitle">
+                                        @product.ProductTitle
+                                    </a>
+                                </h3>
+
+                                @if (featurePrice.ProductPrice != 0)
+                                {
+                                    if (featurePrice.SalePrice != 0)
+                                    {
+                                        <h4 class="product-price">
+                                            <del>@featurePrice.ProductPrice.ToString("c")</del>
+                                            @featurePrice.SalePrice.ToString("c") (@featurePrice.ProductVariant)
+                                        </h4>
+                                    }
+                                    else
+                                    {
+                                        <h4 class="product-price">
+                                            From @featurePrice.ProductPrice.ToString("c")
+                                        </h4>
+                                    }
+                                }
+
+                                <div class="product-buttons">
+                                    @using (Html.BeginUmbracoForm("AddProductToCart", "Shop",
+                                        FormMethod.Post,
+                                        new { role = "form", id = "addToCartForm" }))
+                                    {
+                                        <input id="ProductPageId" name="ProductPageId" type="hidden" value="@product.ProductPageId">
+                                        <input id="ProductCode" name="ProductCode" type="hidden" value="@featurePrice.ProductVariantCode">
+                                        <input id="SelectedQuantity" name="SelectedQuantity" type="hidden" value="1">
+                                        <input id="SelectedPricePageId" name="SelectedPricePageId" type="hidden" value="@featurePrice.ProductPricePage.Id">
+                                        <div class="product-buttons">
+                                            <button class="btn btn-outline-primary btn-sm AddToCartBtn">
+                                                <i class="icon-bag"></i> Add to Cart
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (listPaging.TotalPages > 1)
+                {
+                    <nav class="pagination">
+                        <div class="column">
+                            <ul class="pages">
+                                @Html.PagingLink(listPaging, currentPage.Url, Model.SortOption)
+                            </ul>
+                        </div>
+                    </nav>
+                }
+
+            </div>
+
+            <div class="col-lg-3">
+                <button class="sidebar-toggle position-left" data-toggle="modal" data-target="#modalShopFilters"><i class="icon-layout"></i></button>
+                <aside class="sidebar sidebar-offcanvas">
+                    @if (productCategories.Any())
+                    {
+                        <section class="widget widget-categories">
+                            <h3 class="widget-title">
+                                Product Categories
+                            </h3>
+                            <ul>
+                                @foreach (var category in productCategories)
+                                {
+                                    //set the class for the category items
+                                    var childrenClass = category.ChildLinkItems.Any() ? "has-children expanded" : "";
+                                    <li class="@childrenClass">
+                                        <a href="@category.LinkUrl" title="@category.LinkTitle">
+                                            @category.LinkTitle
+                                            @if (category.ChildLinkItems.Any())
+                                            {
+                                                <span>(@category.ChildLinkItems.Count)</span>
+                                            }
+                                        </a>
+                                        @if (category.ChildLinkItems.Any())
+                                        {
+                                            <ul>
+                                                @foreach (var childLink in category.ChildLinkItems)
+                                                {
+                                                    <li>
+                                                        <a href="@childLink.LinkUrl" title="@childLink.LinkTitle">
+                                                            @childLink.LinkTitle
+                                                        </a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        </section>
+                    }
+                </aside>
+            </div>
+        </div>
+    }
+}

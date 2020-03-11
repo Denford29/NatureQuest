@@ -543,7 +543,8 @@ namespace NatureQuestWebsite.Controllers
             //get the customer paid orders
             model = _shoppingService.GetMemberOrderDetails(model);
             //get the admin paid orders
-            model = _shoppingService.GetAdminOrderDetails(model);
+            //model = _shoppingService.GetAdminOrderDetails(model);
+            model = _shoppingService.GetMemberOrderDetails(model, true);
 
             // return the view with the model
             return View("/Views/Partials/Accounts/MemberAcountDetails.cshtml", model);
@@ -572,7 +573,8 @@ namespace NatureQuestWebsite.Controllers
             //get the customer paid orders
             model = _shoppingService.GetMemberOrderDetails(model);
             //get the admin paid orders
-            model = _shoppingService.GetAdminOrderDetails(model);
+            //model = _shoppingService.GetAdminOrderDetails(model);
+            model = _shoppingService.GetMemberOrderDetails(model, true);
 
             // return the view with the model
             return View("/Views/Partials/Accounts/MemberOrderDetails.cshtml", model);
@@ -613,7 +615,8 @@ namespace NatureQuestWebsite.Controllers
             //get the customer paid orders
             model = _shoppingService.GetMemberOrderDetails(model);
             //get the admin paid orders
-            model = _shoppingService.GetAdminOrderDetails(model);
+            //model = _shoppingService.GetAdminOrderDetails(model);
+            model = _shoppingService.GetMemberOrderDetails(model, true);
 
             // return the view with the model
             return View("/Views/Partials/Accounts/AdminsStripeOrderDetails.cshtml", model);

@@ -9,12 +9,12 @@
     if (productsList.Any())
     {
         <div class="row">
-            <div class="col-xl-9 col-lg-8">
+            <div class="col-lg-9">
                 <div class="shop-toolbar padding-bottom-1x mb-2">
                     <div class="column">
                         <div class="shop-sorting">
                             @using (Html.BeginUmbracoForm("GetProductsList", "PageContent",
-                                null,
+                                new{productsType ="specials"},
                                 new { role = "productListSorting", id = "productListSortingForm" }))
                             {
                                 @Html.HiddenFor(model => listPaging.CurrentPage)
@@ -125,7 +125,7 @@
 
             </div>
 
-            <div class="col-xl-3 col-lg-4">
+            <div class="col-lg-3">
                 <button class="sidebar-toggle position-left" data-toggle="modal" data-target="#modalShopFilters"><i class="icon-layout"></i></button>
                 <aside class="sidebar sidebar-offcanvas">
                     @if (productCategories.Any())

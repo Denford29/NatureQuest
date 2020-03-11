@@ -10,8 +10,11 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 
 namespace NatureQuestWebsite.Services
 {
@@ -62,31 +65,55 @@ namespace NatureQuestWebsite.Services
         private readonly ILogger _logger;
 
         /// <summary>
+        /// set the home page
+        /// </summary>
+        private readonly IPublishedContent _homePage;
+
+        /// <summary>
         /// create the umbraco content service
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="locationService"></param>
         /// <param name="siteMembersService"></param>
         /// <param name="memberService"></param>
+        /// <param name="contextFactory"></param>
         public ContentSavingComponent(
             ILogger logger,
             ILocationService locationService,
             ISiteMembersService siteMembersService,
-            IMemberService memberService)
+            IMemberService memberService,
+            IUmbracoContextFactory contextFactory)
         {
             _logger = logger;
             _locationService = locationService;
             _siteMembersService = siteMembersService;
             _memberService = memberService;
+
+            using (var contextReference = contextFactory.EnsureUmbracoContext())
+            {
+                IPublishedCache contentCache = contextReference.UmbracoContext.ContentCache;
+                //get the home page
+                var homePage = contentCache.GetAtRoot().FirstOrDefault(x => x.ContentType.Alias == "home");
+                //check if we have the home page and set it to the global page
+                if (homePage?.Id > 0)
+                {
+                    //get the home page to use
+                    _homePage = contentCache.GetAtRoot().FirstOrDefault(x => x.ContentType.Alias == "home");
+                }
+            }
         }
 
-        // initialize: runs once when Umbraco starts
+        /// <summary>
+        /// initialize: runs once when Umbraco starts
+        /// </summary>
         public void Initialize()
         {
             ContentService.Saved += ContentService_Saving;
         }
 
-        // terminate: runs once when Umbraco stops
+        /// <summary>
+        /// terminate: runs once when Umbraco stops
+        /// </summary>
         public void Terminate()
         {
         }
@@ -217,6 +244,12 @@ namespace NatureQuestWebsite.Services
             return false;
         }
 
+        /// <summary>
+        /// Send the shipment email on content saving
+        /// </summary>
+        /// <param name="shopOrderPage"></param>
+        /// <param name="contentService"></param>
+        /// <returns></returns>
         public bool SendShipmentEmail(IContent shopOrderPage, IContentService contentService)
         {
             var shipmentEmailSent = false;
@@ -247,58 +280,49 @@ namespace NatureQuestWebsite.Services
             {
                 //create the string builder
                 var emailBodyString = new StringBuilder();
+                //create the email wrapper
+                emailBodyString.Append("<center><table width='600px' border='0' cellpadding='0' cellspacing='0' style='max-width: 600px; margin:0 auto;'><tr><td>");
 
-                //build the email body
-                emailBodyString.Append("<h2>Your Natures Quest Order Shipment.</h2>");
+                //create the header details table
+                emailBodyString.Append("<table width='100%' border='0' cellpadding='5' cellspacing='0'>");
 
-                //add the body introduction
-                emailBodyString.Append($"<p>Your order : {orderId}, has been shipped and will be with you soon.</p>");
+                //add the table header
+                emailBodyString.Append("<tr>");
+                emailBodyString.Append("<td style='width: 50%;background:#2ecc71;'>" +
+                                       "<p><a href='https://www.naturesquest.com.au' tittle='Natures Quest'>" +
+                                       "<img src='https://www.naturesquest.com.au/Images/NatureQuest-Site-Logo.png' alt='Natures Quest' width='185' />" +
+                                       "</a><p/></td>");
+                emailBodyString.Append("<td style='width: 50%;background:#2ecc71;'></td>");
+                emailBodyString.Append("</tr>");
 
-                //add the body shipping details
-                emailBodyString.Append("<h3>Shipment Details.</h3>");
-                //check the order tracking id
-                if (!string.IsNullOrWhiteSpace(orderTrackingId))
-                {
-                    emailBodyString.Append($"<p>Your order tracking number is: {orderTrackingId}</p>");
-                    //check if we have the shipping details page
-                    if (orderShipping?.Id > 0)
-                    {
-                        emailBodyString.Append($"<p>Your order is shipped by: {orderShipping.Name}</p>");
-                        if (orderShipping.HasProperty("websiteTrackingLink"))
-                        {
-                            var shippingLink = orderShipping.GetValue<string>("websiteTrackingLink");
-                            if (!string.IsNullOrWhiteSpace(shippingLink))
-                            {
-                                emailBodyString.Append("<p>Visit the tracking website link here to track your order: " +
-                                                       $"<a href=\"{shippingLink}\" target=\"_blank\">{orderShipping.Name}</a></p>");
-                                
-                            }
-                        }
-                    }
-                }
+                //add the details row 
+                emailBodyString.Append("<tr>");
+                emailBodyString.Append("<td style='width: 50%;'>" +
+                                       $"<h3>Your Natures Quest order: {orderId} ,has now left.</h3>" +
+                                       "</td>");
+                emailBodyString.Append("<td style='width: 50%;'>" +
+                                       "<h4>Got a question?</h4>" +
+                                       "<p>Call us on: 08 8382 6005<br />" +
+                                       "<p>Email: info@naturesquest.com.au</p>" +
+                                       "</td>");
+                emailBodyString.Append("</tr>");
+
+                //close the shipping and details table
+                emailBodyString.Append("</table>");
 
                 //create the email subject
                 var customerSubject = "Your Order shipment from Natures Quest.";
+
                 //create the customer email
-                if (orderMember?.Id > 0)
+                if (orderMember?.Id > 0 && orderShipping?.Id > 0)
                 {
                     //create the default member properties to use
                     var memberEmail = orderMember.Email;
                     var memberName = "";
-                    var mobileNumber = "";
-                    var houseAddress = "";
-                    var suburb = "";
-                    var postCode = "";
-                    var state = "";
 
                     //get the properties that can be edited
                     var editableProperties = orderMember.Properties.Where(property =>
-                        property.Alias == "fullName" ||
-                        property.Alias == "mobileNumber" ||
-                        property.Alias == "houseAddress" ||
-                        property.Alias == "suburb" ||
-                        property.Alias == "postCode" ||
-                        property.Alias == "state").ToList();
+                        property.Alias == "fullName").ToList();
 
                     //get the values from the properties to set them on the model
                     if (editableProperties.Any())
@@ -314,60 +338,43 @@ namespace NatureQuestWebsite.Services
                                         memberName = (string)memberProperty.GetValue();
                                     }
                                     break;
-                                case "mobilenumber":
-                                    if (memberProperty.GetValue() != null && !string.IsNullOrWhiteSpace((string)memberProperty.GetValue()))
-                                    {
-                                        mobileNumber = (string)memberProperty.GetValue();
-                                    }
-                                    break;
-                                case "houseaddress":
-                                    if (memberProperty.GetValue() != null && !string.IsNullOrWhiteSpace((string)memberProperty.GetValue()))
-                                    {
-                                        houseAddress = (string)memberProperty.GetValue();
-                                    }
-                                    break;
-                                case "suburb":
-                                    if (memberProperty.GetValue() != null && !string.IsNullOrWhiteSpace((string)memberProperty.GetValue()))
-                                    {
-                                        suburb = (string)memberProperty.GetValue();
-                                    }
-                                    break;
-                                case "postcode":
-                                    if (memberProperty.GetValue() != null && !string.IsNullOrWhiteSpace((string)memberProperty.GetValue()))
-                                    {
-                                        postCode = (string)memberProperty.GetValue();
-                                    }
-                                    break;
-                                case "state":
-                                    if (memberProperty.GetValue() != null && !string.IsNullOrWhiteSpace((string)memberProperty.GetValue()))
-                                    {
-                                        state = (string)memberProperty.GetValue();
-                                    }
-                                    break;
                             }
                         }
                     }
 
+                    //build the email body
+                    emailBodyString.Append($"<p>Hi {memberName}, <p/>" +
+                                           "<p>Your order how now left.</p>");
+
+                    //add the shipment details
+                    emailBodyString.Append($"<p>Your order was Shipped by: {orderShipping.Name}</p>");
+
                     //add the order shipping details
-                    emailBodyString.Append("<p>Your order shipping details are below:" +
-                                           $"Shipping name: {memberName} <br />" +
-                                           $"Shipping email: {memberEmail} <br />" +
-                                           $"Shipping phone: {mobileNumber} <br />" +
-                                           $"Shipping address: {houseAddress} <br />" +
-                                           $"Shipping suburb: {suburb} <br />" +
-                                           $"Shipping post code: {postCode} <br />" +
-                                           $"Shipping state: {state} </p>");
+                    if (!string.IsNullOrWhiteSpace(orderTrackingId))
+                    {
+                        emailBodyString.Append($"<p>Your tracking number is: {orderTrackingId}");
+                    }
+
+                    if (orderShipping.HasProperty("websiteTrackingLink"))
+                    {
+                        var shippingLink = orderShipping.GetValue<string>("websiteTrackingLink");
+                        if (!string.IsNullOrWhiteSpace(shippingLink))
+                        {
+                            emailBodyString.Append("<p>Visit the tracking website link to track your order:  " +
+                                                   $"<a href=\"{shippingLink}\" target=\"_blank\">{orderShipping.Name}</a></p>");
+
+                        }
+                    }
 
                     //check if we have the order summary saved on the page
                     if (!string.IsNullOrWhiteSpace(orderSummary))
                     {
                         //add the body summary
-                        emailBodyString.Append("<h3>Order Summary.</h3>");
                         emailBodyString.Append($"{orderSummary}");
                     }
 
-                    //add the email body footer
-                    emailBodyString.Append("<p>Thank you for shopping in Natures Quest.<p/>");
+                    //close the email wrapper
+                    emailBodyString.Append("</tr></td></table></center>");
 
                     //create the customer email address to send
                     var customerEmailAddress = new EmailAddress(

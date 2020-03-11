@@ -401,13 +401,206 @@ namespace NatureQuestWebsite.Services
         /// get the product categories
         /// </summary>
         /// <returns></returns>
-        public List<ProductCategory> ProductCategories()
+        public List<ProductCategory> ProductCategories(bool includeSpecials = false)
         {
             //create the default list to return
             var productCategories = new List<ProductCategory>();
 
+            //if we need to include specials add theme here first
+            if (includeSpecials)
+            {
+                //get the specials page
+                var productSpecialsPage = _homePage.Descendants().
+                    FirstOrDefault(page =>
+                    page.ContentType.Alias == "productSpecialsPage"
+                    && !page.Value<bool>("hideFromMenu")
+                    && page.IsPublished());
+
+                //check the specials page and get the products set as featured/specials
+                if (productSpecialsPage?.Id > 0)
+                {
+                    //set the default specials category page title
+                    var specialsTitle = productSpecialsPage.Name;
+                    //check if we have the page title set on the current page
+                    if (productSpecialsPage.HasProperty("pageTitle") && productSpecialsPage.HasValue("pageTitle"))
+                    {
+                        // set the page title to override the default
+                        specialsTitle = productSpecialsPage.GetProperty("pageTitle").Value().ToString();
+                    }
+
+                    //create the default specials category model
+                    var specialsCategoryModel = new ProductCategory
+                    {
+                        CategoryLinkTitle = specialsTitle,
+                        CategoryLinkUrl = productSpecialsPage.Url,
+                        ProductCategoryPage = productSpecialsPage
+                    };
+
+                    //get the product specials
+                    var specialsProducts = _homePage.Descendants().Where(page =>
+                            page.ContentType.Alias == "productPage"
+                            && !page.Value<bool>("hideFromMenu")
+                            && page.Value<bool>("featureProduct"))
+                        .ToList();
+
+                    //add the specials products
+                    if (specialsProducts.Any())
+                    {
+                        // get the products list
+                        var modelProducts = specialsProducts.ToList();
+
+                        //get the model for each of the products
+                        foreach (var product in modelProducts)
+                        {
+                            var productModel = GetProductModel(product);
+                            //add it to the category model
+                            specialsCategoryModel.CategoriesProducts.Add(productModel);
+                        }
+                    }
+
+                    //get the specials category image
+                    if (productSpecialsPage.HasProperty("bannerImage") && productSpecialsPage.HasValue("bannerImage"))
+                    {
+                        //set feature product image
+                        var productVariantImage = productSpecialsPage.Value<IPublishedContent>("bannerImage");
+                        if (productVariantImage?.Id > 0)
+                        {
+                            //get the image url
+                            var imageLink = "/Images/Nature-Quest-Product-Default.png";
+                            var defaultCropSize = productVariantImage.GetCropUrl("product");
+                            var productImagelink = !string.IsNullOrEmpty(defaultCropSize)
+                                ? defaultCropSize
+                                : productVariantImage.GetCropUrl(350, 500);
+                            if (!string.IsNullOrWhiteSpace(productImagelink))
+                            {
+                                imageLink = productImagelink;
+                            }
+
+                            //create the product model
+                            var variantImageModel = new ProductImageModel
+                            {
+                                ImageUrl = imageLink,
+                                ImageAltText = productVariantImage.Name,
+                                ImageProductId = productSpecialsPage.Id.ToString(),
+                                IsFeaturedPriceImage = false
+                            };
+                            //add the image model to the product images
+                            specialsCategoryModel.CategoryImageModel = variantImageModel;
+                        }
+                    }
+                    //if we don't have a image set on the category then get the first one from the products
+                    else if (specialsCategoryModel.CategoriesProducts.Any())
+                    {
+                        var productFirstImage =
+                            specialsCategoryModel.CategoriesProducts.FirstOrDefault(productModel => productModel.ProductImages.Any());
+                        if (productFirstImage != null)
+                        {
+                            specialsCategoryModel.CategoryImageModel = productFirstImage.ProductImages.FirstOrDefault();
+                        }
+                    }
+
+                    //add the specials category model to the view model
+                    productCategories.Add(specialsCategoryModel);
+                }
+
+                //get the best sellers page
+                var productBestSellersPage = _homePage.Descendants().
+                    FirstOrDefault(page =>
+                        page.ContentType.Alias == "productBestSellersPage"
+                        && !page.Value<bool>("hideFromMenu")
+                        && page.IsPublished());
+
+                //check the specials page and get the products set as featured/specials
+                if (productBestSellersPage?.Id > 0)
+                {
+                    //set the default best sellers category page title
+                    var bestSpecialsTitle = productBestSellersPage.Name;
+                    //check if we have the page title set on the current page
+                    if (productSpecialsPage.HasProperty("pageTitle") && productSpecialsPage.HasValue("pageTitle"))
+                    {
+                        // set the page title to override the default
+                        bestSpecialsTitle = productBestSellersPage.GetProperty("pageTitle").Value().ToString();
+                    }
+
+                    //create the default best sellers category model
+                    var bestSellersCategoryModel = new ProductCategory
+                    {
+                        CategoryLinkTitle = bestSpecialsTitle,
+                        CategoryLinkUrl = productBestSellersPage.Url,
+                        ProductCategoryPage = productBestSellersPage
+                    };
+
+                    //get the product specials
+                    var bestSellersProducts = _homePage.Descendants().Where(page =>
+                            page.ContentType.Alias == "productPage"
+                            && !page.Value<bool>("hideFromMenu")
+                            && page.Value<bool>("bestSellerProduct"))
+                        .ToList();
+
+                    //add the best sellers products
+                    if (bestSellersProducts.Any())
+                    {
+                        // get the products list
+                        var modelProducts = bestSellersProducts.ToList();
+
+                        //get the model for each of the products
+                        foreach (var product in modelProducts)
+                        {
+                            var productModel = GetProductModel(product);
+                            //add it to the category model
+                            bestSellersCategoryModel.CategoriesProducts.Add(productModel);
+                        }
+                    }
+
+                    //get the specials category image
+                    if (productBestSellersPage.HasProperty("bannerImage") && productBestSellersPage.HasValue("bannerImage"))
+                    {
+                        //set feature product image
+                        var productVariantImage = productBestSellersPage.Value<IPublishedContent>("bannerImage");
+                        if (productVariantImage?.Id > 0)
+                        {
+                            //get the image url
+                            var imageLink = "/Images/Nature-Quest-Product-Default.png";
+                            var defaultCropSize = productVariantImage.GetCropUrl("product");
+                            var productImagelink = !string.IsNullOrEmpty(defaultCropSize)
+                                ? defaultCropSize
+                                : productVariantImage.GetCropUrl(350, 500);
+                            if (!string.IsNullOrWhiteSpace(productImagelink))
+                            {
+                                imageLink = productImagelink;
+                            }
+
+                            //create the product model
+                            var variantImageModel = new ProductImageModel
+                            {
+                                ImageUrl = imageLink,
+                                ImageAltText = productVariantImage.Name,
+                                ImageProductId = productBestSellersPage.Id.ToString(),
+                                IsFeaturedPriceImage = false
+                            };
+                            //add the image model to the product images
+                            bestSellersCategoryModel.CategoryImageModel = variantImageModel;
+                        }
+                    }
+                    //if we don't have a image set on the category then get the first one from the products
+                    else if (bestSellersCategoryModel.CategoriesProducts.Any())
+                    {
+                        var productFirstImage =
+                            bestSellersCategoryModel.CategoriesProducts.FirstOrDefault(productModel => productModel.ProductImages.Any());
+                        if (productFirstImage != null)
+                        {
+                            bestSellersCategoryModel.CategoryImageModel = productFirstImage.ProductImages.FirstOrDefault();
+                        }
+                    }
+
+                    //add the specials category model to the view model
+                    productCategories.Add(bestSellersCategoryModel);
+                }
+            }
+
             //get the feature products to display
-            var productCategoriesList = _homePage.Descendants().Where(page => page.ContentType.Alias == "productCategoryPage"
+            var productCategoriesList = _homePage.Descendants().Where(page => 
+                                                                        page.ContentType.Alias == "productCategoryPage"
                                                                         && !page.Value<bool>("hideFromMenu")
                                                                         && page.IsPublished())
                 .ToList();
@@ -435,12 +628,13 @@ namespace NatureQuestWebsite.Services
                     };
 
                     //get the products for each category to add to the model
-                    var categoryProducts = productCategory.Children().Where(page => page.ContentType.Alias == "productPage"
+                    var categoryProducts = productCategory.Children().Where(page => 
+                                                                                page.ContentType.Alias == "productPage"
                                                                                 && !page.Value<bool>("hideFromMenu")
                                                                                 && page.IsPublished())
                         .ToList();
 
-                    //if we have some products, take 4 random ones
+                    //if we have some products add them to the model
                     if (categoryProducts.Any())
                     {
                         // get the products list
@@ -498,6 +692,7 @@ namespace NatureQuestWebsite.Services
 
                     //add the category model to the view model
                     productCategories.Add(categoryModel);
+
                 }
             }
 

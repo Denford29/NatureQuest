@@ -13,50 +13,69 @@
                     <table class="table table-hover margin-bottom-none">
                         <thead>
                             <tr>
-                                <th>Order #</th>
-                                <th>Order Date</th>
-                                <th>Status</th>
-                                <th>Total</th>
+                                <th style="width: 20%;">Order #</th>
+                                <th style="width: 20%;">Order Date</th>
+                                <th style="width: 45%;">Status</th>
+                                <th style="width: 15%;">Total</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var orderDetail in Model.AdminOrderDetailsList)
+                            @foreach (var orderDetail in Model.AdminOrderDetailsList.OrderByDescending(order => order.OrderCreatedDate))
                             {
                                 var orderDisplayedStatus = "Pending";
                                 if (orderDetail.OrderPaidSuccess && !orderDetail.OrderShipped)
                                 {
                                     orderDisplayedStatus = "Processing";
                                 }
-                                else if (orderDetail.OrderPaidSuccess && orderDetail.OrderShipped)
+                                else if (orderDetail.OrderPaidSuccess && orderDetail.OrderShipped && !orderDetail.OrderCompleted)
                                 {
                                     orderDisplayedStatus = "Shipped";
                                 }
+                                else if (orderDetail.OrderPaidSuccess && orderDetail.OrderShipped && orderDetail.OrderCompleted)
+                                {
+                                    orderDisplayedStatus = "Completed";
+                                }
 
                                 <tr>
-                                    <td>
-                                        @*<a class="text-medium navi-link" href="#" data-toggle="modal" data-target="#orderDetails">78A643CD409</a>*@
-                                        @if (Model.IsAdminUser)
+                                    <td style="width: 20%;">
+                                        @if (Model.IsAdminUser && !string.IsNullOrWhiteSpace(orderDetail.OrderPaymentIntent?.Id))
                                         {
-                                            var stripeOrderLink = $"https://dashboard.stripe.com/payments/{orderDetail.OrderId}";
-                                            if (!Model.MemberCart.IsStripeLiveMode)
-                                            {
-                                                stripeOrderLink = $"https://dashboard.stripe.com/test/payments/{orderDetail.OrderId}";
-                                            }
+                                            var displayedOrderId = !string.IsNullOrWhiteSpace(orderDetail.OrderId) ?
+                                                orderDetail.OrderId :
+                                                orderDetail.OrderPaymentIntent.Id;
+                                            var stripeOrderLink = $"https://dashboard.stripe.com/payments/{orderDetail.OrderPaymentIntent.Id}";
 
-                                            <a class="text-medium navi-link" href="@stripeOrderLink" target="_blank" title="Stripe Order Details">
-                                                @orderDetail.OrderId
+                                            <a class="navi-link text-break" href="@stripeOrderLink" target="_blank" title="Stripe Order Details">
+                                                @displayedOrderId
                                             </a>
                                         }
                                         else
                                         {
-                                            <a class="text-medium navi-link">@orderDetail.OrderId</a>
+                                            var displayedOrderId = !string.IsNullOrWhiteSpace(orderDetail.OrderId) ?
+                                                orderDetail.OrderId : 
+                                                orderDetail.OrderPaymentIntent?.Id;
+                                            <a class="navi-link text-break">@displayedOrderId</a>
                                         }
                                     </td>
-                                    <td>@orderDetail.OrderCreatedDate.ToShortDateString()</td>
-                                    <td>
+                                    <td style="width: 20%;">@orderDetail.OrderCreatedDate.ToString("D")</td>
+                                    <td style="width: 45%;">
                                         <span class="text-success">@orderDisplayedStatus</span>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox custom-control-inline">
+                                                @Html.CheckBoxFor(model => orderDetail.OrderPaidSuccess, new { @class = "custom-control-input" })
+                                                <label class="custom-control-label">Paid?</label>
+                                            </div>
+                                            <div class="custom-control custom-checkbox custom-control-inline">
+                                                @Html.CheckBoxFor(model => orderDetail.OrderShipped, new { @class = "custom-control-input" })
+                                                <label class="custom-control-label">Shipped?</label>
+                                            </div>
+                                            <div class="custom-control custom-checkbox custom-control-inline">
+                                                @Html.CheckBoxFor(model => orderDetail.OrderCompleted, new { @class = "custom-control-input" })
+                                                <label class="custom-control-label">Completed?</label>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td>
+                                    <td style="width: 15%;">
                                         <span class="text-medium">@orderDetail.OrderTotal.ToString("c")</span>
                                     </td>
                                 </tr>

@@ -368,6 +368,16 @@ namespace NatureQuestWebsite.Services
                             memberModel.MemberOrdersPage = memberOrders;
                         }
 
+                        //get the admin orders 
+                        var adminOrders = _globalOrdersPage.Children.
+                            Where(page => page.IsPublished())
+                            .ToList();
+
+                        if (adminOrders.Any())
+                        {
+                            memberModel.AdminOrdersPage = adminOrders;
+                        }
+
                         //set a flag if the member is an admin user
                         memberModel.IsAdminUser = !string.IsNullOrWhiteSpace(memberModel.MemberRoles.FirstOrDefault(role => role == "Site Admins"));
                     }

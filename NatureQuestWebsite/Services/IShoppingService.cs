@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using NatureQuestWebsite.Models;
 using PayPalCheckoutSdk.Orders;
+using SendGrid.Helpers.Mail;
 using Stripe;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Order = PayPalCheckoutSdk.Orders.Order;
+//using Order = PayPalCheckoutSdk.Orders.Order;
 using ShippingOption = NatureQuestWebsite.Models.ShippingOption;
 
 namespace NatureQuestWebsite.Services
@@ -45,7 +47,7 @@ namespace NatureQuestWebsite.Services
         /// <param name="resultMessage"></param>
         /// <returns></returns>
         bool AddProductToCart(
-            ProductModel productModel, 
+            ProductModel productModel,
             SiteShoppingCart currentShoppingCart,
             out string resultMessage);
 
@@ -186,8 +188,9 @@ namespace NatureQuestWebsite.Services
         /// get the member model orders
         /// </summary>
         /// <param name="membersModel"></param>
+        /// <param name="adminOrders"></param>
         /// <returns></returns>
-        MembersModel GetMemberOrderDetails(MembersModel membersModel);
+        MembersModel GetMemberOrderDetails(MembersModel membersModel, bool adminOrders = false);
 
         /// <summary>
         /// get the admin model orders
@@ -195,5 +198,29 @@ namespace NatureQuestWebsite.Services
         /// <param name="membersModel"></param>
         /// <returns></returns>
         MembersModel GetAdminOrderDetails(MembersModel membersModel);
+
+        /// <summary>
+        /// get and update the system order number
+        /// </summary>
+        /// <param name="currentShoppingCart"></param>
+        /// <returns></returns>
+        string SystemOrderId(SiteShoppingCart currentShoppingCart);
+
+        /// <summary>
+        /// get the shopping cart html summary for emails
+        /// </summary>
+        /// <param name="currentShoppingCart"></param>
+        /// <param name="emailBodyString"></param>
+        /// <returns></returns>
+        StringBuilder CartSummaryHtml(SiteShoppingCart currentShoppingCart, StringBuilder emailBodyString);
+
+        /// <summary>
+        /// send the send grid message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="autoAddBcc"></param>
+        /// <param name="autoAddAdminBcc"></param>
+        /// <returns></returns>
+        Task<bool> SendGridEmail(SendGridMessage message, bool autoAddBcc = false, bool autoAddAdminBcc = false);
     }
 }

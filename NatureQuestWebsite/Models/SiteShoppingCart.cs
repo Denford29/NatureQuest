@@ -188,6 +188,11 @@ namespace NatureQuestWebsite.Models
         /// </summary>
         public List<PurchaseUnitRequest> PayPalPurchaseUnits { get; set; } = new List<PurchaseUnitRequest>();
 
+        /// <summary>
+        /// Get or set the system local order id
+        /// </summary>
+        public string SystemOrderId { get; set; }
+
     }
 
     /// <summary>

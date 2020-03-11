@@ -188,6 +188,11 @@ namespace NatureQuestWebsite.Models
         public List<IPublishedContent> MemberOrdersPage { get; set; } = new List<IPublishedContent>();
 
         /// <summary>
+        /// get or set the list admin orders page
+        /// </summary>
+        public List<IPublishedContent> AdminOrdersPage { get; set; } = new List<IPublishedContent>();
+
+        /// <summary>
         /// get or set the members orders list
         /// </summary>
         public List<OrderDetails> MemberOrderDetailsList { get; set; } = new List<OrderDetails>();

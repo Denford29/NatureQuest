@@ -500,7 +500,13 @@ namespace NatureQuestWebsite.Controllers
                         };
 
                         //check if this landing page has got child pages which can be displayed in the menu
-                        var landingPageChildren = landingPage.Children.Where(page => !page.Value<bool>("hideFromMenu")).ToList();
+                        var landingPageChildren = landingPage.Children.
+                            Where(page => 
+                                        !page.Value<bool>("hideFromMenu") &&
+                                        //exclude specials and best sellers
+                                        page.ContentType.Alias != "productSpecialsPage" &&
+                                        page.ContentType.Alias != "productBestSellersPage")
+                            .ToList();
                         if (landingPageChildren.Any())
                         {
                             //set tht flag to indicate this has children
@@ -580,7 +586,8 @@ namespace NatureQuestWebsite.Controllers
                 {
                     //order the features randomly
                     var r = new Random();
-                    var menuFeatureProducts = featureProducts.OrderBy(x => r.Next()).ToList();
+                    //var menuFeatureProducts = featureProducts.OrderBy(x => r.Next()).Take(6).ToList();
+                    var menuFeatureProducts = featureProducts.Take(6).ToList();
                     //create the mega menu items for the feature products
                     foreach (var featureProduct in menuFeatureProducts)
                     {

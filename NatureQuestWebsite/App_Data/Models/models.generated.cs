@@ -19,7 +19,7 @@ using Umbraco.ModelsBuilder;
 using Umbraco.ModelsBuilder.Umbraco;
 
 [assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "e36c2e90b1133bf8")]
+[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "78ac3b9814f3a842")]
 [assembly:System.Reflection.AssemblyVersion("0.0.0.1")]
 
 namespace Umbraco.Web.PublishedModels
@@ -1900,6 +1900,13 @@ namespace Umbraco.Web.PublishedModels
 		public string OrderTrackingId => this.Value<string>("orderTrackingId");
 
 		///<summary>
+		/// Payment Id: This is the payment method's payment id.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("paymentId")]
+		public string PaymentId => this.Value<string>("paymentId");
+
+		///<summary>
 		/// Payment Method: The payment method used to pay the order
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
@@ -2067,6 +2074,13 @@ namespace Umbraco.Web.PublishedModels
 		// properties
 
 		///<summary>
+		/// Current Order Number: This is the current numeric order number, please do not change.
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("currentOrderNumber")]
+		public int CurrentOrderNumber => this.Value<int>("currentOrderNumber");
+
+		///<summary>
 		/// Live Client Id: PayPal live client id
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
@@ -2093,6 +2107,13 @@ namespace Umbraco.Web.PublishedModels
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
 		[ImplementPropertyType("liveSecretKey")]
 		public string LiveSecretKey => this.Value<string>("liveSecretKey");
+
+		///<summary>
+		/// Order Prefix: Add the text added in front of the order number
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("orderPrefix")]
+		public string OrderPrefix => this.Value<string>("orderPrefix");
 
 		///<summary>
 		/// PayPal Live Mode: Check this option for PayPal to process payment live, if not set stripe will use test mode and no charges will be made.
@@ -2371,6 +2392,58 @@ namespace Umbraco.Web.PublishedModels
 
 		// ctor
 		public StripeOrders(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+	}
+
+	/// <summary>Product Specials Page</summary>
+	[PublishedModel("productSpecialsPage")]
+	public partial class ProductSpecialsPage : SiteDefaultPage
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "productSpecialsPage";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<ProductSpecialsPage, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public ProductSpecialsPage(IPublishedContent content)
+			: base(content)
+		{ }
+
+		// properties
+	}
+
+	/// <summary>Product Best Sellers Page</summary>
+	[PublishedModel("productBestSellersPage")]
+	public partial class ProductBestSellersPage : SiteDefaultPage
+	{
+		// helpers
+#pragma warning disable 0109 // new is redundant
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const string ModelTypeAlias = "productBestSellersPage";
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public new static PublishedContentType GetModelContentType()
+			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		public static PublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<ProductBestSellersPage, TValue>> selector)
+			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
+#pragma warning restore 0109
+
+		// ctor
+		public ProductBestSellersPage(IPublishedContent content)
 			: base(content)
 		{ }
 

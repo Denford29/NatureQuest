@@ -2,7 +2,7 @@
 @inherits Umbraco.Web.Mvc.UmbracoViewPage<MembersModel>
 @{
     //if the user is already subscribed, then display a message
-    if (Model.IsNewsletterMember)
+    if (Model.MemberCurrentLoginStatus.IsLoggedIn && Model.IsNewsletterMember)
     {
         <div class="row widget-light-skin">
             <div class="col-lg-12">
@@ -32,7 +32,8 @@
             </div>
         </div>
     }
-    else if (!Model.IsNewsletterMember)
+    else if (!Model.MemberCurrentLoginStatus.IsLoggedIn ||
+             (Model.MemberCurrentLoginStatus.IsLoggedIn && !Model.IsNewsletterMember))
     {
         //if we have had an error from the 1st attempt display it here
         if (TempData.ContainsKey("subscriptionError") || !string.IsNullOrWhiteSpace(Model.SubscribeMessage))

@@ -45,7 +45,10 @@ namespace NatureQuestWebsite.Controllers
         /// </summary>
         private readonly ILocationService _locationService;
 
-        private int _pageSize = 9;
+        /// <summary>
+        /// set the default page size
+        /// </summary>
+        private readonly int _pageSize = 9;
 
         /// <summary>
         /// initialise the controller
@@ -621,10 +624,12 @@ namespace NatureQuestWebsite.Controllers
         /// get the list of products for a product listing page
         /// </summary>
         /// <returns></returns>
-        public ActionResult GetProductsList(string sortOption, int page = 1)
+        public ActionResult GetProductsList(string sortOption,int page = 1, string productsType = "normal")
         {
             //check if the current page is a product
-            if (CurrentPage.ContentType.Alias == "productCategoryPage"
+            if ((CurrentPage.ContentType.Alias == "productCategoryPage" ||
+                 CurrentPage.ContentType.Alias == "productSpecialsPage" ||
+                 CurrentPage.ContentType.Alias == "productBestSellersPage")
                 && !CurrentPage.Value<bool>("hideFromMenu"))
             {
                 //create the default model, and set a flag if its a category page
@@ -635,14 +640,38 @@ namespace NatureQuestWebsite.Controllers
                     SortOption = sortOption
                 };
 
-                //get the products from the current page's descendants
-                var displayProducts = CurrentPage.Descendants().Where(contentPage => contentPage.ContentType.Alias == "productPage"
-                                                                            && !contentPage.Value<bool>("hideFromMenu")
-                                                                            && contentPage.IsPublished())
-                                                                            .ToList();
+                List<IPublishedContent> displayProducts = null;
+                //if we need normal products
+                if (productsType == "normal")
+                {
+                    //get the products from the current page's descendants
+                    displayProducts = CurrentPage.Descendants().Where(contentPage => contentPage.ContentType.Alias == "productPage"
+                                                                                             && !contentPage.Value<bool>("hideFromMenu")
+                                                                                             && contentPage.IsPublished())
+                                                                                         .ToList();
+                }
+                else if (productsType == "specials")
+                {
+                    //get the products from the current page's descendants
+                    displayProducts = _homePage.Descendants().Where(contentPage =>
+                                                                                            contentPage.ContentType.Alias == "productPage"
+                                                                                            && !contentPage.Value<bool>("hideFromMenu")
+                                                                                            && contentPage.Value<bool>("featureProduct"))
+                                                                                        .ToList();
+                }
+                else if(productsType == "bestSellers")
+                {
+                    //get the products from the current page's descendants
+                    displayProducts = _homePage.Descendants().Where(contentPage =>
+                                                                                            contentPage.ContentType.Alias == "productPage"
+                                                                                            && !contentPage.Value<bool>("hideFromMenu")
+                                                                                            && contentPage.Value<bool>("bestSellerProduct"))
+                                                                                        .ToList();
+                }
+
 
                 //if we have the products to display, get the product models for each
-                if (displayProducts.Any())
+                if (displayProducts?.Any() == true)
                 {
                     //use the helper to get the list of models
                     var productModels = GetProductModels(displayProducts);
@@ -673,7 +702,6 @@ namespace NatureQuestWebsite.Controllers
 
                         //add the products to display
                         model.ProductsList = sortedProducts
-                                                            //.OrderBy(product => product.ProductTitle)
                                                             .Skip((page - 1) * _pageSize)
                                                             .Take(_pageSize)
                                                             .ToList();
@@ -789,7 +817,7 @@ namespace NatureQuestWebsite.Controllers
                 var model = new ProductCategoriesModel
                 {
                     ProductCategoriesLinks = _productsService.ProductCategoryLinks(),
-                    ProductCategories = _productsService.ProductCategories()
+                    ProductCategories = _productsService.ProductCategories(true)
                 };
 
                 //return the view with the model

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection.PortableExecutable;
 using Stripe;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -31,6 +30,11 @@ namespace NatureQuestWebsite.Models
         /// get or set the flag to indicate the order has been shipped
         /// </summary>
         public bool OrderShipped { get; set; }
+
+        /// <summary>
+        /// get or set the flag to indicate the order has been completed
+        /// </summary>
+        public bool OrderCompleted { get; set; }
 
         /// <summary>
         /// get or set the list of order items from shopping cart

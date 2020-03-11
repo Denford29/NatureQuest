@@ -28,6 +28,6 @@ namespace NatureQuestWebsite.Services
         /// get the product categories
         /// </summary>
         /// <returns></returns>
-        List<ProductCategory> ProductCategories();
+        List<ProductCategory> ProductCategories(bool includeSpecials = false);
     }
 }
