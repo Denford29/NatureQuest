@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Web.Mvc;
 using NatureQuestWebsite.Models;
 
@@ -14,11 +13,13 @@ namespace NatureQuestWebsite.Services
         /// <param name="pagingModel"></param>
         /// <param name="pageUrl"></param>
         /// <param name="sortOrder"></param>
+        /// <param name="useSorting"></param>
         /// <returns></returns>
         public static MvcHtmlString PagingLink(this HtmlHelper html,
             PagingModel pagingModel,
             string pageUrl,
-            string sortOrder = "")
+            string sortOrder = "",
+            bool useSorting = true)
         {
             //create the default html string to return
             var pagingListItems = new StringBuilder();
@@ -27,8 +28,13 @@ namespace NatureQuestWebsite.Services
             {
                 //generate the lin url
                 var itemUrl = $"{pageUrl}?page={pageCount}&sortOption={sortOrder}";
+                if (!useSorting)
+                {
+                    itemUrl = $"{pageUrl}?page={pageCount}";
+                }
 
-               //build the li item tag and set the class if its the active link
+
+                //build the li item tag and set the class if its the active link
                 var listTag = new TagBuilder("li");
                 if (pageCount == pagingModel.CurrentPage)
                 {

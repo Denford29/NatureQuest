@@ -15,6 +15,7 @@
             this.cartReview();
             this.submitLoginForm();
             this.submitRegistrationForm();
+
         },
 
         //create the function to do the sorting
@@ -298,6 +299,7 @@
     // on doc ready load the defined main function
     $(document).ready(function () {
         siteScripts.onReady();
+
     });
 
 })(jQuery);

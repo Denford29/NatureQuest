@@ -133,6 +133,13 @@ namespace NatureQuestWebsite.Services
         string GetCartStripeSessionId(SiteShoppingCart currentShoppingCart);
 
         /// <summary>
+        /// clear the stripe session saved on the cart
+        /// </summary>
+        /// <param name="currentShoppingCart"></param>
+        /// <returns></returns>
+        bool ClearStripeSessionId(SiteShoppingCart currentShoppingCart);
+
+        /// <summary>
         /// Finalise the stripe payment
         /// </summary>
         /// <param name="stripePaymentIntent"></param>
@@ -160,8 +167,9 @@ namespace NatureQuestWebsite.Services
         /// Get the stripe list of paid payment intents, with optional customer emails
         /// </summary>
         /// <param name="emailAddress"></param>
+        /// <param name="orderPaymentIntentId"></param>
         /// <returns></returns>
-        List<PaymentIntent> GetStripePaidIntents(string emailAddress = null);
+        List<PaymentIntent> GetStripePaidIntents(string emailAddress = null, string orderPaymentIntentId = null);
 
         /// <summary>
         /// Get the paypal order request object
@@ -192,12 +200,12 @@ namespace NatureQuestWebsite.Services
         /// <returns></returns>
         MembersModel GetMemberOrderDetails(MembersModel membersModel, bool adminOrders = false);
 
-        /// <summary>
-        /// get the admin model orders
-        /// </summary>
-        /// <param name="membersModel"></param>
-        /// <returns></returns>
-        MembersModel GetAdminOrderDetails(MembersModel membersModel);
+        ///// <summary>
+        ///// get the admin model orders
+        ///// </summary>
+        ///// <param name="membersModel"></param>
+        ///// <returns></returns>
+        //MembersModel GetAdminOrderDetails(MembersModel membersModel);
 
         /// <summary>
         /// get and update the system order number

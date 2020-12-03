@@ -35,6 +35,11 @@ namespace NatureQuestWebsite.Services
         private readonly IMemberService _memberService;
 
         /// <summary>
+        /// get the member type
+        /// </summary>
+        private readonly IMemberType _memberType;
+
+        /// <summary>
         /// create a list of the members roles
         /// </summary>
         private readonly List<string> _memberRoles;
@@ -95,22 +100,24 @@ namespace NatureQuestWebsite.Services
         /// <param name="logger"></param>
         /// <param name="memberService"></param>
         /// <param name="contextFactory"></param>
+        /// <param name="memberTypeService"></param>
         public SiteMembersService(
             ILogger logger,
             IMemberService memberService,
-            IUmbracoContextFactory contextFactory)
+            IUmbracoContextFactory contextFactory,
+            IMemberTypeService memberTypeService)
         {
             _logger = logger;
             _memberService = memberService;
 
+            //get the member type
+            _memberType = memberTypeService.Get("Member");
+
             //get all the roles
             _memberRoles = _memberService.GetAllRoles().ToList();
 
-            //add the default address to the admin list
-            //_siteToEmailAddresses.Add(new EmailAddress("denfordmutseriwa@yahoo.com", "Admin"));
-
             //create the default system email address
-            _systemEmailAddress = new EmailAddress("denfordmutseriwa@yahoo.com", "Admin");
+            _systemEmailAddress = new EmailAddress("admin@rdmonline.com.au", "Admin");
             _fromEmailAddress = new EmailAddress("support@naturesquest.com.au", _siteName);
 
             //get the sendgrid api key
@@ -472,7 +479,7 @@ namespace NatureQuestWebsite.Services
                     var currentMember = memberModel.LoggedInMember;
                     //get the properties that can be edited
                     var editableProperties = currentMember.Properties.Where(property =>
-                                                            memberModel.ModelMemberType.MemberCanEditProperty(property.Alias) &&
+                                                            _memberType.MemberCanEditProperty(property.Alias) &&
                                                             !string.IsNullOrWhiteSpace(property.Alias)).ToList();
 
                     //get the values from the properties to set them on the model
@@ -868,8 +875,3 @@ namespace NatureQuestWebsite.Services
     }
 }
 
-//var newMember = _memberService.CreateMemberWithIdentity(
-//    memberModel.Email,
-//    memberModel.Email,
-//    memberName,
-//    memberType);

@@ -1,0 +1,124 @@
+﻿
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<List<NatureQuestWebsite.Models.OrderDetails>>
+@{
+    var adminOrdersList = Model;
+    if (adminOrdersList.Any())
+    {
+        foreach (var orderDetails in adminOrdersList)
+        {
+            var displayedOrderId = !string.IsNullOrWhiteSpace(orderDetails.OrderId) ?
+                orderDetails.OrderId :
+                orderDetails.OrderPaymentIntent.Id;
+            var printAreaId = $"printSection{displayedOrderId}";
+            var model = orderDetails;
+
+            var orderPaid = model.OrderPaidSuccess;
+            var orderShipped = model.OrderShipped;
+            var orderCompleted = model.OrderCompleted;
+            var invoicePrinted = model.InvoicePrinted;
+            <div class="modal fade" id="orderDetails-@displayedOrderId" tabindex="-1">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Order No  - @displayedOrderId</h4>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="d-print-block mb-0">
+                                @Html.Raw(orderDetails.OrderInvoiceHtml)
+                            </div>
+                            <div class="d-none" id="@printAreaId">
+                                @Html.Raw(orderDetails.OrderInvoiceHtml)
+                            </div>
+                        </div>
+
+                        <div class="modal-footer d-flex flex-wrap align-items-center justify-content-center">
+                            @*<div class="row">*@
+
+                                @*@using (Html.BeginUmbracoForm("UpdateOrderDetails", "Accounts",
+                                        FormMethod.Post,
+                                        new { role = "form", id = displayedOrderId, @class = "row form-group" }))
+                                    {
+                                        //add the anti forgery token and the hidden fields
+                                        @Html.AntiForgeryToken()
+                                        var orderPaid = model.OrderPaidSuccess;
+                                        var orderShipped = model.OrderShipped;
+                                        var orderCompleted = model.OrderCompleted;
+                                        var invoicePrinted = model.InvoicePrinted;*@
+                                <div class="custom-control custom-checkbox py-3 col-2">
+                                    @if (orderPaid)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="OrderPaidSuccess" checked="checked">
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="OrderPaidSuccess">
+                                    }
+                                    <label class="custom-control-label" for="OrderPaidSuccess">Paid?</label>
+                                </div>
+
+                                <div class="custom-control custom-checkbox py-3 col-2">
+                                    @if (orderShipped)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="OrderShipped" checked="checked">
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="OrderShipped">
+                                    }
+
+                                    <label class="custom-control-label" for="OrderShipped">Shipped?</label>
+                                </div>
+
+                                <div class="custom-control custom-checkbox py-3 col-2">
+                                    @if (orderCompleted)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="OrderCompleted" checked="checked">
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="OrderCompleted">
+                                    }
+
+                                    <label class="custom-control-label" for="OrderCompleted">Completed?</label>
+                                </div>
+
+                                <div class="custom-control custom-checkbox py-3 col-2">
+                                    @if (invoicePrinted)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="InvoicePrinted" checked="checked">
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="InvoicePrinted">
+                                    }
+
+                                    <label class="custom-control-label" for="InvoicePrinted">Invoiced Printed?</label>
+                                </div>
+
+                                @*<div class="col-3">
+                                             <button class="btn btn-outline-primary btn-sm" type="submit">
+                                                 <i class="icon-circle-check"></i>&nbsp;Update Status
+                                             </button>
+                                         </div>
+                                    // }*@
+
+                                <div class="text-lg px-2 py-2 col-2">
+                                    Total: <span class='text-medium'>@orderDetails.OrderTotal.ToString("c")</span>
+                                </div>
+                                <div class="px-2 py-1 col-2">
+                                    <button class="btn btn-outline-primary  btn-sm" type="button" onclick="printElement('@printAreaId');">
+                                        <i class="icon-printer"></i>&nbsp;Print Invoice
+                                    </button>
+                                </div>
+                            @*</div>*@
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+}

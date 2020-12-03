@@ -1,88 +1,124 @@
 ﻿@using NatureQuestWebsite.Models
+@using NatureQuestWebsite.Services
 @inherits Umbraco.Web.Mvc.UmbracoViewPage<MembersModel>
 @{
     if (Model.LoggedInMember != null && Model.IsAdminUser)
     {
         @Html.Partial("/Views/Partials/Accounts/AccountsSideBar.cshtml", Model)
+        var listPaging = Model.AdminOrdersPaging;
+        var currentPage = Model.StripeOrdersPage;
 
         <div class="col-lg-9">
             <div class="padding-top-2x mt-2 hidden-lg-up"></div>
-            @if (Model.AdminOrderDetailsList.Any())
+            @if (Model.PagedAdminOrders.Any())
             {
+                <div class="row">
+                    <div class="col-5">
+                        <h4 class="margin-bottom-1x">
+                            Site Orders
+                        </h4>
+                    </div>
+                    <div class="col-7 text-right">
+                        @if (listPaging.TotalPages > 1)
+                        {
+                            <span>Showing:&nbsp;page @listPaging.CurrentPage of @listPaging.TotalPages pages</span>
+                        }
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table table-hover margin-bottom-none">
                         <thead>
-                            <tr>
-                                <th style="width: 20%;">Order #</th>
-                                <th style="width: 20%;">Order Date</th>
-                                <th style="width: 45%;">Status</th>
-                                <th style="width: 15%;">Total</th>
-                            </tr>
+                        <tr>
+                            <th style="width: 15%;">Order #</th>
+                            <th style="width: 25%;">Order Date</th>
+                            <th style="width: 45%;">Status</th>
+                            <th style="width: 15%;">Total</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            @foreach (var orderDetail in Model.AdminOrderDetailsList.OrderByDescending(order => order.OrderCreatedDate))
+                        @foreach (var orderDetail in Model.PagedAdminOrders)
+                        {
+                            var orderDisplayedStatus = "Pending";
+                            if (orderDetail.OrderPaidSuccess && !orderDetail.OrderShipped)
                             {
-                                var orderDisplayedStatus = "Pending";
-                                if (orderDetail.OrderPaidSuccess && !orderDetail.OrderShipped)
-                                {
-                                    orderDisplayedStatus = "Processing";
-                                }
-                                else if (orderDetail.OrderPaidSuccess && orderDetail.OrderShipped && !orderDetail.OrderCompleted)
-                                {
-                                    orderDisplayedStatus = "Shipped";
-                                }
-                                else if (orderDetail.OrderPaidSuccess && orderDetail.OrderShipped && orderDetail.OrderCompleted)
-                                {
-                                    orderDisplayedStatus = "Completed";
-                                }
-
-                                <tr>
-                                    <td style="width: 20%;">
-                                        @if (Model.IsAdminUser && !string.IsNullOrWhiteSpace(orderDetail.OrderPaymentIntent?.Id))
-                                        {
-                                            var displayedOrderId = !string.IsNullOrWhiteSpace(orderDetail.OrderId) ?
-                                                orderDetail.OrderId :
-                                                orderDetail.OrderPaymentIntent.Id;
-                                            var stripeOrderLink = $"https://dashboard.stripe.com/payments/{orderDetail.OrderPaymentIntent.Id}";
-
-                                            <a class="navi-link text-break" href="@stripeOrderLink" target="_blank" title="Stripe Order Details">
-                                                @displayedOrderId
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            var displayedOrderId = !string.IsNullOrWhiteSpace(orderDetail.OrderId) ?
-                                                orderDetail.OrderId : 
-                                                orderDetail.OrderPaymentIntent?.Id;
-                                            <a class="navi-link text-break">@displayedOrderId</a>
-                                        }
-                                    </td>
-                                    <td style="width: 20%;">@orderDetail.OrderCreatedDate.ToString("D")</td>
-                                    <td style="width: 45%;">
-                                        <span class="text-success">@orderDisplayedStatus</span>
-                                        <div class="form-group">
-                                            <div class="custom-control custom-checkbox custom-control-inline">
-                                                @Html.CheckBoxFor(model => orderDetail.OrderPaidSuccess, new { @class = "custom-control-input" })
-                                                <label class="custom-control-label">Paid?</label>
-                                            </div>
-                                            <div class="custom-control custom-checkbox custom-control-inline">
-                                                @Html.CheckBoxFor(model => orderDetail.OrderShipped, new { @class = "custom-control-input" })
-                                                <label class="custom-control-label">Shipped?</label>
-                                            </div>
-                                            <div class="custom-control custom-checkbox custom-control-inline">
-                                                @Html.CheckBoxFor(model => orderDetail.OrderCompleted, new { @class = "custom-control-input" })
-                                                <label class="custom-control-label">Completed?</label>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td style="width: 15%;">
-                                        <span class="text-medium">@orderDetail.OrderTotal.ToString("c")</span>
-                                    </td>
-                                </tr>
+                                orderDisplayedStatus = "Processing";
                             }
+                            else if (orderDetail.OrderPaidSuccess && orderDetail.OrderShipped && !orderDetail.OrderCompleted)
+                            {
+                                orderDisplayedStatus = "Shipped";
+                            }
+                            else if (orderDetail.OrderPaidSuccess && orderDetail.OrderShipped && orderDetail.OrderCompleted)
+                            {
+                                orderDisplayedStatus = "Completed";
+                            }
+
+                            var displayedOrderId = !string.IsNullOrWhiteSpace(orderDetail.OrderId) ?
+                                orderDetail.OrderId :
+                                orderDetail.OrderPaymentIntent.Id;
+
+                            <tr>
+                                <td style="width: 15%;">
+                                    @if (Model.IsAdminUser && !string.IsNullOrWhiteSpace(orderDetail.OrderPaymentIntent?.Id))
+                                    {
+
+                                        var stripeOrderLink = $"https://dashboard.stripe.com/payments/{orderDetail.OrderPaymentIntent.Id}";
+                                        <a class="navi-link text-break" href="@stripeOrderLink" target="_blank" title="Stripe Order Details">
+                                            @displayedOrderId
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a class="navi-link text-break">@displayedOrderId</a>
+                                    }
+                                </td>
+                                <td style="width: 25%;">
+                                    @orderDetail.OrderCreatedDate.ToString("D")
+                                </td>
+                                <td style="width: 45%;">
+                                    <span class="text-success">@orderDisplayedStatus</span>
+                                    <div class="form-group">
+                                        <div class="custom-control custom-checkbox custom-control-inline">
+                                            @Html.CheckBoxFor(model => orderDetail.OrderPaidSuccess, new { @class = "custom-control-input" })
+                                            <label class="custom-control-label">Paid?</label>
+                                        </div>
+
+                                        <div class="custom-control custom-checkbox custom-control-inline">
+                                            @Html.CheckBoxFor(model => orderDetail.OrderShipped, new { @class = "custom-control-input" })
+                                            <label class="custom-control-label">Shipped?</label>
+                                        </div>
+
+                                        <div class="custom-control custom-checkbox custom-control-inline">
+                                            @Html.CheckBoxFor(model => orderDetail.OrderCompleted, new { @class = "custom-control-input" })
+                                            <label class="custom-control-label">Completed?</label>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="width: 15%;">
+                                    <span class="text-medium">@orderDetail.OrderTotal.ToString("c")</span>
+                                    <div class="text-left">
+                                        <a class="btn btn-sm btn-link-primary margin-left-none margin-right-none padding-left-none padding-right-none"
+                                           href="" data-toggle="modal" data-target="#orderDetails-@displayedOrderId">
+                                            <i class="icon-download"></i>&nbsp;Invoice
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                         </tbody>
                     </table>
                 </div>
+
+                if (listPaging.TotalPages > 1)
+                {
+                    <nav class="pagination">
+                        <div class="column">
+                            <ul class="pages">
+                                @Html.PagingLink(listPaging, currentPage.Url, useSorting: false)
+                            </ul>
+                        </div>
+                    </nav>
+                }
             }
             else
             {
@@ -96,74 +132,5 @@
             <hr>
         </div>
 
-        @*Open Ticket Modal
-            <div class="modal fade" id="orderDetails" tabindex="-1">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title">Order No  - 34VB5540K83</h4>
-                            <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="table-responsive shopping-cart mb-0">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Product Name</th>
-                                            <th class="text-center">Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="product-item">
-                                                    <a class="product-thumb" href="shop-single.html">
-                                                        <img src="/Images/shop/cart/01.jpg" alt="Product">
-                                                    </a>
-                                                    <div class="product-info">
-                                                        <h4 class="product-title">
-                                                            <a href="shop-single.html">Unionbay Park<small>x 1</small></a>
-                                                        </h4><span><em>Size:</em> 10.5</span><span><em>Color:</em> Dark Blue</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="text-center text-lg text-medium">$43.90</td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="product-item">
-                                                    <a class="product-thumb" href="shop-single.html"><img src="/Images/shop/cart/02.jpg" alt="Product"></a>
-                                                    <div class="product-info">
-                                                        <h4 class="product-title"><a href="shop-single.html">Daily Fabric Cap<small>x 2</small></a></h4><span><em>Size:</em> XL</span><span><em>Color:</em> Black</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="text-center text-lg text-medium">$24.89</td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="product-item">
-                                                    <a class="product-thumb" href="shop-single.html"><img src="/Images/shop/cart/03.jpg" alt="Product"></a>
-                                                    <div class="product-info">
-                                                        <h4 class="product-title"><a href="shop-single.html">Cole Haan Crossbody<small>x 1</small></a></h4><span><em>Size:</em> -</span><span><em>Color:</em> Turquoise</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="text-center text-lg text-medium">$200.00</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <hr class="mb-3">
-                            <div class="d-flex flex-wrap justify-content-between align-items-center pb-2">
-                                <div class="px-2 py-1">Subtotal: <span class='text-medium'>$289.68</span></div>
-                                <div class="px-2 py-1">Shipping: <span class='text-medium'>$22.50</span></div>
-                                <div class="px-2 py-1">Tax: <span class='text-medium'>$3.42</span></div>
-                                <div class="text-lg px-2 py-1">Total: <span class='text-medium'>$315.60</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>*@
     }
 }

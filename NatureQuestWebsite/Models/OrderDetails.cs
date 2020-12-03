@@ -37,6 +37,11 @@ namespace NatureQuestWebsite.Models
         public bool OrderCompleted { get; set; }
 
         /// <summary>
+        /// get or set the flag to indicate the order invoice has been printed
+        /// </summary>
+        public bool InvoicePrinted { get; set; }
+
+        /// <summary>
         /// get or set the list of order items from shopping cart
         /// </summary>
         public List<CartItem> OrderItems { get; set; } = new List<CartItem>();
@@ -70,5 +75,7 @@ namespace NatureQuestWebsite.Models
         /// get or set the order created date
         /// </summary>
         public DateTime OrderCreatedDate { get; set; }
+
+        public string OrderInvoiceHtml { get; set; }
     }
 }

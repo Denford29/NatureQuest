@@ -18,4 +18,27 @@
             @Html.Action("GetAdminStripeOrderDetailsView", "Accounts")
         </div>
     </div>
+
+}
+
+@section footerScripts{
+    @Html.Action("GetAdminOrderInvoiceDetails", "Accounts")
+    
+    <script>
+        function printElement(elem) {
+            //get the element to print
+            var printAreaElement = document.getElementById(elem);
+
+            if (printAreaElement) {
+                //open a new window
+                var newWindow = window.open();
+                //add the element to the html
+                $(newWindow.document.body).html(printAreaElement);
+                //call the print method
+                newWindow.print();
+                //close the window
+                newWindow.close();
+            }
+        }
+    </script>
 }

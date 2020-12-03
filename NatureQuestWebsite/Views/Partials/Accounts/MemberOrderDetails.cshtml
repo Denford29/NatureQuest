@@ -33,16 +33,30 @@
                                 }
 
                                 <tr>
-                                    <td>
+                                    <td style="width: 15%;">
                                         <a class="text-medium navi-link">@orderDetail.OrderId</a>
-                                        @*<a class="text-medium navi-link" href="#" data-toggle="modal" data-target="#orderDetails">78A643CD409</a>*@
-
                                     </td>
-                                    <td>@orderDetail.OrderCreatedDate.ToShortDateString()</td>
-                                    <td>
+                                    <td style="width: 25%;">
+                                        @orderDetail.OrderCreatedDate.ToString("D")
+                                    </td>
+                                    <td style="width: 45%;">
                                         <span class="text-success">@orderDisplayedStatus</span>
+                                        <div class="form-group">
+                                            <div class="custom-control custom-checkbox custom-control-inline">
+                                                @Html.CheckBoxFor(model => orderDetail.OrderPaidSuccess, new { @class = "custom-control-input" })
+                                                <label class="custom-control-label">Paid?</label>
+                                            </div>
+                                            <div class="custom-control custom-checkbox custom-control-inline">
+                                                @Html.CheckBoxFor(model => orderDetail.OrderShipped, new { @class = "custom-control-input" })
+                                                <label class="custom-control-label">Shipped?</label>
+                                            </div>
+                                            <div class="custom-control custom-checkbox custom-control-inline">
+                                                @Html.CheckBoxFor(model => orderDetail.OrderCompleted, new { @class = "custom-control-input" })
+                                                <label class="custom-control-label">Completed?</label>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td>
+                                    <td style="width: 15%;">
                                         <span class="text-medium">@orderDetail.OrderTotal.ToString("c")</span>
                                     </td>
                                 </tr>

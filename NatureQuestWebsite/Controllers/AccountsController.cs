@@ -25,11 +25,6 @@ namespace NatureQuestWebsite.Controllers
         private readonly ISiteMembersService _siteMemberService;
 
         /// <summary>
-        /// get the member type service
-        /// </summary>
-        private readonly IMemberTypeService _memberTypeService;
-
-        /// <summary>
         /// get the member type
         /// </summary>
         private readonly IMemberType _memberType;
@@ -65,6 +60,11 @@ namespace NatureQuestWebsite.Controllers
         private readonly IShoppingService _shoppingService;
 
         /// <summary>
+        /// set the default page size
+        /// </summary>
+        private readonly int _pageSize = 25;
+
+        /// <summary>
         /// initiate the controller with the services used
         /// </summary>
         /// <param name="siteMembersService"></param>
@@ -79,13 +79,12 @@ namespace NatureQuestWebsite.Controllers
             _siteMemberService = siteMembersService;
 
             //set the member type service to use
-            _memberTypeService = memberTypeService;
 
             //set the shopping cart service to use
             _shoppingService = shoppingService;
 
             //get the member type
-            _memberType = _memberTypeService.Get("Member");
+            _memberType = memberTypeService.Get("Member");
 
             // get the login status
             _currentLoginStatus = Members.GetCurrentLoginStatus();
@@ -167,7 +166,10 @@ namespace NatureQuestWebsite.Controllers
                 // set the error message and return the current page
                 var errorMessage = "Ops... Subscription Error, Please fill in your email address and try again.";
                 TempData["subscriptionError"] = errorMessage;
-                model.SubscribeMessage = errorMessage;
+                if (model != null)
+                {
+                    model.SubscribeMessage = errorMessage;
+                }
                 return CurrentUmbracoPage();
             }
 
@@ -258,7 +260,10 @@ namespace NatureQuestWebsite.Controllers
                 // set the error message and return the current page
                 var errorMessage = "Ops... Contact Error, Please fill in all the details and try again.";
                 TempData["contactError"] = errorMessage;
-                model.SubscribeMessage = errorMessage;
+                if (model != null)
+                {
+                    model.SubscribeMessage = errorMessage;
+                }
                 return CurrentUmbracoPage();
             }
 
@@ -584,7 +589,7 @@ namespace NatureQuestWebsite.Controllers
         /// Get the admin stripe orders view
         /// </summary>
         /// <returns></returns>
-        public ActionResult GetAdminStripeOrderDetailsView()
+        public ActionResult GetAdminStripeOrderDetailsView(int page = 1)
         {
             //check if the user is logged in, if not redirect to the login page
             if (!_currentLoginStatus.IsLoggedIn)
@@ -615,11 +620,83 @@ namespace NatureQuestWebsite.Controllers
             //get the customer paid orders
             model = _shoppingService.GetMemberOrderDetails(model);
             //get the admin paid orders
-            //model = _shoppingService.GetAdminOrderDetails(model);
             model = _shoppingService.GetMemberOrderDetails(model, true);
+
+            //sort the admin orders into pages
+            if (model.AdminOrderDetailsList.Any())
+            {
+                model.PagedAdminOrders = model.AdminOrderDetailsList
+                                                                    .OrderByDescending(order => order.OrderCreatedDate)
+                                                                    .Skip((page - 1) * _pageSize)
+                                                                    .Take(_pageSize)
+                                                                    .ToList();
+                //create the paging model
+                var ordersPagingModelModel = new PagingModel
+                {
+                    CurrentPage = page,
+                    ItemsPerPage = _pageSize,
+                    TotalItems = model.AdminOrderDetailsList.Count
+                };
+                // add the paging model to the model
+                model.AdminOrdersPaging = ordersPagingModelModel;
+            }
 
             // return the view with the model
             return View("/Views/Partials/Accounts/AdminsStripeOrderDetails.cshtml", model);
+        }
+
+        /// <summary>
+        /// Get the admin order invoices details
+        /// </summary>
+        /// <param name="page"></param>
+        /// <returns></returns>
+        public ActionResult GetAdminOrderInvoiceDetails(int page = 1)
+        {
+            //check if the user is logged in, if not redirect to the login page
+            if (!_currentLoginStatus.IsLoggedIn)
+            {
+                //if we have the registration page redirect there
+                if (_registrationLoginPage?.Id > 0)
+                {
+                    return RedirectToUmbracoPage(_registrationLoginPage);
+                }
+                //otherwise redirect to the home page
+                return RedirectToUmbracoPage(_homePage);
+            }
+
+            // create the default model
+            var model = GetMembersModel(new MembersModel(), _currentLoginStatus);
+
+            //check if the user is an admin user
+            if (!model.IsAdminUser)
+            {
+                //if we have the account details page redirect there
+                if (_accountDetailsPage?.Id > 0)
+                {
+                    return RedirectToUmbracoPage(_accountDetailsPage);
+                }
+                //otherwise redirect to the home page
+                return RedirectToUmbracoPage(_homePage);
+            }
+
+            //get the admin paid orders
+            model = _shoppingService.GetMemberOrderDetails(model, true);
+
+            //sort the admin orders into pages
+            if (model.AdminOrderDetailsList.Any())
+            {
+                model.PagedAdminOrders = model.AdminOrderDetailsList
+                    .OrderByDescending(order => order.OrderCreatedDate)
+                    .Skip((page - 1) * _pageSize)
+                    .Take(_pageSize)
+                    .ToList();
+
+                // return the view with the model
+                return View("/Views/Partials/Accounts/OderDetailsInvoice.cshtml", model.PagedAdminOrders);
+            }
+
+            // return to the current page with an error
+            return RedirectToCurrentUmbracoPage();
         }
 
         /// <summary>
@@ -739,6 +816,24 @@ namespace NatureQuestWebsite.Controllers
             }
             //return the set model
             return model;
+        }
+
+        [HttpPost]
+        public ActionResult UpdateOrderDetails(OrderDetails model)
+        {
+            //check if the model is valid
+            if (!ModelState.IsValid)
+            {
+                // set the error message and return the current page
+                var errorMessage = "Ops... Update Error, There was an error updating the order details ,please try again.";
+                TempData["updateError"] = errorMessage;
+                return CurrentUmbracoPage();
+            }
+
+            // set the success message and return the current page
+            var successMessage = "The order details have been updated successfully.";
+            TempData["updateSuccess"] = successMessage;
+            return CurrentUmbracoPage();
         }
     }
 }

@@ -154,6 +154,11 @@ namespace NatureQuestWebsite.Controllers
             //check the result of the basket
             if (productAdded)
             {
+                //if we have updated the cart clear out the saved stripe session if there is one
+                if (!string.IsNullOrWhiteSpace(CurrentShoppingCart.StripeCartSession?.Id))
+                {
+                    _shoppingService.ClearStripeSessionId(CurrentShoppingCart);
+                }
                 cartResult.ResultSuccess = true;
                 cartResult.ResultMessage = resultMessage;
                 TempData["cartResult"] = cartResult;
@@ -225,6 +230,11 @@ namespace NatureQuestWebsite.Controllers
             //check the result of the basket
             if (cartCleared)
             {
+                //if we have updated the cart clear out the saved stripe session if there is one
+                if (!string.IsNullOrWhiteSpace(CurrentShoppingCart.StripeCartSession?.Id))
+                {
+                    _shoppingService.ClearStripeSessionId(CurrentShoppingCart);
+                }
                 clearCartResult.ResultSuccess = true;
                 clearCartResult.ResultMessage = resultMessage;
                 TempData["clearCartResult"] = clearCartResult;
@@ -278,6 +288,11 @@ namespace NatureQuestWebsite.Controllers
             //check the result of the basket
             if (cartCleared)
             {
+                //if we have updated the cart clear out the saved stripe session if there is one
+                if (!string.IsNullOrWhiteSpace(CurrentShoppingCart.StripeCartSession?.Id))
+                {
+                    _shoppingService.ClearStripeSessionId(CurrentShoppingCart);
+                }
                 removeCartItemResult.ResultSuccess = true;
                 removeCartItemResult.ResultMessage = resultMessage;
                 TempData["removeCartItemResult"] = removeCartItemResult;
@@ -341,6 +356,11 @@ namespace NatureQuestWebsite.Controllers
             //check the result of the basket
             if (cartCleared)
             {
+                //if we have updated the cart clear out the saved stripe session if there is one
+                if (!string.IsNullOrWhiteSpace(CurrentShoppingCart.StripeCartSession?.Id))
+                {
+                    _shoppingService.ClearStripeSessionId(CurrentShoppingCart);
+                }
                 updateCartItemResult.ResultSuccess = true;
                 updateCartItemResult.ResultMessage = resultMessage;
                 TempData["removeCartItemResult"] = updateCartItemResult;
@@ -499,14 +519,14 @@ namespace NatureQuestWebsite.Controllers
             //create the shipping details
             var newShippingDetails = new ShippingDetails
             {
-                ShippingFullname = shippingFullname,
-                ShippingEmail = shippingEmail,
-                ShippingMobileNumber = shippingMobileNumber,
-                ShippingOptionDetails = shippingCartDetails,
-                ShippingAddress = shippingAddress,
-                ShippingSuburb = shippingSuburb,
-                ShippingPostCode = shippingPostCode,
-                ShippingState = shippingState
+                ShippingFullname = shippingFullname.Trim(),
+                ShippingEmail = shippingEmail.Trim(),
+                ShippingMobileNumber = shippingMobileNumber.Trim(),
+                ShippingOptionDetails = shippingCartDetails.Trim(),
+                ShippingAddress = shippingAddress.Trim(),
+                ShippingSuburb = shippingSuburb.Trim(),
+                ShippingPostCode = shippingPostCode.Trim(),
+                ShippingState = shippingState.Trim()
             };
             CurrentShoppingCart.CartShippingDetails = newShippingDetails;
 
@@ -514,15 +534,6 @@ namespace NatureQuestWebsite.Controllers
             if (string.IsNullOrWhiteSpace(CurrentShoppingCart.StripeCartSession?.Id))
             {
                 CurrentShoppingCart.StripeCartSessionId = _shoppingService.GetCartStripeSessionId(CurrentShoppingCart);
-            }
-
-            //check if we have a current paypal checkout order request object, if not then create 1
-            if (CurrentShoppingCart.PayPalOrder == null)
-            {
-                //_shoppingService.GetCartPayPalOrderRequest(CurrentShoppingCart);
-                var getPayPalOrder = _shoppingService.GetCartPayPalOrderRequest(CurrentShoppingCart).
-                    ContinueWith(order => CurrentShoppingCart.PayPalRequestOrder = order.Result);
-                //getPayPalOrder.Wait();
             }
 
             //we had an error updating the shipping selected

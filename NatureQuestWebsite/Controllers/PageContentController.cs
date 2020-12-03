@@ -669,7 +669,6 @@ namespace NatureQuestWebsite.Controllers
                                                                                         .ToList();
                 }
 
-
                 //if we have the products to display, get the product models for each
                 if (displayProducts?.Any() == true)
                 {
@@ -713,6 +712,7 @@ namespace NatureQuestWebsite.Controllers
                             ItemsPerPage = _pageSize,
                             TotalItems = productModels.Count
                         };
+
                         model.ProductsPaging = pagingModel;
 
                         // default sort option

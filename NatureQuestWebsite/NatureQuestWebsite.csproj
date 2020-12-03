@@ -25,6 +25,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <ApplicationInsightsResourceId>/subscriptions/33fa10bf-eb0c-4528-9d1c-4710668589da/resourcegroups/NatureQuest/providers/microsoft.insights/components/NatureQuest-AppInsights</ApplicationInsightsResourceId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -104,6 +105,9 @@
     </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.4.0\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.TelemetryCorrelation, Version=1.0.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.TelemetryCorrelation.1.0.7\lib\net45\Microsoft.AspNet.TelemetryCorrelation.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis, Version=2.10.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeAnalysis.Common.2.10.0\lib\netstandard1.3\Microsoft.CodeAnalysis.dll</HintPath>
@@ -201,6 +205,9 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Collections.Immutable, Version=1.2.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Collections.Immutable.1.5.0\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
     </Reference>
@@ -217,8 +224,8 @@
     <Reference Include="System.Data.SqlServerCe.Entity, Version=4.0.0.1, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <HintPath>..\packages\Umbraco.SqlServerCE.4.0.0.1\lib\net472\System.Data.SqlServerCe.Entity.dll</HintPath>
     </Reference>
-    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.2.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.4.1\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.6.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
     <Reference Include="System.Diagnostics.FileVersionInfo, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Diagnostics.FileVersionInfo.4.3.0\lib\net46\System.Diagnostics.FileVersionInfo.dll</HintPath>
@@ -260,6 +267,10 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Management" />
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
     <Reference Include="System.Net.Http, Version=4.1.1.2, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Net.Http.4.3.3\lib\net46\System.Net.Http.dll</HintPath>
       <Private>True</Private>
@@ -270,6 +281,9 @@
     </Reference>
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
     <Reference Include="System.Reflection, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reflection.4.3.0\lib\net462\System.Reflection.dll</HintPath>
       <Private>True</Private>
@@ -284,6 +298,9 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Extensions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.Extensions.4.3.0\lib\net462\System.Runtime.Extensions.dll</HintPath>
       <Private>True</Private>
@@ -683,9 +700,11 @@
     <Content Include="Media\0dmdma51\natures-quest-go-vita.png" />
     <Content Include="Media\0n4lojcs\nature-quest-wash.png" />
     <Content Include="Media\0rhlzbww\nature_s_quest-nourishing_care_conditioner_500ml-9342789003010.jpg" />
+    <Content Include="Media\0utntodz\foodland-logo.png" />
     <Content Include="Media\2dddr5ok\nature_s_quest-nourishing_care_shampoo_500ml-9342789003065.jpg" />
     <Content Include="Media\2ezjln32\nq-bodywash-250.png" />
     <Content Include="Media\2l5c35sq\nature-quest-banner-1.jpg" />
+    <Content Include="Media\2skf54zn\flannerys.png" />
     <Content Include="Media\2w3kigri\natures-quest-foodlandsa.png" />
     <Content Include="Media\3dsnfpvr\natures-quest-terrywhite-hemmart.png" />
     <Content Include="Media\3lnoqfmw\nature_s_quest-ladies_deodorant_125ml-9342789000101.jpg" />
@@ -697,6 +716,7 @@
     <Content Include="Media\5mzb2ftl\nature_s_quest-natural_face___eye_serum_15ml-9342789000231.jpg" />
     <Content Include="Media\a03dvg3q\nature_s_quest-tiny_tots_conditioner_250ml-9342789002099.jpg" />
     <Content Include="Media\a2mbodwq\nature_s_quest-daily_conditioner_250ml-9342789002068.jpg" />
+    <Content Include="Media\amhfiw1x\natures_quest_sanitiser.jpeg" />
     <Content Include="Media\beel2mjs\nature-quest-body-care.jpg" />
     <Content Include="Media\bwrli20q\nature-quest-wash.jpg" />
     <Content Include="Media\cdrb33x1\natures-quest-logo.png" />
@@ -706,6 +726,7 @@
     <Content Include="Media\d3ocwux1\nature_s_quest-lavender_250ml-9342789002075.jpg" />
     <Content Include="Media\dgbjlljn\nature_s_quest-lavender_shampoo_1lt-9342789004017.jpg" />
     <Content Include="Media\dgzfichs\nature_s_quest-daily_shampoo_250ml-9342789002013.jpg" />
+    <Content Include="Media\dmplttph\natural-food-barn.png" />
     <Content Include="Media\duflrpbj\nature_s_quest-natural_chest_rub_45gm-9342789000170.jpg" />
     <Content Include="Media\eescl4dw\natures-quest-mega-health.png" />
     <Content Include="Media\evcdyh1f\nature_s_quest-natural_facial_moisturiser_45gm-9342789000194.jpg" />
@@ -716,11 +737,15 @@
     <Content Include="Media\gnclvvgj\nature_s_quest-multi_purpose_cleaner_500ml-9342789003072.jpg" />
     <Content Include="Media\hbpnztpt\nature-quest-natural-care.png" />
     <Content Include="Media\hinfai3x\nature_s_quest-men_s_deodorant_125ml-9342789000118.jpg" />
+    <Content Include="Media\hqudkddt\foodland-iga-logo.jpg" />
     <Content Include="Media\hw5dwmls\nature_s_quest-facial_toner_125ml-9342789000071.jpg" />
+    <Content Include="Media\iivmrnzv\independent-health-foods-logo.png" />
     <Content Include="Media\jchbcgf3\nature_s_quest-facial_scrub_125ml-9342789000064.jpg" />
+    <Content Include="Media\jhehmziv\the-green-dispensary.png" />
     <Content Include="Media\jpfdx1pd\nature_s_quest-body_lotion_250ml-9342789002129.jpg" />
     <Content Include="Media\jxipwfty\nature_s_quest-baby_lotion_125ml-9342789000033.jpg" />
     <Content Include="Media\jzhnropd\nature_s_quest-body_lotion_500ml-9342789003102.jpg" />
+    <Content Include="Media\k0pbcvt5\terrywhite-chemmart-phy.png" />
     <Content Include="Media\kn5bdw0z\nature_s_quest-lavendar_shampoo_250ml-9342789002020.jpg" />
     <Content Include="Media\lguewm1h\nature_s_quest-lavender_shampoo_500ml-9342789003034.jpg" />
     <Content Include="Media\lx5b5u1y\nature_s_quest-moroccan_shampoo_250ml-9342789000200.jpg" />
@@ -730,23 +755,29 @@
     <Content Include="Media\oggkxmym\nature_s_quest-natural_hand_sanitiser_240ml-9342789000262.jpg" />
     <Content Include="Media\peljwvy5\nature_s_quest-nourishing_care_conditioner_250ml-9342789002051.jpg" />
     <Content Include="Media\pwuhmhte\natures-quest-chemplus.png" />
+    <Content Include="Media\q2smecf3\independent-stores-logo.png" />
     <Content Include="Media\qafe2v31\nature_s_quest-hand_wash_250ml-9342789002112.jpg" />
     <Content Include="Media\qfvoljk5\nature_s_quest-foaming_face_cleanser_125ml-9342789000088.jpg" />
     <Content Include="Media\qhtl2ryo\nature_s_quest-tanning_lotion_250ml-9342789000279.jpg" />
     <Content Include="Media\qy3h1g2c\natures-quest-healthy-life.png" />
     <Content Include="Media\r3jn1dzf\nature_s_quest-lavender_conditioner_1lt-9342789004031.jpg" />
+    <Content Include="Media\riyfgyom\foodland-iga-logo.jpg" />
+    <Content Include="Media\sjzgeixb\terrywhite-logo.jpg" />
     <Content Include="Media\sn1j4vwm\nature_s_quest-fortifying_shampoo_250ml-9342789002037.jpg" />
     <Content Include="Media\srwjvtgv\nature_s_quest-laundry_liquid_1lt-9342789004079.jpg" />
     <Content Include="Media\svsdb3i4\natures-quest-lavendar_shampoo-edit.jpg" />
     <Content Include="Media\sxyenvjc\nature_s_quest-rosehip_oil_25ml-9342789000002.jpg" />
     <Content Include="Media\ulrnn1cw\nature_s_quest-tiny_tots_bath_wash_250ml-9342789002150.jpg" />
     <Content Include="Media\uptpsc4d\nature_s_quest-2_in_1_shampoo___bath_wash_250ml-9342789000248.jpg" />
+    <Content Include="Media\uswh5u3o\group-photo-2019.jpg" />
     <Content Include="Media\vevdtxtz\nature_s_quest-fragrance_free_body_wash_250ml_9342789000224.jpg" />
     <Content Include="Media\wdeozifc\nature-quest-facial-care.jpg" />
     <Content Include="Media\wlhhmweg\nature_s_quest-moroccan_conditioner_250ml-9342789000217.jpg" />
     <Content Include="Media\wmyd2swj\nature_s_quest-dishwashing_liquid_1lt-9342789004055.jpg" />
+    <Content Include="Media\xbbhllfu\copy-of-copy-of-copy-of-haru-2.png" />
     <Content Include="Media\y2ibm5ss\nature_s_quest-facial_moisturiser_125ml-9342789000057.jpg" />
     <Content Include="Media\yjvffltn\nature-quest-open-graph.jpg" />
+    <Content Include="Media\yjxb2zm1\independent-pharmacies-logo.png" />
     <Content Include="Media\ysqgpgqg\nature_s_quest-hand_cream_125ml-9342789000095.jpg" />
     <Content Include="Media\ysyjot2w\nature_s_quest-hand_wash_refill_1lt-9342789004062.jpg" />
     <Content Include="Media\z2hfjppx\natures-quest-healthy-elements.jpg" />
@@ -754,6 +785,7 @@
     <Content Include="Media\zdnphkyg\nature_s_quest-hand_sanitiser_50ml-9342789000255.jpg" />
     <Content Include="Media\zioh4ayl\nature-quest-natural-care.jpg" />
     <Content Include="Media\zjzj2o2g\nature_s_quest-fortifying_shampoo_500ml-9342789003041.jpg" />
+    <Content Include="Media\zm2k3bca\sanitiser-1l.png" />
     <Content Include="Scripts\app.js" />
     <Content Include="Scripts\card.min.js" />
     <Content Include="Scripts\custom.js" />
@@ -776,6 +808,7 @@
     <Compile Include="Models\MainMenuModel.cs" />
     <Compile Include="Models\MembersModel.cs" />
     <Compile Include="Models\OrderDetails.cs" />
+    <Compile Include="Models\PagingModel.cs" />
     <Compile Include="Models\ProductCategoriesModel.cs" />
     <Compile Include="Models\ProductModel.cs" />
     <Compile Include="Models\ProductsListModel.cs" />
@@ -824,6 +857,8 @@
     <Content Include="App_Plugins\Cultiv.Tabify\package.manifest" />
     <Content Include="App_Plugins\MediumEditor\package.manifest" />
     <Content Include="App_Plugins\MediumEditor\style.scss" />
+    <Content Include="ApplicationInsights.config" />
+    <Content Include="Connected Services\Application Insights\ConnectedService.json" />
     <None Include="packages.config" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\Partials\Grid\Editors\Textstring.cshtml" />
@@ -896,6 +931,7 @@
     <Content Include="Views\productSpecialsPage.cshtml" />
     <Content Include="Views\Partials\Products\ProductBestSellersList.cshtml" />
     <Content Include="Views\Partials\Products\ProductSpecialsList.cshtml" />
+    <Content Include="Views\Partials\Accounts\OderDetailsInvoice.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -908,9 +944,15 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.2.6.1\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="ErrorHandler\" />
     <Folder Include="Media\dt1fcchz\" />
+    <Folder Include="Media\octjp0yd\" />
     <Folder Include="Media\rhlhbh4k\" />
     <Folder Include="Media\thdn5jrj\" />
+    <Folder Include="Media\ujqndwsy\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

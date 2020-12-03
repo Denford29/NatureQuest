@@ -197,6 +197,19 @@ namespace NatureQuestWebsite.Models
         /// </summary>
         public List<OrderDetails> MemberOrderDetailsList { get; set; } = new List<OrderDetails>();
 
+        /// <summary>
+        /// get or set the admin orders 
+        /// </summary>
         public List<OrderDetails> AdminOrderDetailsList { get; set; } = new List<OrderDetails>();
+
+        /// <summary>
+        /// get or set the admin orders paging model
+        /// </summary>
+        public PagingModel AdminOrdersPaging { get; set; }
+
+        /// <summary>
+        /// get or set the admin orders 
+        /// </summary>
+        public List<OrderDetails> PagedAdminOrders { get; set; } = new List<OrderDetails>();
     }
 }

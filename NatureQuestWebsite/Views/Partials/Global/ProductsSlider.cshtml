@@ -16,16 +16,25 @@
                             <div class="row justify-content-center align-items-center">
                                 <div class="col-lg-5 col-md-6 padding-bottom-2x text-md-left text-center">
                                     <div class="from-bottom">
+									@if(!string.IsNullOrWhiteSpace(slider?.SliderHeading))
+										{
                                         <div class="h2 text-body text-normal mb-2 pt-1">
                                             @slider.SliderHeading
                                         </div>
+										}
+										@if(!string.IsNullOrWhiteSpace(slider?.SliderText))
+										{
                                         <div class="h2 text-body text-normal mb-4 pb-1">
                                             <span class="text-bold">@slider.SliderText</span>
                                         </div>
+										}
                                     </div>
+									@if(slider.SliderLinkPage != null)
+									{
                                     <a class="btn btn-primary btn-outline-primary scale-up delay-1" href="@slider.SliderUrl" title="@slider.SliderLinkPage.Name">
                                         View @slider.SliderLinkPage.Name
                                     </a>
+									}
                                 </div>
                                 <div class="col-md-6 padding-bottom-2x mb-3">
                                     <img class="d-block mx-auto" src="@slider.SliderImage" alt="@slider.SliderLinkPage.Name">

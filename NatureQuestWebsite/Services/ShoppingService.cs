@@ -245,7 +245,7 @@ namespace NatureQuestWebsite.Services
             _siteMembersService = siteMembersService;
 
             //create the default system email address
-            _systemEmailAddress = new EmailAddress("denfordmutseriwa@yahoo.com", "Admin");
+            _systemEmailAddress = new EmailAddress("admin@rdmonline.com.au", "Admin");
             _fromEmailAddress = new EmailAddress("support@naturesquest.com.au", _siteName);
 
             //get the sendgrid api key
@@ -776,6 +776,8 @@ namespace NatureQuestWebsite.Services
                 var random = new Random();
                 currentOrderNumber = random.Next(10000, 100000);
             }
+            //for testing use the order number 999999
+            //currentOrderNumber = 999999;
 
             //generate the order number to use
             var systemOrderNumber = $"{orderPrefix}-{currentOrderNumber}";
@@ -831,9 +833,19 @@ namespace NatureQuestWebsite.Services
                     var memberCartName = $"{memberName.Trim().Replace(" ", "-")}-({cartMember.Email})-Cart";
                     //get the parent carts page
                     var cartsParentPage = _contentService.GetById(cartsPage.Id);
-                    //use the content service to create the cart page
-                    var newMemberCartPage =
+
+                    //get the stored cart page for the member
+                    var existingMemberCartPage = _globalCartsPage.Children.FirstOrDefault(page => page.HasProperty("cartMember") &&
+                                                                                    page.HasValue("cartMember") &&
+                                                                                    page.Value<IPublishedContent>(
+                                                                                        "cartMember")?.Name ==
+                                                                                    cartMember.Name);
+                    //if we have have an existing one use that
+                    var newMemberCartPage = existingMemberCartPage?.Id > 0 ?
+                        _contentService.GetById(existingMemberCartPage.Id) : 
                         _contentService.CreateAndSave(memberCartName, cartsParentPage, CartPageAlias);
+
+                    
                     //check if the new page has been created
                     if (newMemberCartPage != null)
                     {
@@ -860,21 +872,24 @@ namespace NatureQuestWebsite.Services
                         //check if we now have the published page, send an email out and return this page
                         if (cartPublishedPage != null)
                         {
-                            //create the admin email to notify of a new cart page
-                            var newCartSubject = "A new member cart has been created.";
-                            var newCartBody =
-                                $"<p>A new member cart with the name: {cartPublishedPage.Name} has been created." +
-                                "<br /> <br />Regards, <br /> Website Team</p>";
-                            //create the admin email
-                            var adminNewCartMessage = MailHelper.CreateSingleEmail(
-                                _fromEmailAddress,
-                                _systemEmailAddress,
-                                newCartSubject,
-                                "",
-                                newCartBody);
-                            //send the admin email
-                            var unused1 = SendGridEmail(adminNewCartMessage, autoAddAdminBcc: true);
-
+                            if (existingMemberCartPage == null)
+                            {
+                                //create the admin email to notify of a new cart page
+                                var newCartSubject = "A new member cart has been created.";
+                                var newCartBody =
+                                    $"<p>A new member cart with the name: {cartPublishedPage.Name} has been created." +
+                                    "<br /> <br />Regards, <br /> Website Team</p>";
+                                //create the admin email
+                                var adminNewCartMessage = MailHelper.CreateSingleEmail(
+                                    _fromEmailAddress,
+                                    _systemEmailAddress,
+                                    newCartSubject,
+                                    "",
+                                    newCartBody);
+                                //send the admin email
+                                var unused1 = SendGridEmail(adminNewCartMessage, autoAddAdminBcc: true);
+                            }
+                            
                             //return the page
                             return cartPublishedPage;
                         }
@@ -1973,6 +1988,26 @@ namespace NatureQuestWebsite.Services
         }
 
         /// <summary>
+        /// clear the stripe session saved on the cart
+        /// </summary>
+        /// <param name="currentShoppingCart"></param>
+        /// <returns></returns>
+        public bool ClearStripeSessionId(SiteShoppingCart currentShoppingCart)
+        {
+            var stripeSessionCleared = false;
+
+            //check the cart
+            if (!string.IsNullOrWhiteSpace(currentShoppingCart?.StripeCartSession?.Id))
+            {
+                currentShoppingCart.StripeCartSession = null;
+                currentShoppingCart.StripeCartSessionId = String.Empty;
+                stripeSessionCleared = true;
+            }
+            //return the cleared flag
+            return stripeSessionCleared;
+        }
+
+        /// <summary>
         /// Finalise the stripe payment
         /// </summary>
         /// <param name="stripePaymentIntent"></param>
@@ -2074,206 +2109,226 @@ namespace NatureQuestWebsite.Services
             out string resultMessage,
             out OrderDetails stripeOrderDetails)
         {
+            // set the default result
+            var orderPlaced = false;
             //create the initial response
             resultMessage = "There was an error placing your order";
             stripeOrderDetails = new OrderDetails();
             stripeOrderDetails.OrderItems.AddRange(currentShoppingCart.CartItems);
-
-            //get the stripe api key to use
-            StripeConfiguration.ApiKey = currentShoppingCart.IsStripeLiveMode
-                ? currentShoppingCart.StripeLiveSecretKey
-                : currentShoppingCart.StripeTestSecretKey;
-
-            // set the default result
-            var orderPlaced = false;
-            // get the cart stripe customer to check for order and payment
-            var orderCustomer = GetStripeCustomer(currentShoppingCart);
-            if (!string.IsNullOrWhiteSpace(orderCustomer?.Id))
+            try
             {
-                //get the intent and check if it has succeeded
-                var cartSessionPaymentIntentId = currentShoppingCart.StripeCartSession?.PaymentIntentId;
-                if (!string.IsNullOrWhiteSpace(cartSessionPaymentIntentId))
+                //get the stripe api key to use
+                StripeConfiguration.ApiKey = currentShoppingCart.IsStripeLiveMode
+                    ? currentShoppingCart.StripeLiveSecretKey
+                    : currentShoppingCart.StripeTestSecretKey;
+
+                // get the cart stripe customer to check for order and payment
+                var orderCustomer = GetStripeCustomer(currentShoppingCart);
+                if (!string.IsNullOrWhiteSpace(orderCustomer?.Id))
                 {
-                    var paymentIntentService = new PaymentIntentService();
-                    var paymentIntent = paymentIntentService.Get(cartSessionPaymentIntentId);
-                    if (paymentIntent?.Status == "succeeded")
+                    //get the intent and check if it has succeeded
+                    var cartSessionPaymentIntentId = currentShoppingCart.StripeCartSession?.PaymentIntentId;
+                    if (!string.IsNullOrWhiteSpace(cartSessionPaymentIntentId))
                     {
-                        //if we have a member save the order
-                        if (currentShoppingCart.CartMember?.Id > 0)
+                        var paymentIntentService = new PaymentIntentService();
+                        var paymentIntent = paymentIntentService.Get(cartSessionPaymentIntentId);
+                        if (paymentIntent?.Status == "succeeded")
                         {
-                            var memberOrder = CreateMemberOrderPage(
-                                _globalOrdersPage,
-                                currentShoppingCart.CartMember,
-                                currentShoppingCart.SystemOrderId,
-                                //paymentIntent.Id,
-                                currentShoppingCart,
-                                "Stripe");
-
-                            //create the member order page first
-                            if (memberOrder?.Id > 0)
+                            //if we have a member save the order
+                            if (currentShoppingCart.CartMember?.Id > 0)
                             {
-
-                                //create the user email
-                                var customerEmailBody = CustomerEmailBody(
-                                    currentShoppingCart,
+                                var memberOrder = CreateMemberOrderPage(
+                                    _globalOrdersPage,
+                                    currentShoppingCart.CartMember,
                                     currentShoppingCart.SystemOrderId,
                                     //paymentIntent.Id,
-                                    currentShoppingCart.CartMembersModel.FullName);
+                                    currentShoppingCart,
+                                    "Stripe");
 
-                                if (!string.IsNullOrWhiteSpace(customerEmailBody?.ToString()))
+                                //create the member order page first
+                                if (memberOrder?.Id > 0)
                                 {
-                                    //create the customer email
-                                    var customerEmailAddress = new EmailAddress(currentShoppingCart.CartMember.Email, currentShoppingCart.CartMembersModel.FullName);
 
-                                    var customerSubject = "Your Order on Natures Quest.";
-
-                                    //create the global emails
-                                    var customerMessage = MailHelper.CreateSingleEmail(
-                                        _fromEmailAddress,
-                                        customerEmailAddress,
-                                        customerSubject,
-                                        "",
-                                        customerEmailBody.ToString());
-                                    //send the global email
-                                    var unused3 = SendGridEmail(customerMessage, true, true);
-                                }
-
-                                //clear the cart once we have the member order
-                                var cartCleared = ClearShoppingCart(currentShoppingCart, out _);
-                                if (cartCleared)
-                                {
-                                    orderPlaced = true;
-                                    resultMessage = "Your Order has been placed and saved in your account";
-                                }
-                            }
-                        }
-                        //its an anonymous cart
-                        else
-                        {
-                            //get the default values to use
-                            var shippingDetails = currentShoppingCart.CartShippingDetails;
-
-                            //check if we already have a registered member from the cart shipping email used
-                            var anonymousMember = _siteMembersService.GetMemberByEmail(shippingDetails.ShippingEmail);
-                            //if we don't have an existing one then create a new one
-                            if (anonymousMember == null)
-                            {
-                                //update the anonymous member model to use
-                                var anonymousMemberModel = currentShoppingCart.CartMembersModel;
-                                anonymousMemberModel.Email = shippingDetails.ShippingEmail;
-                                anonymousMemberModel.FullName = shippingDetails.ShippingFullname;
-                                anonymousMemberModel.MobileNumber = shippingDetails.ShippingMobileNumber;
-                                anonymousMemberModel.HouseAddress = shippingDetails.ShippingAddress;
-                                anonymousMemberModel.Suburb = shippingDetails.ShippingSuburb;
-                                anonymousMemberModel.PostCode = shippingDetails.ShippingPostCode;
-                                anonymousMemberModel.State = shippingDetails.ShippingState;
-
-                                //create a default member account here for the anonymous user
-                                var newMember = _siteMembersService.RegisterSiteMember(anonymousMemberModel,
-                                    out MembershipCreateStatus createStatus);
-                                if (newMember != null && createStatus == MembershipCreateStatus.Success)
-                                {
-                                    anonymousMember = newMember.LoggedInMember;
-                                }
-                            }
-
-                            //we should have a new anonymous member by now
-                            if (anonymousMember != null)
-                            {
-                                //create the cart page for the user
-                                var newCartPage = CreateMemberCartPage(_globalCartsPage, anonymousMember);
-
-                                // if the new cart page is not null create the session with that and return it
-                                if (newCartPage != null && newCartPage.Id != 0)
-                                {
-                                    //save the cart member and member cart page to the current cart
-                                    currentShoppingCart.CartMember = anonymousMember;
-                                    currentShoppingCart.MemberCartPage = newCartPage;
-                                }
-
-                                //update the saved cart
-                                var cartUpdated = false;
-                                //update the saved cart
-                                if (currentShoppingCart.CartItems.Any())
-                                {
-                                    foreach (var cartItem in currentShoppingCart.CartItems)
-                                    {
-                                        //get the price product page
-                                        var priceProduct = _umbracoHelper.Content(cartItem.CartItemPageId);
-                                        if (priceProduct != null)
-                                        {
-                                            cartUpdated = UpdateMemberSavedCart(
-                                                currentShoppingCart,
-                                                priceProduct,
-                                                true,
-                                                out _);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    cartUpdated = true;
-                                }
-
-                                //check if the cart has been updated
-                                if (cartUpdated)
-                                {
-                                    var anonymousMemberOrder = CreateMemberOrderPage(
-                                        _globalOrdersPage,
-                                        anonymousMember,
+                                    //create the user email
+                                    var customerEmailBody = CustomerEmailBody(
+                                        currentShoppingCart,
                                         currentShoppingCart.SystemOrderId,
                                         //paymentIntent.Id,
-                                        currentShoppingCart,
-                                        "Stripe");
+                                        currentShoppingCart.CartMembersModel.FullName);
 
-                                    //create the member order page first
-                                    if (anonymousMemberOrder?.Id > 0)
+                                    if (!string.IsNullOrWhiteSpace(customerEmailBody?.ToString()))
                                     {
-                                        //create the user email
-                                        var customerEmailBody = CustomerEmailBody(
-                                            currentShoppingCart,
+                                        //create the customer email
+                                        var customerEmailAddress = new EmailAddress(currentShoppingCart.CartMember.Email, currentShoppingCart.CartMembersModel.FullName);
+
+                                        var customerSubject = "Your Order on Natures Quest.";
+
+                                        //create the global emails
+                                        var customerMessage = MailHelper.CreateSingleEmail(
+                                            _fromEmailAddress,
+                                            customerEmailAddress,
+                                            customerSubject,
+                                            "",
+                                            customerEmailBody.ToString());
+                                        //send the global email
+                                        var unused3 = SendGridEmail(customerMessage, true, true);
+                                    }
+
+                                    //clear the cart once we have the member order
+                                    var cartCleared = ClearShoppingCart(currentShoppingCart, out _);
+                                    if (cartCleared)
+                                    {
+                                        orderPlaced = true;
+                                        resultMessage = "Your Order has been placed and saved in your account";
+                                    }
+                                }
+                            }
+                            //its an anonymous cart
+                            else
+                            {
+                                //get the default values to use
+                                var shippingDetails = currentShoppingCart.CartShippingDetails;
+
+                                //check if we already have a registered member from the cart shipping email used
+                                var anonymousMember = _siteMembersService.GetMemberByEmail(shippingDetails.ShippingEmail.Trim());
+                                //if we don't have an existing one then create a new one
+                                if (anonymousMember == null)
+                                {
+                                    //update the anonymous member model to use
+                                    var anonymousMemberModel = currentShoppingCart.CartMembersModel;
+                                    anonymousMemberModel.Email = shippingDetails.ShippingEmail.Trim();
+                                    anonymousMemberModel.FullName = shippingDetails.ShippingFullname.Trim();
+                                    anonymousMemberModel.MobileNumber = shippingDetails.ShippingMobileNumber.Trim();
+                                    anonymousMemberModel.HouseAddress = shippingDetails.ShippingAddress.Trim();
+                                    anonymousMemberModel.Suburb = shippingDetails.ShippingSuburb.Trim();
+                                    anonymousMemberModel.PostCode = shippingDetails.ShippingPostCode.Trim();
+                                    anonymousMemberModel.State = shippingDetails.ShippingState.Trim();
+
+                                    //create a default member account here for the anonymous user
+                                    var newMember = _siteMembersService.RegisterSiteMember(anonymousMemberModel,
+                                        out MembershipCreateStatus createStatus);
+                                    if (newMember != null && createStatus == MembershipCreateStatus.Success)
+                                    {
+                                        anonymousMember = newMember.LoggedInMember;
+                                    }
+                                }
+
+                                //we should have a new anonymous member by now
+                                if (anonymousMember != null)
+                                {
+                                    //create the cart page for the user
+                                    var newCartPage = CreateMemberCartPage(_globalCartsPage, anonymousMember);
+
+                                    // if the new cart page is not null create the session with that and return it
+                                    if (newCartPage != null && newCartPage.Id != 0)
+                                    {
+                                        //save the cart member and member cart page to the current cart
+                                        currentShoppingCart.CartMember = anonymousMember;
+                                        currentShoppingCart.MemberCartPage = newCartPage;
+                                    }
+
+                                    //update the saved cart
+                                    var cartUpdated = false;
+                                    //update the saved cart
+                                    if (currentShoppingCart.CartItems.Any())
+                                    {
+                                        foreach (var cartItem in currentShoppingCart.CartItems)
+                                        {
+                                            //get the price product page
+                                            var priceProduct = _umbracoHelper.Content(cartItem.CartItemPageId);
+                                            if (priceProduct != null)
+                                            {
+                                                cartUpdated = UpdateMemberSavedCart(
+                                                    currentShoppingCart,
+                                                    priceProduct,
+                                                    true,
+                                                    out _);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        cartUpdated = true;
+                                    }
+
+                                    //check if the cart has been updated
+                                    if (cartUpdated)
+                                    {
+                                        var anonymousMemberOrder = CreateMemberOrderPage(
+                                            _globalOrdersPage,
+                                            anonymousMember,
                                             currentShoppingCart.SystemOrderId,
                                             //paymentIntent.Id,
-                                            shippingDetails.ShippingFullname);
+                                            currentShoppingCart,
+                                            "Stripe");
 
-                                        if (!string.IsNullOrWhiteSpace(customerEmailBody?.ToString()))
+                                        //create the member order page first
+                                        if (anonymousMemberOrder?.Id > 0)
                                         {
-                                            //create the customer email
-                                            var customerEmailAddress = new EmailAddress(
-                                                shippingDetails.ShippingEmail,
+                                            //create the user email
+                                            var customerEmailBody = CustomerEmailBody(
+                                                currentShoppingCart,
+                                                currentShoppingCart.SystemOrderId,
+                                                //paymentIntent.Id,
                                                 shippingDetails.ShippingFullname);
 
-                                            var customerSubject = "Your Order on Natures Quest.";
+                                            if (!string.IsNullOrWhiteSpace(customerEmailBody?.ToString()))
+                                            {
+                                                //create the customer email
+                                                var customerEmailAddress = new EmailAddress(
+                                                    shippingDetails.ShippingEmail.Trim(),
+                                                    shippingDetails.ShippingFullname.Trim());
 
-                                            //create the global emails
-                                            var customerMessage = MailHelper.CreateSingleEmail(
-                                                _fromEmailAddress,
-                                                customerEmailAddress,
-                                                customerSubject,
-                                                "",
-                                                customerEmailBody.ToString());
-                                            //send the global email
-                                            var unused3 = SendGridEmail(customerMessage, true, true);
-                                        }
+                                                var customerSubject = "Your Order on Natures Quest.";
 
-                                        //clear the cart once we have the member order
-                                        var cartCleared = ClearShoppingCart(currentShoppingCart, out _);
-                                        if (cartCleared)
-                                        {
-                                            orderPlaced = true;
-                                            resultMessage = "Your Order has been placed and saved in your account";
+                                                //create the global emails
+                                                var customerMessage = MailHelper.CreateSingleEmail(
+                                                    _fromEmailAddress,
+                                                    customerEmailAddress,
+                                                    customerSubject,
+                                                    "",
+                                                    customerEmailBody.ToString());
+                                                //send the global email
+                                                var unused3 = SendGridEmail(customerMessage, true, true);
+                                            }
+
+                                            //clear the cart once we have the member order
+                                            var cartCleared = ClearShoppingCart(currentShoppingCart, out _);
+                                            if (cartCleared)
+                                            {
+                                                orderPlaced = true;
+                                                resultMessage = "Your Order has been placed and saved in your account";
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
 
-                        //fill in the order details to return to the view page
-                        stripeOrderDetails.OrderId = cartSessionPaymentIntentId;
-                        stripeOrderDetails.OrderProcessedMessage = resultMessage;
-                        stripeOrderDetails.OrderPaidSuccess = orderPlaced;
+                            //fill in the order details to return to the view page
+                            stripeOrderDetails.OrderId = cartSessionPaymentIntentId;
+                            stripeOrderDetails.OrderProcessedMessage = resultMessage;
+                            stripeOrderDetails.OrderPaidSuccess = orderPlaced;
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                //there was an error getting member details 
+                _logger.Error(Type.GetType("ShoppingService > PlaceStripeCartOrder"), ex, "Error placing stripe order.");
+                //send an admin email with the error
+                var errorMessage =
+                    $"Error placing stripe order.<br /><br />{ex.Message}<br /><br />{ex.StackTrace}<br /><br />{ex.InnerException}";
+                var errorSubject = $"Error placing stripe order {_siteName}";
+
+                //system email
+                var systemMessage = MailHelper.CreateSingleEmail(
+                    _fromEmailAddress,
+                    _systemEmailAddress,
+                    errorSubject,
+                    "",
+                    errorMessage);
+                var unused = SendGridEmail(systemMessage);
             }
 
             //return the result
@@ -2320,11 +2375,8 @@ namespace NatureQuestWebsite.Services
                             orderId = siteOrder.GetProperty("orderId").Value().ToString();
                         }
                         //get the payment intent matching the site order
-                        var siteOrderIntent = memberStripePayments.FirstOrDefault(payment => payment.Id == orderPaymentIntentId);
-                        if (siteOrderIntent == null)
-                        {
-                            siteOrderIntent = memberStripePayments.FirstOrDefault(payment => payment.Id == orderId);
-                        }
+                        var siteOrderIntent = memberStripePayments.FirstOrDefault(payment => payment.Id == orderPaymentIntentId) ??
+                                                        memberStripePayments.FirstOrDefault(payment => payment.Id == orderId);
 
                         //check if we have the intent id and payment intent to match
                         if (siteOrder != null)
@@ -2357,6 +2409,13 @@ namespace NatureQuestWebsite.Services
                                 modelOrderDetails.OrderCompleted = siteOrder.Value<bool>("isOrderComplete");
                             }
 
+                            //get the saved order invoice status
+                            if (siteOrder.HasProperty("invoicePrinted") && siteOrder.HasValue("invoicePrinted"))
+                            {
+                                // set the page title to override the default
+                                modelOrderDetails.InvoicePrinted = siteOrder.Value<bool>("invoicePrinted");
+                            }
+
                             //get the payment intent shipping details
                             var stripeShippingDetails = siteOrderIntent?.Shipping;
                             if (!string.IsNullOrWhiteSpace(stripeShippingDetails?.TrackingNumber))
@@ -2375,10 +2434,32 @@ namespace NatureQuestWebsite.Services
                                 modelOrderDetails.OrderShippingDetails = modelShipping;
                             }
 
+
+                            //get the saved order html 
+                            if (siteOrder.HasProperty("orderSummary") && siteOrder.HasValue("orderSummary"))
+                            {
+                                // save the html on the order details
+                                var orderEmailHtml = CustomerEmailBody(null, orderId, stripeShippingDetails?.Name);
+                                var orderCartSummary = siteOrder.Value<string>("orderSummary");
+                                modelOrderDetails.OrderInvoiceHtml =
+                                    orderEmailHtml.ToString().Replace("**Cart-Summary**", orderCartSummary);
+                            }
+
                             //set the site order page id
                             modelOrderDetails.SiteOrderPage = siteOrder;
                             //get the stripe payment date
-                            modelOrderDetails.OrderCreatedDate = siteOrderIntent?.Created ?? siteOrder.CreateDate;
+                            var orderDisplayedDate = siteOrder.CreateDate;
+                            var ausTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("AUS Eastern Standard Time");
+                            if (ausTimeZoneInfo != null)
+                            {
+                                var localAusDate = TimeZoneInfo.ConvertTime(orderDisplayedDate, ausTimeZoneInfo);
+                                modelOrderDetails.OrderCreatedDate = localAusDate;
+                            }
+                            else
+                            {
+                                modelOrderDetails.OrderCreatedDate = orderDisplayedDate;
+                            }
+
                             //get the order total
                             if (siteOrderIntent?.Amount != null)
                             {
@@ -2402,83 +2483,93 @@ namespace NatureQuestWebsite.Services
             return membersModel;
         }
 
-        /// <summary>
-        /// get the admin model orders
-        /// </summary>
-        /// <param name="membersModel"></param>
-        /// <returns></returns>
-        public MembersModel GetAdminOrderDetails(MembersModel membersModel)
-        {
-            //check if we have a member email to use and if they are an admin user
-            if (!string.IsNullOrWhiteSpace(membersModel.LoggedInMember?.Email) && membersModel.IsAdminUser)
-            {
-                //get the model member
-                var modelMember = membersModel.LoggedInMember;
-                //add the current cart for use later
-                membersModel.MemberCart = GetCurrentCart(modelMember.Email);
-                //get the user's stripe payment intents for the orders
-                var memberStripePayments = GetStripePaidIntents();
+        ///// <summary>
+        ///// get the admin model orders
+        ///// </summary>
+        ///// <param name="membersModel"></param>
+        ///// <returns></returns>
+        //public MembersModel GetAdminOrderDetails(MembersModel membersModel)
+        //{
+        //    //check if we have a member email to use and if they are an admin user
+        //    if (!string.IsNullOrWhiteSpace(membersModel.LoggedInMember?.Email) && membersModel.IsAdminUser)
+        //    {
+        //        //get the model member
+        //        var modelMember = membersModel.LoggedInMember;
+        //        //add the current cart for use later
+        //        membersModel.MemberCart = GetCurrentCart(modelMember.Email);
+        //        //get the user's stripe payment intents for the orders
+        //        var memberStripePayments = GetStripePaidIntents();
 
-                //create the order models from the stripe payments list
-                if (memberStripePayments.Any())
-                {
-                    //go through each of the site orders 
-                    foreach (var stripePaymentIntent in memberStripePayments)
-                    {
-                        var orderPaymentIntentId = stripePaymentIntent.Id;
+        //        //create the order models from the stripe payments list
+        //        if (memberStripePayments.Any())
+        //        {
+        //            //go through each of the site orders 
+        //            foreach (var stripePaymentIntent in memberStripePayments)
+        //            {
+        //                var orderPaymentIntentId = stripePaymentIntent.Id;
 
-                        var modelOrderDetails = new OrderDetails
-                        {
-                            OrderId = orderPaymentIntentId,
-                            OrderPaidSuccess = true,
-                            OrderPaymentIntent = stripePaymentIntent
-                        };
+        //                var modelOrderDetails = new OrderDetails
+        //                {
+        //                    OrderId = orderPaymentIntentId,
+        //                    OrderPaidSuccess = true,
+        //                    OrderPaymentIntent = stripePaymentIntent
+        //                };
 
-                        //get the payment intent shipping details
-                        var stripeShippingDetails = stripePaymentIntent.Shipping;
-                        if (!string.IsNullOrWhiteSpace(stripeShippingDetails?.TrackingNumber))
-                        {
-                            var modelShipping = new ShippingDetails
-                            {
-                                ShippingTrackingNumber = stripeShippingDetails.TrackingNumber,
-                                ShippingMobileNumber = stripeShippingDetails.Address.Line2,
-                                ShippingFullname = stripeShippingDetails.Name,
-                                ShippingAddress = stripeShippingDetails.Address.Line1,
-                                ShippingSuburb = stripeShippingDetails.Address.City,
-                                ShippingPostCode = stripeShippingDetails.Address.PostalCode,
-                                ShippingState = stripeShippingDetails.Address.State
-                            };
-                            //add it to the model
-                            modelOrderDetails.OrderShippingDetails = modelShipping;
-                        }
+        //                //get the payment intent shipping details
+        //                var stripeShippingDetails = stripePaymentIntent.Shipping;
+        //                if (!string.IsNullOrWhiteSpace(stripeShippingDetails?.TrackingNumber))
+        //                {
+        //                    var modelShipping = new ShippingDetails
+        //                    {
+        //                        ShippingTrackingNumber = stripeShippingDetails.TrackingNumber,
+        //                        ShippingMobileNumber = stripeShippingDetails.Address.Line2,
+        //                        ShippingFullname = stripeShippingDetails.Name,
+        //                        ShippingAddress = stripeShippingDetails.Address.Line1,
+        //                        ShippingSuburb = stripeShippingDetails.Address.City,
+        //                        ShippingPostCode = stripeShippingDetails.Address.PostalCode,
+        //                        ShippingState = stripeShippingDetails.Address.State
+        //                    };
+        //                    //add it to the model
+        //                    modelOrderDetails.OrderShippingDetails = modelShipping;
+        //                }
 
-                        //get the stripe payment date
-                        if (stripePaymentIntent.Created.HasValue)
-                        {
-                            modelOrderDetails.OrderCreatedDate = stripePaymentIntent.Created.Value;
-                        }
+        //                //get the stripe payment date
+        //                if (stripePaymentIntent.Created.HasValue)
+        //                {
+        //                    var orderDisplayedDate = stripePaymentIntent.Created.Value;
+        //                    var ausTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("AUS Eastern Standard Time");
+        //                    if (ausTimeZoneInfo != null)
+        //                    {
+        //                        TimeZoneInfo.ConvertTimeFromUtc(orderDisplayedDate, ausTimeZoneInfo);
+        //                    }
+        //                    modelOrderDetails.OrderCreatedDate = orderDisplayedDate;
+        //                }
 
-                        //get the order total
-                        if (stripePaymentIntent.Amount != null)
-                        {
-                            modelOrderDetails.OrderTotal = Convert.ToDecimal(stripePaymentIntent.Amount) / Convert.ToDecimal(100);
-                        }
+        //                //get the order total
+        //                if (stripePaymentIntent.Amount != null)
+        //                {
+        //                    modelOrderDetails.OrderTotal = Convert.ToDecimal(stripePaymentIntent.Amount) / Convert.ToDecimal(100);
+        //                }
 
-                        //finally add the order details to the model list
-                        membersModel.AdminOrderDetailsList.Add(modelOrderDetails);
-                    }
-                }
-            }
-            //return the model
-            return membersModel;
-        }
+        //                //add the invoice html for the order
+        //                //modelOrderDetails.OrderInvoiceHtml = 
+
+        //                //finally add the order details to the model list
+        //                membersModel.AdminOrderDetailsList.Add(modelOrderDetails);
+        //            }
+        //        }
+        //    }
+        //    //return the model
+        //    return membersModel;
+        //}
 
         /// <summary>
         /// Get the stripe list of paid payment intents, with optional customer emails
         /// </summary>
         /// <param name="emailAddress"></param>
+        /// <param name="orderPaymentIntentId"></param>
         /// <returns></returns>
-        public List<PaymentIntent> GetStripePaidIntents(string emailAddress = null)
+        public List<PaymentIntent> GetStripePaidIntents(string emailAddress = null, string orderPaymentIntentId = null)
         {
             //get the stripe api key to use
             StripeConfiguration.ApiKey = StripeLiveMode
@@ -2520,6 +2611,14 @@ namespace NatureQuestWebsite.Services
             var paymentIntents = paymentIntentService.List(paymentOptions).Data.
                                                                                     Where(paymentIntent => paymentIntent.Status == "succeeded").
                                                                                     ToList();
+
+            //if we have a payment intent id to filter with filter the list here
+            if (!string.IsNullOrWhiteSpace(orderPaymentIntentId))
+            {
+                paymentIntents = paymentIntents.
+                    Where(paymentIntent => paymentIntent.Id == orderPaymentIntentId)
+                    .ToList();
+            }
 
             //if we have any payment intents save these
             if (paymentIntents.Any())
@@ -2956,12 +3055,6 @@ namespace NatureQuestWebsite.Services
             string orderNumber,
             string customerName)
         {
-            //check the current cart has got items
-            if (currentShoppingCart?.CartItems.Any() == false)
-            {
-                return null;
-            }
-
             //create the string builder
             var emailBodyString = new StringBuilder();
 
@@ -3007,6 +3100,11 @@ namespace NatureQuestWebsite.Services
             if (currentShoppingCart != null)
             {
                 emailBodyString = CartSummaryHtml(currentShoppingCart, emailBodyString);
+            }
+            //add the text to replace the cart summary with
+            else
+            {
+                emailBodyString.Append("**Cart-Summary**");
             }
             //close the email wrapper
             emailBodyString.Append("</tr></td></table></center>");

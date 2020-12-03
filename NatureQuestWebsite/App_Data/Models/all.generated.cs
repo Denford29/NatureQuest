@@ -8,7 +8,7 @@ using  Umbraco.Web;
 using  Umbraco.ModelsBuilder;
 using  Umbraco.ModelsBuilder.Umbraco;
 [assembly: PureLiveAssembly]
-[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "78ac3b9814f3a842")]
+[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = "b2be5875cc1ae221")]
 [assembly:System.Reflection.AssemblyVersion("0.0.0.1")]
 
 
@@ -1858,6 +1858,13 @@ namespace Umbraco.Web.PublishedModels
 		{ }
 
 		// properties
+
+		///<summary>
+		/// Invoice Printed: Set to true if the orders invoice has been printed
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder", "8.0.4")]
+		[ImplementPropertyType("invoicePrinted")]
+		public bool InvoicePrinted => this.Value<bool>("invoicePrinted");
 
 		///<summary>
 		/// Is Order Paid: Indicates if the order is paid.
